@@ -7,9 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Klasse som viser en oversikt over ansatte.
+ *
+ * @author Terje Berg-Hansen
+ * @version 0.0.1
+ */
 @Controller
 public class Ansatte {
-
 
 
     @RequestMapping(value = "/ansatte")

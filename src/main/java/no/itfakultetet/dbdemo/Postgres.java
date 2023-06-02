@@ -7,6 +7,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  Klasse som kobler til Postgres og lager resultatsett og header og content til tabeller i Thymeleaf.
+ *
+ *  @author Terje Berg-Hansen
+ */
 public class Postgres {
 
     public Postgres(String query) {
