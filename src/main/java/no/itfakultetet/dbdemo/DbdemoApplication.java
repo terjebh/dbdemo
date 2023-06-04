@@ -10,7 +10,6 @@ public class DbdemoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DbdemoApplication.class, args);
-
         @Controller
         class WebController {
             @RequestMapping(value = "/index")
