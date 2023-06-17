@@ -1,8 +1,8 @@
 package no.itfakultetet.dbdemo;
 
-import com.zaxxer.hikari.pool.HikariProxyResultSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.sql.RowSet;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.List;
  *  @author Terje Berg-Hansen
  */
 public class Postgres {
+    private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
 
     public Postgres(String query) {
 
@@ -31,6 +32,7 @@ public class Postgres {
         } catch (SQLException e) {
             //throw new RuntimeException(e);
             System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
+            logger.error("Noe gikk galt: Feilkode:" + e.getErrorCode() + "Feilmelding: " + e.getMessage());
         }
         return rs;
     }
