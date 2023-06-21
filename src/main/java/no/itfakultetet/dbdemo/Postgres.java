@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Klasse som kobler til Postgres og lager resultatsett og header og content til tabeller i Thymeleaf.
+ * Klasse som kobler til Postgres og lager resultatsett og header og content til tabeller i Thymeleaf.
  *
- *  @author Terje Berg-Hansen
+ * @author Terje Berg-Hansen
  */
 public class Postgres {
     private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
@@ -31,7 +31,7 @@ public class Postgres {
 
         } catch (SQLException e) {
             //throw new RuntimeException(e);
-            System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
+            // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
             logger.error("Noe gikk galt: Feilkode:" + e.getErrorCode() + "Feilmelding: " + e.getMessage());
         }
         return rs;
@@ -57,10 +57,10 @@ public class Postgres {
         List<List<String>> tabell = new ArrayList<>();
 
 
-        while(resultSet.next()) {
+        while (resultSet.next()) {
             List<String> rad = new ArrayList<>();
             for (int i = 1; i <= numberOfColumns; i++) {
-                 rad.add(resultSet.getString(i));
+                rad.add(resultSet.getString(i));
             }
 
             tabell.add(rad);
