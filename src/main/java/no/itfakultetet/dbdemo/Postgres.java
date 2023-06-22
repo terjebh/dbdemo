@@ -15,11 +15,6 @@ import java.util.List;
 public class Postgres {
     private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
 
-    public Postgres(String query) {
-
-
-    }
-
     public static ResultSet createResultset(String query) {
         String url = "jdbc:postgresql://noderia.com/hr?user=kurs&password=kurs123&ssl=false";
         ResultSet rs = null;
@@ -47,7 +42,6 @@ public class Postgres {
         }
         return header;
     }
-
 
     public static List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
 
