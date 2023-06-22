@@ -12,6 +12,14 @@ a {
   color: navy;
 }
 
+#input {
+float: left;
+}
+
+#info {
+float: right;
+}
+
 table {
   margin-top: 20px;
   border: solid 1px #333;

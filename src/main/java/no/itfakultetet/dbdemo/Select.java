@@ -11,9 +11,7 @@ import java.sql.SQLException;
 public class Select {
 
     @GetMapping(value = "/select")
-
     public String hentSql() {
-
         return "select";
     }
 
