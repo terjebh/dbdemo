@@ -9,7 +9,7 @@
 </head>
 </head>
 <body>
-<div th:replace="meny :: meny"> </div>
+<div th:replace="~{meny :: meny}"> </div>
 <main>
 <h1>DBApp   <button class="btn btn-primary" onclick="document.location.href='/select'">Ny SQL</button> </h1>
 <h4><th:block th:text="${query}" /></h4>
