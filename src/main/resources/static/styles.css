@@ -46,3 +46,9 @@ td {
   color: white;
   padding:5px;
 }
+
+#selectDB {
+height: 30px;
+font-size: 18px;
+vertically-align: baseline;
+}
