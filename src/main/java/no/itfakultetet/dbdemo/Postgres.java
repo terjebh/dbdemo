@@ -67,7 +67,7 @@ public class Postgres {
         while (resultSet.next()) {
             dbList.add(resultSet.getString(1));
         }
-            return dbList;
+            return dbList.stream().sorted().toList();
     }
 
 // get list of tables
