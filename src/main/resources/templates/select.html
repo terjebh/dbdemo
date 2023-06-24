@@ -14,7 +14,7 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <h1>DBApp
+    <h1><span id="dbHead">DBApp</span>
         <select id="selectDB">
             <option>Velg Database</option>
             <div th:each="db : ${dbList}">
@@ -51,6 +51,8 @@
         </ul>
     </div>
 </main>
-
+<script>
+    document.getElementById("query").focus();
+</script>
 </body>
 </html>

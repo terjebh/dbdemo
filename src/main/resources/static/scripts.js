@@ -15,3 +15,7 @@ if (document.getElementById("query").value=="") {
 }
 }
 });
+
+document.getElementById("selectDB").addEventListener("change", function () {
+  document.getElementById("dbHead").innerHTML="DB: "+document.getElementById("selectDB").value;
+});
