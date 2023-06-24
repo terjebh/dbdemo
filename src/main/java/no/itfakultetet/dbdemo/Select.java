@@ -11,7 +11,14 @@ import java.sql.SQLException;
 public class Select {
 
     @GetMapping(value = "/select")
-    public String hentSql() {
+    public String hentSql(Model model) {
+        String query = "select datname from pg_database";
+
+        try ( ResultSet resultSet = Postgres.createResultset(query)) {
+            model.addAttribute("dbList", Postgres.createDbList(resultSet));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return "select";
     }
 
@@ -23,7 +30,7 @@ public class Select {
         try {
             model.addAttribute("tableHeader", Postgres.createHeader(resultSet));
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
-            model.addAttribute("query",query);
+            model.addAttribute("query", query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

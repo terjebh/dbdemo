@@ -3,41 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Ansatte</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="/styles.css"/>
     <script src="/scripts.js" defer></script>
 </head>
 <body>
-<div th:replace="~{meny :: meny}"> </div>
+<div th:replace="~{meny :: meny}"></div>
 <main>
-<h1>DBApp  <select id="selectDB"><option>Velg Database</option></select></h1>
+    <h1>DBApp
+        <select id="selectDB">
+            <option>Velg Database</option>
+            <div th:each="db : ${dbList}">
+                <option>
+                    <th:block th:text="${db}"/>
+                </option>
+            </div>
+        </select></h1>
 
-<div id="input">Skriv Select-setning:
-    <form id="sql" method="post" action="/select">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
-    </form>
-        <br><button class="btn btn-success" style="margin-top:5px;" id="hent">Hent data</button>
+    <div id="input">Skriv Select-setning:
+        <form id="sql" method="post" action="/select">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
+        </form>
+        <br>
+        <button class="btn btn-success" style="margin-top:5px;" id="hent">Hent data</button>
 
-</div>
+    </div>
     <p></p>
-<div id="info">
-    <h4>Tabeller i databasen</h4>
-    <ul>
-       <li>departments (9 rader)</li>
-        <li>dept_emp (331 603 rader)</li>
-        <li>dept_manager (24 rader)(</li>
-        <li>employees (300 024 rader)</li>
-        <li>titles (443 308 rader)</li>
-        <li>salaries (2 844 047 rader)</li>
-    </ul>
-    <h4>Views i databasen</h4>
-<ul>
-    <li>avdelingsoversikt (9 rader)</li>
-    <li>ansattoversikt (300 024 rader)</li>
-</ul>
-</div>
+    <div id="info">
+        <h4>Tabeller i databasen</h4>
+        <ul>
+            <li>departments (9 rader)</li>
+            <li>dept_emp (331 603 rader)</li>
+            <li>dept_manager (24 rader)(</li>
+            <li>employees (300 024 rader)</li>
+            <li>titles (443 308 rader)</li>
+            <li>salaries (2 844 047 rader)</li>
+        </ul>
+        <h4>Views i databasen</h4>
+        <ul>
+            <li>avdelingsoversikt (9 rader)</li>
+            <li>ansattoversikt (300 024 rader)</li>
+        </ul>
+    </div>
 </main>
 
 </body>

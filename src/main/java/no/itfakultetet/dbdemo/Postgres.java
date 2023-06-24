@@ -51,20 +51,22 @@ public class Postgres {
 
         List<List<String>> tabell = new ArrayList<>();
 
-
         while (resultSet.next()) {
             List<String> rad = new ArrayList<>();
             for (int i = 1; i <= numberOfColumns; i++) {
                 rad.add(resultSet.getString(i));
             }
-
             tabell.add(rad);
-
-
         }
-
-
         return tabell;
     }
 
+    public static List<String> createDbList(ResultSet resultSet)  throws SQLException{
+        List<String> dbList = new ArrayList<>();
+
+        while (resultSet.next()) {
+            dbList.add(resultSet.getString(1));
+        }
+            return dbList;
+    }
 }

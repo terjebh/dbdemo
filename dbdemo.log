@@ -1,615 +1,69 @@
-2023-06-16T23:22:43.326+02:00  INFO 143943 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 19 with PID 143943 (/home/terje/utvikling2/java/dbdemo/target/classes started by terje in /home/terje/utvikling2/java/dbdemo)
-2023-06-16T23:22:43.334+02:00  INFO 143943 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-16T23:22:43.393+02:00  INFO 143943 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in /home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-16T23:22:43.394+02:00  INFO 143943 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-16T23:22:43.394+02:00  INFO 143943 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-16T23:22:44.687+02:00  INFO 143943 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-16T23:22:44.688+02:00  INFO 143943 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : An older version [1.2.36] of the Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [2.0.1]
-2023-06-16T23:22:44.688+02:00  INFO 143943 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [1.2.36] using APR version [1.7.2].
-2023-06-16T23:22:44.692+02:00  INFO 143943 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
-2023-06-16T23:22:44.700+02:00  INFO 143943 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-16T23:22:44.700+02:00  INFO 143943 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-16T23:22:44.738+02:00  INFO 143943 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-16T23:22:44.738+02:00  INFO 143943 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1343 ms
-2023-06-16T23:22:45.078+02:00  INFO 143943 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-16T23:22:45.489+02:00  INFO 143943 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@63257c1f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@60bfb442, org.springframework.security.web.context.SecurityContextHolderFilter@6e603514, org.springframework.security.web.header.HeaderWriterFilter@3d37ef71, org.springframework.security.web.csrf.CsrfFilter@2d759bc4, org.springframework.security.web.authentication.logout.LogoutFilter@10f6b5b1, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@2d9c2224, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@3f73c449, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@2858f114, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@30766df4, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@45cf5751, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@504654fe, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@504ecb4a, org.springframework.security.web.access.ExceptionTranslationFilter@7a20dfb3, org.springframework.security.web.access.intercept.AuthorizationFilter@6c2659f4]
-2023-06-16T23:22:45.552+02:00  INFO 143943 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-16T23:22:45.581+02:00  INFO 143943 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-16T23:22:45.593+02:00  INFO 143943 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 2.737 seconds (process running for 3.356)
-2023-06-16T23:23:00.390+02:00  INFO 143943 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-16T23:23:00.390+02:00  INFO 143943 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-16T23:23:00.391+02:00  INFO 143943 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-16T23:23:08.740+02:00  WARN 143943 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:23:13.342+02:00  WARN 143943 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:23:37.026+02:00  WARN 143943 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:23:42.730+02:00  WARN 143943 --- [http-nio-8080-exec-3] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-3][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:23:53.826+02:00  WARN 143943 --- [http-nio-8080-exec-6] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-6][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:03.864+02:00  WARN 143943 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:17.139+02:00  WARN 143943 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:23.248+02:00  WARN 143943 --- [http-nio-8080-exec-3] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-3][ansatte] Deprecated unwrapped fragment expression "meny :: meny" found in template ansatte, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:31.190+02:00  WARN 143943 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:49.782+02:00  WARN 143943 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:24:59.395+02:00  WARN 143943 --- [http-nio-8080-exec-10] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-10][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:25:05.858+02:00  WARN 143943 --- [http-nio-8080-exec-7] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-7][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:25:08.426+02:00  WARN 143943 --- [http-nio-8080-exec-10] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-10][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:25:19.361+02:00  WARN 143943 --- [http-nio-8080-exec-2] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-2][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:25:38.231+02:00 ERROR 143943 --- [http-nio-8080-exec-5] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null] with root cause
+2023-06-24T21:22:00.936+02:00  WARN 14748 --- [PostgreSQL-JDBC-Cleaner] org.postgresql.util.LazyCleaner          : Unexpected exception while executing onClean
 
-java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null
-	at no.itfakultetet.dbdemo.Postgres.createHeader(Postgres.java:40) ~[classes/:na]
-	at no.itfakultetet.dbdemo.Select.hentData(Select.java:26) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:578) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:170) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:188) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:174) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:131) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at java.base/java.lang.Thread.run(Thread.java:1589) ~[na:na]
+java.net.SocketException: Connection reset by peer
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:413) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:433) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:812) ~[na:na]
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1120) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:125) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.implFlush(BufferedOutputStream.java:252) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:240) ~[na:na]
+	at org.postgresql.core.PGStream.flush(PGStream.java:721) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.core.QueryExecutorCloseAction.close(QueryExecutorCloseAction.java:71) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.jdbc.PgConnectionCleaningAction.onClean(PgConnectionCleaningAction.java:89) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$Node.onClean(LazyCleaner.java:218) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$1.run(LazyCleaner.java:136) ~[postgresql-42.6.0.jar:42.6.0]
+	at java.base/java.lang.Thread.run(Thread.java:1623) ~[na:na]
 
-2023-06-16T23:25:47.331+02:00  WARN 143943 --- [http-nio-8080-exec-6] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-6][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:25:54.543+02:00 ERROR 143943 --- [http-nio-8080-exec-9] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null] with root cause
+2023-06-24T21:22:01.576+02:00  WARN 14748 --- [PostgreSQL-JDBC-Cleaner] org.postgresql.util.LazyCleaner          : Unexpected exception while executing onClean
 
-java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null
-	at no.itfakultetet.dbdemo.Postgres.createHeader(Postgres.java:40) ~[classes/:na]
-	at no.itfakultetet.dbdemo.Select.hentData(Select.java:26) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:578) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:170) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:188) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:174) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:131) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at java.base/java.lang.Thread.run(Thread.java:1589) ~[na:na]
+java.net.SocketException: Connection reset by peer
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:413) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:433) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:812) ~[na:na]
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1120) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:125) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.implFlush(BufferedOutputStream.java:252) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:240) ~[na:na]
+	at org.postgresql.core.PGStream.flush(PGStream.java:721) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.core.QueryExecutorCloseAction.close(QueryExecutorCloseAction.java:71) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.jdbc.PgConnectionCleaningAction.onClean(PgConnectionCleaningAction.java:89) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$Node.onClean(LazyCleaner.java:218) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$1.run(LazyCleaner.java:136) ~[postgresql-42.6.0.jar:42.6.0]
+	at java.base/java.lang.Thread.run(Thread.java:1623) ~[na:na]
 
-2023-06-16T23:29:58.723+02:00 ERROR 143943 --- [http-nio-8080-exec-3] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null] with root cause
+2023-06-24T21:22:01.580+02:00  WARN 14748 --- [PostgreSQL-JDBC-Cleaner] org.postgresql.util.LazyCleaner          : Unexpected exception while executing onClean
 
-java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null
-	at no.itfakultetet.dbdemo.Postgres.createHeader(Postgres.java:40) ~[classes/:na]
-	at no.itfakultetet.dbdemo.Select.hentData(Select.java:26) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:578) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:170) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:188) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:174) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:131) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at java.base/java.lang.Thread.run(Thread.java:1589) ~[na:na]
+java.net.SocketException: Connection reset by peer
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:413) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:433) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:812) ~[na:na]
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1120) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:125) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.implFlush(BufferedOutputStream.java:252) ~[na:na]
+	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:240) ~[na:na]
+	at org.postgresql.core.PGStream.flush(PGStream.java:721) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.core.QueryExecutorCloseAction.close(QueryExecutorCloseAction.java:71) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.jdbc.PgConnectionCleaningAction.onClean(PgConnectionCleaningAction.java:89) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$Node.onClean(LazyCleaner.java:218) ~[postgresql-42.6.0.jar:42.6.0]
+	at org.postgresql.util.LazyCleaner$1.run(LazyCleaner.java:136) ~[postgresql-42.6.0.jar:42.6.0]
+	at java.base/java.lang.Thread.run(Thread.java:1623) ~[na:na]
 
-2023-06-16T23:29:59.957+02:00  WARN 143943 --- [http-nio-8080-exec-4] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-4][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:39:59.673+02:00  INFO 148035 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 19 with PID 148035 (/home/terje/utvikling2/java/dbdemo/target/classes started by terje in /home/terje/utvikling2/java/dbdemo)
-2023-06-16T23:39:59.677+02:00  INFO 148035 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-16T23:39:59.765+02:00  INFO 148035 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in /home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-16T23:39:59.766+02:00  INFO 148035 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-16T23:39:59.767+02:00  INFO 148035 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-16T23:40:01.234+02:00  INFO 148035 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-16T23:40:01.236+02:00  INFO 148035 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : An older version [1.2.36] of the Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [2.0.1]
-2023-06-16T23:40:01.236+02:00  INFO 148035 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [1.2.36] using APR version [1.7.2].
-2023-06-16T23:40:01.240+02:00  INFO 148035 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
-2023-06-16T23:40:01.256+02:00  INFO 148035 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-16T23:40:01.257+02:00  INFO 148035 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-16T23:40:01.316+02:00  INFO 148035 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-16T23:40:01.317+02:00  INFO 148035 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1549 ms
-2023-06-16T23:40:01.741+02:00  INFO 148035 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-16T23:40:02.067+02:00  INFO 148035 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@12d2fcf7, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@573b79b1, org.springframework.security.web.context.SecurityContextHolderFilter@6325bb84, org.springframework.security.web.header.HeaderWriterFilter@6230025d, org.springframework.security.web.csrf.CsrfFilter@5781dd73, org.springframework.security.web.authentication.logout.LogoutFilter@4a2c4dbb, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@36a806da, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@5ad9964e, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@2d1a76a1, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@6db50327, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@3762090e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5524d44c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@571896c8, org.springframework.security.web.access.ExceptionTranslationFilter@5c353992, org.springframework.security.web.access.intercept.AuthorizationFilter@4d6effc7]
-2023-06-16T23:40:02.132+02:00  INFO 148035 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-16T23:40:02.156+02:00  INFO 148035 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-16T23:40:02.167+02:00  INFO 148035 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 3.069 seconds (process running for 3.515)
-2023-06-16T23:40:06.967+02:00  INFO 148035 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-16T23:40:06.967+02:00  INFO 148035 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-16T23:40:06.968+02:00  INFO 148035 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-16T23:40:07.162+02:00  WARN 148035 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-16T23:40:14.805+02:00 ERROR 148035 --- [http-nio-8080-exec-4] no.itfakultetet.dbdemo.Postgres          : Noe gikk galt: 
-Feilkode:0
-Feilmelding: ERROR: relation "test" does not exist
-  Position: 15
-2023-06-16T23:40:14.810+02:00 ERROR 148035 --- [http-nio-8080-exec-4] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null] with root cause
-
-java.lang.NullPointerException: Cannot invoke "java.sql.ResultSet.getMetaData()" because "resultSet" is null
-	at no.itfakultetet.dbdemo.Postgres.createHeader(Postgres.java:42) ~[classes/:na]
-	at no.itfakultetet.dbdemo.Select.hentData(Select.java:26) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:578) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.0.9.jar:6.0.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.8.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:170) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:188) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:174) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:131) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.1.0.jar:6.1.0]
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.0.9.jar:6.0.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.8.jar:10.1.8]
-	at java.base/java.lang.Thread.run(Thread.java:1589) ~[na:na]
-
-2023-06-18T15:01:15.854+02:00  INFO 5968 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 20.0.1 with PID 5968 (C:\Users\ThinkPad\IdeaProjects\dbdemo\target\classes started by ThinkPad in C:\Users\ThinkPad\IdeaProjects\dbdemo)
-2023-06-18T15:01:15.858+02:00  INFO 5968 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-18T15:01:16.009+02:00  INFO 5968 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\ThinkPad\.m2\repository\com\oracle\database\jdbc\ojdbc8\21.9.0.0\ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/C:/Users/ThinkPad/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-18T15:01:16.010+02:00  INFO 5968 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-18T15:01:16.010+02:00  INFO 5968 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-18T15:01:18.885+02:00  INFO 5968 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-18T15:01:18.913+02:00  INFO 5968 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-18T15:01:18.913+02:00  INFO 5968 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-18T15:01:19.021+02:00  INFO 5968 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-18T15:01:19.023+02:00  INFO 5968 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3011 ms
-2023-06-18T15:01:19.596+02:00  INFO 5968 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-18T15:01:20.358+02:00  INFO 5968 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@5565f385, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3031f908, org.springframework.security.web.context.SecurityContextHolderFilter@22167213, org.springframework.security.web.header.HeaderWriterFilter@5b9d155f, org.springframework.security.web.csrf.CsrfFilter@3700154a, org.springframework.security.web.authentication.logout.LogoutFilter@531a840c, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@7c3cfdf, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@4b629d3, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@7d74ba95, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@2c392100, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1e183682, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@31ca7bc0, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@446e6c0c, org.springframework.security.web.access.ExceptionTranslationFilter@3a96feef, org.springframework.security.web.access.intercept.AuthorizationFilter@2878df8]
-2023-06-18T15:01:20.469+02:00  INFO 5968 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-18T15:01:20.538+02:00  INFO 5968 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-18T15:01:20.557+02:00  INFO 5968 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 5.742 seconds (process running for 6.967)
-2023-06-22T03:59:47.749+02:00  INFO 135309 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 19 with PID 135309 (/home/terje/utvikling2/java/dbdemo/target/classes started by terje in /home/terje/utvikling2/java/dbdemo)
-2023-06-22T03:59:47.752+02:00  INFO 135309 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-22T03:59:47.816+02:00  INFO 135309 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in /home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-22T03:59:47.816+02:00  INFO 135309 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-22T03:59:47.816+02:00  INFO 135309 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-22T03:59:49.081+02:00  INFO 135309 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-22T03:59:49.082+02:00  INFO 135309 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : An older version [1.2.36] of the Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [2.0.1]
-2023-06-22T03:59:49.082+02:00  INFO 135309 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [1.2.36] using APR version [1.7.2].
-2023-06-22T03:59:49.086+02:00  INFO 135309 --- [restartedMain] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
-2023-06-22T03:59:49.094+02:00  INFO 135309 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-22T03:59:49.094+02:00  INFO 135309 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-22T03:59:49.143+02:00  INFO 135309 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-22T03:59:49.143+02:00  INFO 135309 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1326 ms
-2023-06-22T03:59:49.427+02:00  INFO 135309 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-22T03:59:49.794+02:00  INFO 135309 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@d5c2a0f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6f5f7efe, org.springframework.security.web.context.SecurityContextHolderFilter@3fb4cce7, org.springframework.security.web.header.HeaderWriterFilter@4dbd5a93, org.springframework.security.web.csrf.CsrfFilter@62be71a, org.springframework.security.web.authentication.logout.LogoutFilter@43c58552, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@2353d5ea, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@2c991aa, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@3f73c449, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@504654fe, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@12b97153, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4adfb758, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1c1a2043, org.springframework.security.web.access.ExceptionTranslationFilter@d0b9362, org.springframework.security.web.access.intercept.AuthorizationFilter@7a20dfb3]
-2023-06-22T03:59:49.851+02:00  INFO 135309 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-22T03:59:49.878+02:00  INFO 135309 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-22T03:59:49.892+02:00  INFO 135309 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 2.686 seconds (process running for 3.204)
-2023-06-22T04:00:02.964+02:00  INFO 135309 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-22T04:00:02.964+02:00  INFO 135309 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-22T04:00:02.965+02:00  INFO 135309 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-22T04:00:06.263+02:00  WARN 135309 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-22T04:00:13.919+02:00  WARN 135309 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-22T04:00:28.779+02:00  WARN 135309 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-22T04:00:30.958+02:00  WARN 135309 --- [http-nio-8080-exec-3] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-3][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-22T04:00:33.462+02:00  WARN 135309 --- [http-nio-8080-exec-6] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-6][ansatte] Deprecated unwrapped fragment expression "meny :: meny" found in template ansatte, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-22T04:00:36.629+02:00  WARN 135309 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:28:14.793+02:00  INFO 75327 --- [main] n.i.dbdemo.DbdemoApplicationTests        : Starting DbdemoApplicationTests using Java 19 with PID 75327 (started by terje in /home/terje/IdeaProjects/dbdemo)
-2023-06-23T01:28:14.795+02:00  INFO 75327 --- [main] n.i.dbdemo.DbdemoApplicationTests        : No active profile set, falling back to 1 default profile: "default"
-2023-06-23T01:28:16.590+02:00  INFO 75327 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-23T01:28:17.230+02:00  INFO 75327 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1ad9b8d3, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@168ad26f, org.springframework.security.web.context.SecurityContextHolderFilter@9a20cbd, org.springframework.security.web.header.HeaderWriterFilter@5ba90d8a, org.springframework.security.web.csrf.CsrfFilter@6ad1701a, org.springframework.security.web.authentication.logout.LogoutFilter@5d508d22, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@5f61371d, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@2282400e, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@4f93bf0a, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@45292ec1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@445821a6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@ee21292, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@322204dc, org.springframework.security.web.access.ExceptionTranslationFilter@4ea17147, org.springframework.security.web.access.intercept.AuthorizationFilter@182e7eda]
-2023-06-23T01:28:17.325+02:00  INFO 75327 --- [main] n.i.dbdemo.DbdemoApplicationTests        : Started DbdemoApplicationTests in 3.112 seconds (process running for 5.149)
-2023-06-23T01:28:35.465+02:00  INFO 75403 --- [main] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication v0.0.1-SNAPSHOT using Java 19 with PID 75403 (/home/terje/IdeaProjects/dbdemo/target/dbdemo-0.0.1-SNAPSHOT.jar started by terje in /home/terje/IdeaProjects/dbdemo)
-2023-06-23T01:28:35.499+02:00  INFO 75403 --- [main] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-23T01:28:38.853+02:00  INFO 75403 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-23T01:28:38.905+02:00  INFO 75403 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-23T01:28:38.908+02:00  INFO 75403 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-23T01:28:39.098+02:00  INFO 75403 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-23T01:28:39.099+02:00  INFO 75403 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3315 ms
-2023-06-23T01:28:39.546+02:00  INFO 75403 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-23T01:28:40.390+02:00  INFO 75403 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7e809b79, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5cc126dc, org.springframework.security.web.context.SecurityContextHolderFilter@1d1f7216, org.springframework.security.web.header.HeaderWriterFilter@7e242b4d, org.springframework.security.web.csrf.CsrfFilter@76ba13c, org.springframework.security.web.authentication.logout.LogoutFilter@757d6814, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@4fad94a7, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@2a1edad4, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@625e134e, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@716a7124, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6e16b8b5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@25ddbbbb, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@72bd06ca, org.springframework.security.web.access.ExceptionTranslationFilter@d5ae57e, org.springframework.security.web.access.intercept.AuthorizationFilter@36b0fcd5]
-2023-06-23T01:28:40.595+02:00  INFO 75403 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-23T01:28:40.635+02:00  INFO 75403 --- [main] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 6.328 seconds (process running for 7.191)
-2023-06-23T01:28:41.288+02:00  INFO 75403 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-23T01:28:41.289+02:00  INFO 75403 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-23T01:28:41.290+02:00  INFO 75403 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-23T01:28:58.070+02:00  WARN 75403 --- [http-nio-8080-exec-7] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-7][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:29:34.130+02:00  WARN 75403 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:29:47.875+02:00  WARN 75403 --- [http-nio-8080-exec-2] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-2][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:30:31.255+02:00  WARN 75403 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:30:39.262+02:00  WARN 75403 --- [http-nio-8080-exec-9] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-9][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:34:52.497+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 19 with PID 76369 (/home/terje/IdeaProjects/dbdemo/target/classes started by terje in /home/terje/IdeaProjects/dbdemo)
-2023-06-23T01:34:52.501+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-23T01:34:52.612+02:00  INFO 76369 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in /home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/home/terje/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-23T01:34:52.613+02:00  INFO 76369 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-23T01:34:52.613+02:00  INFO 76369 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-23T01:34:54.210+02:00  INFO 76369 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-23T01:34:54.221+02:00  INFO 76369 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-23T01:34:54.222+02:00  INFO 76369 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-23T01:34:54.265+02:00  INFO 76369 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-23T01:34:54.265+02:00  INFO 76369 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1651 ms
-2023-06-23T01:34:54.549+02:00  INFO 76369 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-23T01:34:54.940+02:00  INFO 76369 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@255aa1d6, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6b4e7dde, org.springframework.security.web.context.SecurityContextHolderFilter@409d2bd, org.springframework.security.web.header.HeaderWriterFilter@1fe39373, org.springframework.security.web.csrf.CsrfFilter@6df309a, org.springframework.security.web.authentication.logout.LogoutFilter@2cdc4f8, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@193c9ad1, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@6e86eb33, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@71ae72b6, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@320f9ab1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@350bd5e9, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4d58f983, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3d897d6e, org.springframework.security.web.access.ExceptionTranslationFilter@2b674762, org.springframework.security.web.access.intercept.AuthorizationFilter@4693920e]
-2023-06-23T01:34:55.003+02:00  INFO 76369 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-23T01:34:55.034+02:00  INFO 76369 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-23T01:34:55.048+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 3.315 seconds (process running for 4.023)
-2023-06-23T01:34:55.166+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-23T01:34:55.169+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-23T01:34:55.171+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-23T01:34:58.853+02:00  WARN 76369 --- [http-nio-8080-exec-4] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-4][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:36:11.629+02:00  WARN 76369 --- [http-nio-8080-exec-9] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-9][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:36:13.671+02:00  WARN 76369 --- [http-nio-8080-exec-2] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-2][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:36:55.195+02:00  WARN 76369 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:48:28.268+02:00  WARN 76369 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:49:16.033+02:00  WARN 76369 --- [http-nio-8080-exec-4] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-4][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T01:49:51.115+02:00  INFO 76369 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 14 class path changes (0 additions, 0 deletions, 14 modifications)
-2023-06-23T01:49:51.148+02:00  INFO 76369 --- [Thread-5] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
-2023-06-23T01:49:51.150+02:00  INFO 76369 --- [Thread-5] o.a.c.c.C.[Tomcat].[localhost].[/]       : Destroying Spring FrameworkServlet 'dispatcherServlet'
-2023-06-23T01:49:51.525+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 19 with PID 76369 (/home/terje/IdeaProjects/dbdemo/target/classes started by terje in /home/terje/IdeaProjects/dbdemo)
-2023-06-23T01:49:51.525+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-23T01:49:51.974+02:00  INFO 76369 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-23T01:49:51.975+02:00  INFO 76369 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-23T01:49:51.975+02:00  INFO 76369 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-23T01:49:51.986+02:00  INFO 76369 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-23T01:49:51.987+02:00  INFO 76369 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 458 ms
-2023-06-23T01:49:52.091+02:00  INFO 76369 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-23T01:49:52.189+02:00  INFO 76369 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@41221324, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@15c7c47b, org.springframework.security.web.context.SecurityContextHolderFilter@7ad95565, org.springframework.security.web.header.HeaderWriterFilter@4d805a33, org.springframework.security.web.csrf.CsrfFilter@64debb99, org.springframework.security.web.authentication.logout.LogoutFilter@659b8d02, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@290ef4af, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@6ff70b5d, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@4b32f1e0, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@10449f11, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6b4a2bd4, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@20698ca1, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7f3a4380, org.springframework.security.web.access.ExceptionTranslationFilter@3e7ea2ce, org.springframework.security.web.access.intercept.AuthorizationFilter@5e015605]
-2023-06-23T01:49:52.211+02:00  INFO 76369 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-23T01:49:52.224+02:00  INFO 76369 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-23T01:49:52.229+02:00  INFO 76369 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 0.744 seconds (process running for 901.205)
-2023-06-23T01:49:52.232+02:00  INFO 76369 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
-2023-06-23T01:50:56.734+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-23T01:50:56.734+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-23T01:50:56.736+02:00  INFO 76369 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
-2023-06-23T01:50:56.776+02:00  WARN 76369 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:30:46.440+02:00  INFO 14748 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 20.0.1 with PID 14748 (C:\Users\ThinkPad\IdeaProjects\dbdemo\target\classes started by ThinkPad in C:\Users\ThinkPad\IdeaProjects\dbdemo)
-2023-06-23T21:30:46.444+02:00  INFO 14748 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
-2023-06-23T21:30:46.599+02:00  INFO 14748 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\ThinkPad\.m2\repository\com\oracle\database\jdbc\ojdbc8\21.9.0.0\ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/C:/Users/ThinkPad/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
-2023-06-23T21:30:46.600+02:00  INFO 14748 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2023-06-23T21:30:46.600+02:00  INFO 14748 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2023-06-23T21:30:49.287+02:00  INFO 14748 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2023-06-23T21:30:49.308+02:00  INFO 14748 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2023-06-23T21:30:49.313+02:00  INFO 14748 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
-2023-06-23T21:30:49.409+02:00  INFO 14748 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2023-06-23T21:30:49.410+02:00  INFO 14748 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2808 ms
-2023-06-23T21:30:49.993+02:00  INFO 14748 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
-2023-06-23T21:30:50.650+02:00  INFO 14748 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@263d24ab, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@c80b1d, org.springframework.security.web.context.SecurityContextHolderFilter@3a96feef, org.springframework.security.web.header.HeaderWriterFilter@4713a116, org.springframework.security.web.csrf.CsrfFilter@435785db, org.springframework.security.web.authentication.logout.LogoutFilter@651f4c2, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@471b8257, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@31ca7bc0, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@2c392100, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@3b53a019, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5b9d155f, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1112ace3, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@5ae2ed46, org.springframework.security.web.access.ExceptionTranslationFilter@e06833a, org.springframework.security.web.access.intercept.AuthorizationFilter@6f9f54a8]
-2023-06-23T21:30:50.726+02:00  INFO 14748 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2023-06-23T21:30:50.779+02:00  INFO 14748 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2023-06-23T21:30:50.800+02:00  INFO 14748 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 5.367 seconds (process running for 6.354)
-2023-06-23T21:31:57.010+02:00  INFO 14748 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-06-23T21:31:57.011+02:00  INFO 14748 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2023-06-23T21:31:57.013+02:00  INFO 14748 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2023-06-23T21:32:09.206+02:00  WARN 14748 --- [http-nio-8080-exec-10] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-10][index] Deprecated unwrapped fragment expression "meny :: meny" found in template index, line 11, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:32:17.583+02:00  WARN 14748 --- [http-nio-8080-exec-2] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-2][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:21.938+02:00  WARN 14748 --- [http-nio-8080-exec-9] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-9][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:24.311+02:00  WARN 14748 --- [http-nio-8080-exec-3] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-3][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:29.974+02:00  WARN 14748 --- [http-nio-8080-exec-5] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-5][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:31.967+02:00  WARN 14748 --- [http-nio-8080-exec-6] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-6][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:37.294+02:00  WARN 14748 --- [http-nio-8080-exec-8] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-8][select] Deprecated unwrapped fragment expression "meny :: meny" found in template select, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
-2023-06-23T21:35:43.169+02:00  WARN 14748 --- [http-nio-8080-exec-1] actStandardFragmentInsertionTagProcessor : [THYMELEAF][http-nio-8080-exec-1][resultat] Deprecated unwrapped fragment expression "meny :: meny" found in template resultat, line 12, col 6. Please use the complete syntax of fragment expressions instead ("~{meny :: meny}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2023-06-24T21:54:37.098+02:00  INFO 14204 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Starting DbdemoApplication using Java 20.0.1 with PID 14204 (C:\Users\ThinkPad\IdeaProjects\dbdemo\target\classes started by ThinkPad in C:\Users\ThinkPad\IdeaProjects\dbdemo)
+2023-06-24T21:54:37.105+02:00  INFO 14204 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : No active profile set, falling back to 1 default profile: "default"
+2023-06-24T21:54:37.278+02:00  INFO 14204 --- [restartedMain] o.s.b.devtools.restart.ChangeableUrls    : The Class-Path manifest attribute in C:\Users\ThinkPad\.m2\repository\com\oracle\database\jdbc\ojdbc8\21.9.0.0\ojdbc8-21.9.0.0.jar referenced one or more files that do not exist: file:/C:/Users/ThinkPad/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.9.0.0/oraclepki.jar
+2023-06-24T21:54:37.278+02:00  INFO 14204 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2023-06-24T21:54:37.279+02:00  INFO 14204 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2023-06-24T21:54:39.897+02:00  INFO 14204 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2023-06-24T21:54:39.921+02:00  INFO 14204 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-06-24T21:54:39.922+02:00  INFO 14204 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.8]
+2023-06-24T21:54:40.022+02:00  INFO 14204 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2023-06-24T21:54:40.023+02:00  INFO 14204 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2743 ms
+2023-06-24T21:54:40.543+02:00  INFO 14204 --- [restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2023-06-24T21:54:41.144+02:00  INFO 14204 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@353201be, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1e84486d, org.springframework.security.web.context.SecurityContextHolderFilter@1890e3ae, org.springframework.security.web.header.HeaderWriterFilter@2e4bc12f, org.springframework.security.web.csrf.CsrfFilter@1be0e94c, org.springframework.security.web.authentication.logout.LogoutFilter@945269d, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@2ecd7bdb, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@3240f5cb, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@4864c2a3, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@68487ab7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6e952da8, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@43dc4ef3, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@50c278bd, org.springframework.security.web.access.ExceptionTranslationFilter@49150329, org.springframework.security.web.access.intercept.AuthorizationFilter@6aad06e1]
+2023-06-24T21:54:41.250+02:00  INFO 14204 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2023-06-24T21:54:41.301+02:00  INFO 14204 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2023-06-24T21:54:41.320+02:00  INFO 14204 --- [restartedMain] n.itfakultetet.dbdemo.DbdemoApplication  : Started DbdemoApplication in 5.049 seconds (process running for 6.044)
+2023-06-24T21:54:53.746+02:00  INFO 14204 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-06-24T21:54:53.748+02:00  INFO 14204 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-06-24T21:54:53.750+02:00  INFO 14204 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
