@@ -14,17 +14,21 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <h1><span id="dbHead">DBApp</span>
+    <div>
+    <span id="dbHead">DBApp</span>
+    <span><form id="dbForm" method="get" action="/select" >
         <select id="selectDB">
-            <option>Velg Database</option>
+            <option value="">Velg Database</option>
             <div th:each="db : ${dbList}">
                 <option>
                     <th:block th:text="${db}"/>
                 </option>
             </div>
-        </select></h1>
-
-    <div id="input">Skriv Select-setning:
+        </select>
+        </form>
+    </span>
+    </div>
+    <div id="input" style="float:left">Skriv Select-setning:
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
