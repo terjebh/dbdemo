@@ -14,21 +14,9 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <div>
-    <span id="dbHead">DBApp</span>
-    <span><form id="dbForm" method="get" action="/select" >
-        <select id="selectDB">
-            <option value="">Velg Database</option>
-            <div th:each="db : ${dbList}">
-                <option>
-                    <th:block th:text="${db}"/>
-                </option>
-            </div>
-        </select>
-        </form>
-    </span>
-    </div>
-    <div id="input" style="float:left">Skriv Select-setning:
+    <div id="input" style="float:left">
+        <span id="DBHead">DBApp</span>
+        <span id="skrivSelect">Skriv Select-setning:</span>
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
@@ -39,6 +27,17 @@
     </div>
     <p></p>
     <div id="info">
+    <span><form id="dbForm" method="get" action="/select" >
+        <select id="selectDB">
+            <option value="">Velg Database</option>
+            <div style="float:left" th:each="db : ${dbList}">
+                <option>
+                    <th:block th:text="${db}"/>
+                </option>
+            </div>
+        </select>
+        </form>
+    </span>
         <h4>Tabeller i databasen</h4>
         <ul>
             <li>departments (9 rader)</li>

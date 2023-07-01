@@ -47,8 +47,21 @@ td {
   padding:5px;
 }
 
+#DBHead {
+font-size: 30px;
+float: left;
+padding-right:5px;
+vertically-align: top;
+}
+
+#skrivSelect {
+font-size: 16px;
+text-align: baseline;
+}
+
 #selectDB {
 height: 30px;
 font-size: 18px;
-vertically-align: baseline;
+text-align: baseline;
+float:left;
 }
