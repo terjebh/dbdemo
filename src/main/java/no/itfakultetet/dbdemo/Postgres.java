@@ -15,8 +15,8 @@ import java.util.List;
 public class Postgres {
     private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
 
-    public static ResultSet createResultset(String query) {
-        String url = "jdbc:postgresql://noderia.com/hr?user=kurs&password=kurs123&ssl=false";
+    public static ResultSet createResultset(String db, String query) {
+        String url = "jdbc:postgresql://noderia.com/"+db+"?user=kurs&password=kurs123&ssl=false";
         ResultSet rs = null;
         try {
             Connection conn = DriverManager.getConnection(url);

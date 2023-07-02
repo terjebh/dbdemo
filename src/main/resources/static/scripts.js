@@ -18,5 +18,6 @@ if (document.getElementById("query").value=="") {
 
 document.getElementById("selectDB").addEventListener("change", function () {
   document.getElementById("DBHead").innerHTML="DB: "+document.getElementById("selectDB").value;
+  document.getElementById("db").value = document.getElementById("selectDB").value;
   document.getElementById("query").focus();
 });

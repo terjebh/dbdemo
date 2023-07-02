@@ -14,7 +14,7 @@ public class Select {
     public String hentSql(Model model) {
         String query = "select datname from pg_database";
 
-        try ( ResultSet resultSet = Postgres.createResultset(query)) {
+        try ( ResultSet resultSet = Postgres.createResultset("hr",query)) {
             model.addAttribute("dbList", Postgres.createDbList(resultSet));
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -23,9 +23,9 @@ public class Select {
     }
 
     @PostMapping(value = "/select")
-    public String hentData(Model model, @RequestParam(value = "query") String query) {
+    public String hentData(Model model, @RequestParam(value = "db") String db, @RequestParam(value = "query") String query) {
 
-        ResultSet resultSet = Postgres.createResultset(query);
+        ResultSet resultSet = Postgres.createResultset(db,query);
 
         try {
             model.addAttribute("tableHeader", Postgres.createHeader(resultSet));

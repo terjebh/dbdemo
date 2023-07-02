@@ -20,7 +20,7 @@ public class Ansatte {
     @RequestMapping(value = "/ansatte")
     public String ansatte(Model model) {
 
-        ResultSet resultSet = Postgres.createResultset("Select * from employees limit 100");
+        ResultSet resultSet = Postgres.createResultset("hr", "Select * from employees limit 100");
 
         try {
             model.addAttribute("tableHeader", Postgres.createHeader(resultSet));

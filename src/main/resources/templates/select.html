@@ -19,6 +19,7 @@
         <span id="skrivSelect">Skriv Select-setning:</span>
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" name="db" id="db" value="hr"/>
             <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
         </form>
         <br>
