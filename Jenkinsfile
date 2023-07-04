@@ -14,9 +14,8 @@ pipeline {
     stage("Maven Package") {
 
       steps {
-        sh 'mvn clean package'
+        sh '/usr/bin/mvn clean package'
       }
-
     }
 
      stage("Save Artifact") {
