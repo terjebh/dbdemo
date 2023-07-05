@@ -69,7 +69,7 @@ pipeline {
 
               stage('Message Mattermost') {
                  steps {
-                mattermostSend channel: '@itfakultetet,Jenkins', endpoint: 'http://mattermost.noderia.com:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon på Nexus og hub.docker.com  :white_check_mark:'
+                mattermostSend channel: '@itfakultetet, town-square, Jenkins', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon på Nexus og hub.docker.com  :white_check_mark:'
                 emailext body: "Dette er en mail fra Jenkins pipeline\nJenkins sier:  Jobb: ${env.JOB_NAME}\nByggnummer:  ${env.BUILD_NUMBER} gikk bra!", subject: 'DBDEMO - Ny versjon!', to: 'terje@itfakultetet.no'
                }
               }
