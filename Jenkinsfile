@@ -32,7 +32,7 @@ pipeline {
                   dockerImage = docker.build imagename
                 }
               }
-           }
+     }
 
      stage('Deploy Docker Image to Dockerhub') {
               steps{
@@ -44,7 +44,7 @@ pipeline {
                   }
                 }
               }
-            }
+     }
             stage('Remove Unused docker image') {
               steps{
                 sh "docker rmi $imagename:$BUILD_NUMBER"
@@ -63,24 +63,19 @@ pipeline {
                  protocol: 'http',
                  repository: 'DBDemo',
                  version: '0.0.1-SNAPSHOT'
-
                }
-              }
-
-              post {
-                    success {
-                     mattermostSend channel: '@itfakultetet, jenkins, town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon av DBDemo på Nexus og hub.docker.com  :white_check_mark:'
-                     emailext body: "Dette er en mail fra Jenkins pipeline\nJenkins sier:  Jobb: ${env.JOB_NAME}\nByggnummer:  ${env.BUILD_NUMBER} gikk bra!", subject: 'DBDEMO - Ny versjon!', to: 'terje@itfakultetet.no'
-                                }
-
-                    failure {
-                     mattermostSend channel: '@itfakultetet, jenkins,town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### OOOps! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER} :x:", text: '### Ny versjon av Jenkins-test feilet  :x:'
-                     emailext body: "Dette er en mail fra Jenkins pipeline<p>Jenkins sier<p>: <br><b>Jobb</b>: ${env.JOB_NAME}<br><b>Byggnummer:</b>  ${env.BUILD_NUMBER} mislyktes!", subject: 'Bygging av DBDemo feilet', to: 'terje@itfakultetet.no'
-                    }
-                  }
-              }
-
-
           }
 
-}
+          post {
+                 success {
+                   mattermostSend channel: '@itfakultetet, jenkins, town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon av DBDemo på Nexus og hub.docker.com  :white_check_mark:'
+                   emailext body: "Dette er en mail fra Jenkins pipeline\nJenkins sier:  Jobb: ${env.JOB_NAME}\nByggnummer:  ${env.BUILD_NUMBER} gikk bra!", subject: 'DBDEMO - Ny versjon!', to: 'terje@itfakultetet.no'
+                 }
+
+                 failure {
+                   mattermostSend channel: '@itfakultetet, jenkins,town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### OOOps! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER} :x:", text: '### Ny versjon av Jenkins-test feilet  :x:'
+                   emailext body: "Dette er en mail fra Jenkins pipeline<p>Jenkins sier<p>: <br><b>Jobb</b>: ${env.JOB_NAME}<br><b>Byggnummer:</b>  ${env.BUILD_NUMBER} mislyktes!", subject: 'Bygging av DBDemo feilet', to: 'terje@itfakultetet.no'
+                 }
+          }
+    }
+  }
