@@ -66,6 +66,7 @@ pipeline {
                }
           }
 
+     }
           post {
                  success {
                    mattermostSend channel: '@itfakultetet, jenkins, town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon av DBDemo på Nexus og hub.docker.com  :white_check_mark:'
@@ -77,5 +78,4 @@ pipeline {
                    emailext body: "Dette er en mail fra Jenkins pipeline<p>Jenkins sier<p>: <br><b>Jobb</b>: ${env.JOB_NAME}<br><b>Byggnummer:</b>  ${env.BUILD_NUMBER} mislyktes!", subject: 'Bygging av DBDemo feilet', to: 'terje@itfakultetet.no'
                  }
           }
-    }
   }
