@@ -12,10 +12,13 @@ public class Select {
 
     @GetMapping(value = "/select")
     public String hentSql(Model model) {
-        String databases = "select datname from pg_database";
-        String tables = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')";
-        try ( ResultSet resultSet = Postgres.createResultset("hr",databases)) {
-            model.addAttribute("dbList", Postgres.createDbList(resultSet));
+        String database = "hr";
+        String databaseQuery = "select datname from pg_database";
+        String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
+        try ( ResultSet resultSetDbs = Postgres.createResultset(database,databaseQuery);
+              ResultSet resultsetTables = Postgres.createResultset(database,tableQuery); ) {
+            model.addAttribute("dbList", Postgres.createDbList(resultSetDbs));
+            model.addAttribute(("dbTables"), Postgres.createTableList(resultsetTables) );
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

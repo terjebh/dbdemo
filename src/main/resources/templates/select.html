@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Ansatte</title>
+    <title>SELECT</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
             crossorigin="anonymous"></script>
@@ -14,6 +14,30 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
+    <div id="info" style="float:left">
+    <span><form id="dbForm" method="get" action="/select" >
+        <select id="selectDB">
+            <option value="">Velg Database</option>
+            <div style="float:left" th:each="db : ${dbList}">
+                <option>
+                    <th:block th:text="${db}"/>
+                </option>
+            </div>
+        </select>
+        </form>
+    </span>
+        <br/><br/>
+        <h4>Tabeller og Views</h4>
+        <ul>
+            <span th:each="table : ${dbTables}">
+                <Li>
+                    <th:block th:text="${table}"/>
+                </Li>
+            </span>
+
+        </ul>
+    </div>
+
     <div id="input" style="float:left">
         <span id="DBHead">DBApp</span>
         <span id="skrivSelect">Skriv Select-setning:</span>
@@ -27,33 +51,7 @@
 
     </div>
     <p></p>
-    <div id="info">
-    <span><form id="dbForm" method="get" action="/select" >
-        <select id="selectDB">
-            <option value="">Velg Database</option>
-            <div style="float:left" th:each="db : ${dbList}">
-                <option>
-                    <th:block th:text="${db}"/>
-                </option>
-            </div>
-        </select>
-        </form>
-    </span>
-        <h4>Tabeller i databasen</h4>
-        <ul>
-            <li>departments (9 rader)</li>
-            <li>dept_emp (331 603 rader)</li>
-            <li>dept_manager (24 rader)(</li>
-            <li>employees (300 024 rader)</li>
-            <li>titles (443 308 rader)</li>
-            <li>salaries (2 844 047 rader)</li>
-        </ul>
-        <h4>Views i databasen</h4>
-        <ul>
-            <li>avdelingsoversikt (9 rader)</li>
-            <li>ansattoversikt (300 024 rader)</li>
-        </ul>
-    </div>
+
 </main>
 <script>
     document.getElementById("query").focus();

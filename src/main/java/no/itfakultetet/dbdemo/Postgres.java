@@ -67,7 +67,17 @@ public class Postgres {
         while (resultSet.next()) {
             dbList.add(resultSet.getString(1));
         }
+
             return dbList.stream().sorted().toList();
+    }
+
+    public static List<String> createTableList(ResultSet resultSetTables) throws SQLException {
+        List<String> tableList = new ArrayList<>();
+
+        while (resultSetTables.next()) {
+            tableList.add(resultSetTables.getString(1)+": "+resultSetTables.getString(2)+" ("+resultSetTables.getString(3)+")");
+        }
+        return tableList.stream().toList();
     }
 
 // get list of tables
