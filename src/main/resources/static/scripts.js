@@ -1,7 +1,10 @@
 document.getElementById("hent").addEventListener("click",function ()  {
-if (document.getElementById("query").value=="") {
+if (document.getElementById("selectDB").value=="") {
+   alert("Velg en database å hente data fra ...");
+} else if (document.getElementById("query").value=="") {
    alert("Ingen SQL å hente data fra...");
 } else {
+  alert(document.getElementById("selectDB").value);
   document.getElementById("sql").submit();
 }
 });

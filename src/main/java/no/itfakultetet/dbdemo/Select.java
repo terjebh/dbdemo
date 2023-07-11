@@ -13,7 +13,8 @@ public class Select {
     @GetMapping(value = "/select")
     public String hentSql(Model model) {
         String database = "hr";
-        String databaseQuery = "select datname from pg_database";
+        String user = "kurs";
+        String databaseQuery = "select datname from pg_database WHERE has_database_privilege('"+user+"', datname, 'CONNECT') and datistemplate = false";
         String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
         try ( ResultSet resultSetDbs = Postgres.createResultset(database,databaseQuery);
               ResultSet resultsetTables = Postgres.createResultset(database,tableQuery); ) {
