@@ -12,9 +12,7 @@ a {
   color: navy;
 }
 
-#input {
-float: left;
-}
+
 
 #info {
 float: right;
@@ -47,11 +45,18 @@ td {
   padding:5px;
 }
 
+#input {
+float: left;
+text-align: bottom;
+vertical-align: bottom;
+line-height: 35px;;
+}
+
 #DBHead {
 font-size: 30px;
 float: left;
 padding-right:5px;
-vertically-align: top;
+vertical-align: bottom;
 }
 
 #feilmelding {
@@ -62,8 +67,9 @@ margin-left: 10px;
 
 
 #skrivSelect {
+float:left;
 font-size: 16px;
-text-align: baseline;
+vertical-align: bottom;
 }
 
 #selectDB {
