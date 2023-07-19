@@ -39,9 +39,11 @@
     </div>
 
     <div id="input">
+        <div id="inputHead">
         <span id="DBHead">DBApp</span>
         <span id="skrivSelect">Skriv Select-setning:</span>
         <span id="feilmelding"></span>
+        </div>
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <input type="hidden" name="db" id="db"/>

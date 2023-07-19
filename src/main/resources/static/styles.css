@@ -49,7 +49,10 @@ td {
 float: left;
 text-align: bottom;
 vertical-align: bottom;
-line-height: 35px;;
+}
+
+#inputHead {
+line-height: 35px;
 }
 
 #DBHead {
