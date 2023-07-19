@@ -35,6 +35,7 @@ public class Select {
             model.addAttribute("tableHeader", Postgres.createHeader(resultSet));
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
             model.addAttribute("query", query);
+            model.addAttribute("db",db);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

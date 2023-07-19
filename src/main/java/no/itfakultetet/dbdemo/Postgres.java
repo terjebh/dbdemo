@@ -27,8 +27,7 @@ public class Postgres {
         } catch (SQLException e) {
             //throw new RuntimeException(e);
             // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
-            logger.error("Noe gikk galt: Feilkode:" + e.getErrorCode() + "Feilmelding: " + e.getMessage());
-
+            logger.error("Noe gikk galt. Feilmelding: " + e.getMessage());
         }
         return rs;
     }

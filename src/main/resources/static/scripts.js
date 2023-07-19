@@ -4,14 +4,15 @@ if (document.getElementById("selectDB").value=="") {
 } else if (document.getElementById("query").value=="") {
    alert("Ingen SQL å hente data fra...");
 } else {
-  alert(document.getElementById("selectDB").value);
   document.getElementById("sql").submit();
 }
 });
 
 document.getElementById("query").addEventListener("keyup", function (event) {
 if (event.ctrlKey && event.keyCode == 13) {
-if (document.getElementById("query").value=="") {
+if (document.getElementById("selectDB").value=="") {
+   alert("Velg en database å hente data fra ...");
+} else if (document.getElementById("query").value=="") {
    alert("Ingen SQL å hente data fra...");
 } else {
   document.getElementById("sql").submit();
