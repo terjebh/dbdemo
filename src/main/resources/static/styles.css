@@ -54,6 +54,13 @@ padding-right:5px;
 vertically-align: top;
 }
 
+#feilmelding {
+color: red;
+font-weight: bold;
+margin-left: 10px;
+}
+
+
 #skrivSelect {
 font-size: 16px;
 text-align: baseline;

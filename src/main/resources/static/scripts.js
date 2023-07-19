@@ -1,8 +1,8 @@
 document.getElementById("hent").addEventListener("click",function ()  {
 if (document.getElementById("selectDB").value=="") {
-   alert("Velg en database å hente data fra ...");
+   document.getElementById("feilmelding").innerHTML="Velg en database å hente data fra ...";
 } else if (document.getElementById("query").value=="") {
-   alert("Ingen SQL å hente data fra...");
+   document.getElementById("feilmelding").innerHTML="Skriv en SQL-setning å hente data med...";
 } else {
   document.getElementById("sql").submit();
 }
@@ -11,9 +11,9 @@ if (document.getElementById("selectDB").value=="") {
 document.getElementById("query").addEventListener("keyup", function (event) {
 if (event.ctrlKey && event.keyCode == 13) {
 if (document.getElementById("selectDB").value=="") {
-   alert("Velg en database å hente data fra ...");
+   document.getElementById("feilmelding").innerHTML="Velg en database å hente data fra ...";
 } else if (document.getElementById("query").value=="") {
-   alert("Ingen SQL å hente data fra...");
+     document.getElementById("feilmelding").innerHTML="Skriv en SQL-setning å hente data med...";
 } else {
   document.getElementById("sql").submit();
 }
