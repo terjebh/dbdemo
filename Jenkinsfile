@@ -21,7 +21,7 @@ pipeline {
 
      stage("Save Artifact") {
         steps {
-         archiveArtifacts artifacts: "target/dbdemo-0.0.1-SNAPSHOT.jar", fingerprint: true
+         archiveArtifacts artifacts: "target/dbdemo-0.0.2-SNAPSHOT.jar", fingerprint: true
         }
 
      }
@@ -55,14 +55,14 @@ pipeline {
 
           stage('Upload jar to Nexus') {
                steps {
-                 nexusArtifactUploader artifacts: [[artifactId: 'DBDemo', classifier: '', file: 'target/dbdemo-0.0.1-SNAPSHOT.jar', type: 'jar']],
+                 nexusArtifactUploader artifacts: [[artifactId: 'DBDemo', classifier: '', file: 'target/dbdemo-0.0.2-SNAPSHOT.jar', type: 'jar']],
                  credentialsId: '72654080-f2e8-42cf-b93d-b38038fbb381',
                  groupId: 'no.itfakultetet',
                  nexusUrl: 'noderia.com:8081',
                  nexusVersion: 'nexus3',
                  protocol: 'http',
                  repository: 'DBDemo',
-                 version: '0.0.1-SNAPSHOT'
+                 version: '0.0.2-SNAPSHOT'
                }
           }
 
