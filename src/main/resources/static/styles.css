@@ -12,6 +12,10 @@ a {
   color: navy;
 }
 
+textarea {
+  resize: vertical;
+  font-size: large;
+}
 
 
 #info {

@@ -20,9 +20,12 @@ if (document.getElementById("selectDB").value=="") {
 }
 });
 
+// Select-meny for velging av database og henting av databasens tabeller
 document.getElementById("selectDB").addEventListener("change", function () {
   document.getElementById("DBHead").innerHTML="DB: "+document.getElementById("selectDB").value;
   document.getElementById("feilmelding").innerHTML="";
   document.getElementById("db").value = document.getElementById("selectDB").value;
   document.getElementById("query").focus();
+
+
 });
