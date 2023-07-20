@@ -2,35 +2,45 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css"/>
 </head>
 <body>
-<div th:replace="~{meny :: meny}"> </div>
+<div th:replace="~{meny :: meny}"></div>
 <main>
-<h1>DBApp   <button class="btn btn-primary" onclick="document.location.href='/select'">Ny SQL</button> </h1>
-<h4><th:block th:text="${db}" />: <th:block th:text="${query}" /></h4>
-<div id="queryResult">
-    <table id="tabell" class="table table-striped" >
-        <thead>
-        <tr>
-            <th th:each="header : ${tableHeader}" style="background-color:black;">
-                <th:block th:text="${header}"/>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="rad : ${tableContent}">
-            <td th:each="kolonne : ${rad}">
-                <th:block th:text="${kolonne}"/>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+    <h1>DBApp
+        <button class="btn btn-primary" onclick="document.location.href='/select'">Ny SQL</button>
+    </h1>
+    <h4>
+        <th:block th:text="${db}"/>
+        :
+        <th:block th:text="${query}"/>
+    </h4>
+    <div id="queryResult">
+        <table id="tabell" class="table table-striped">
+            <thead>
+            <tr>
+                <th th:each="header : ${tableHeader}" style="background-color:black;">
+                    <th:block th:text="${header}"/>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rad : ${tableContent}">
+                <td th:each="kolonne : ${rad}">
+                    <th:block th:text="${kolonne}"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 <script>
+Object.assign(DataTable.defaults, {
+     ordering: false
+});
     let table = new DataTable('#tabell');
 </script>
 
