@@ -39,7 +39,11 @@
 </main>
 <script>
 Object.assign(DataTable.defaults, {
-     ordering: false
+     ordering: false,
+     lengthMenu: [
+        [10, 25, 50, -1],
+        [10, 25, 50, 'All']
+    ]
 });
     let table = new DataTable('#tabell');
 </script>
