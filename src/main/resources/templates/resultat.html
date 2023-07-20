@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Ansatte</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/styles.css"/>
-</head>
+    <div th:replace="~{head :: head}"></div>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
 </head>
 <body>
 <div th:replace="~{meny :: meny}"> </div>
@@ -14,10 +12,10 @@
 <h1>DBApp   <button class="btn btn-primary" onclick="document.location.href='/select'">Ny SQL</button> </h1>
 <h4><th:block th:text="${db}" />: <th:block th:text="${query}" /></h4>
 <div id="queryResult">
-    <table id="tabell">
+    <table id="tabell" class="table table-striped" >
         <thead>
         <tr>
-            <th th:each="header : ${tableHeader}">
+            <th th:each="header : ${tableHeader}" style="background-color:black;">
                 <th:block th:text="${header}"/>
             </th>
         </tr>
@@ -32,5 +30,9 @@
     </table>
 </div>
 </main>
+<script>
+    let table = new DataTable('#tabell');
+</script>
+
 </body>
 </html>
