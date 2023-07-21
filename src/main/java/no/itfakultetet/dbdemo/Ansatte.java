@@ -1,5 +1,6 @@
 package no.itfakultetet.dbdemo;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +16,16 @@ import java.sql.SQLException;
  */
 @Controller
 public class Ansatte {
+    @Value("${app.username}")
+    public static String username;
 
+    @Value("${app.pwd}")
+    public static String pwd;
 
     @RequestMapping(value = "/ansatte")
     public String ansatte(Model model) {
 
-        ResultSet resultSet = Postgres.createResultset("hr", "Select * from employees limit 100");
+        ResultSet resultSet = Postgres.createResultset("hr", "Select * from employees limit 100",username,pwd);
 
         try {
             model.addAttribute("tableHeader", Postgres.createHeader(resultSet));

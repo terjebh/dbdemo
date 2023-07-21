@@ -2,7 +2,9 @@ package no.itfakultetet.dbdemo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.sql.*;
@@ -14,16 +16,11 @@ import java.util.List;
  *
  * @author Terje Berg-Hansen
  */
+
 public class Postgres {
     private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
-    @Value("${spring.datasource.username}")
-    private static String username;
 
-    @Value("${spring.datasource.password}")
-    private static String pwd;
-
-        public static ResultSet createResultset(String db, String query) {
-
+        public static ResultSet createResultset(String db, String query, String username,String pwd ) {
             System.out.println("username: "+ username);
             System.out.println("pwd: "+ pwd);
         String url = "jdbc:postgresql://noderia.com/"+db+"?user="+username+"&password="+pwd+"&ssl=false";
