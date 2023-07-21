@@ -12,10 +12,10 @@ import java.sql.SQLException;
 public class Select {
 
     @Value("${app.username}")
-    public static String username;
+    private String username;
 
     @Value("${app.pwd}")
-    public static String pwd;
+    private String pwd;
 
     @GetMapping(value = "/select")
     public String hentSql(Model model) {
