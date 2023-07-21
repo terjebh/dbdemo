@@ -1,5 +1,6 @@
-package no.itfakultetet.dbdemo;
+package no.itfakultetet.dbdemo.controllers;
 
+import jakarta.websocket.OnError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,11 +45,15 @@ public class Select {
             model.addAttribute("query", query);
             model.addAttribute("db",db);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            // throw new RuntimeException(e);
+            model.addAttribute("feilmeding",e.getMessage());
+            return "error";
         }
 
         return "resultat";
     }
+
+
 
 
 }
