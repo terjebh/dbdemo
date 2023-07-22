@@ -12,9 +12,12 @@ a {
   color: navy;
 }
 
-textarea {
-  resize: vertical;
-  font-size: large;
+#queryText {
+  font-size: 18px;
+  width: 800px;
+  height: 200px;
+  border: solid 1px silver;
+  border-radius: 5px;
 }
 
 
