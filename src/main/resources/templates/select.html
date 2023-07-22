@@ -7,7 +7,7 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <div id="DBHead">PostgreSQL</div>
+    <div id="DBHead"><th:block th:text="${rdbms}"/></div>
 
     <div id="input">
         <div id="inputHead">

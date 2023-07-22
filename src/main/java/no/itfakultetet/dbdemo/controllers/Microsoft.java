@@ -19,7 +19,7 @@ public class Microsoft {
         public static ResultSet createResultset(String db, String query, String username,String pwd ) {
             System.out.println("username: "+ username);
             System.out.println("pwd: "+ pwd);
-            String url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user=kurs1;password=':)Kurs123'";
+            String url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user=kurs2;password=:)Kurs123;encrypt=false";
         ResultSet rs = null;
         try {
             Connection conn = DriverManager.getConnection(url);

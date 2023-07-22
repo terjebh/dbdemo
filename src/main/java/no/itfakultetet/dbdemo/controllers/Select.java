@@ -24,6 +24,7 @@ public class Select {
         String databaseQuery = "select datname from pg_database WHERE has_database_privilege('"+username+"', datname, 'CONNECT') and datistemplate = false";
         try ( ResultSet resultSetDbs = Postgres.createResultset(database,databaseQuery,username,pwd);) {
             model.addAttribute("dbList", Postgres.createDbList(resultSetDbs));
+            model.addAttribute("rdbms","PostgreSQL");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -57,13 +58,11 @@ public class Select {
         String databaseQuery = "Select * from Sys.Databases";
         try ( ResultSet resultSetDbs = Microsoft.createResultset(database,databaseQuery,"kurs1",":)Kurs123");) {
             model.addAttribute("dbList", Microsoft.createDbList(resultSetDbs));
+            model.addAttribute("rdbms","Microsoft SQL Server");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return "select";
     }
-
-
-
 
 }
