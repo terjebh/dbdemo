@@ -1,3 +1,5 @@
+hljs.highlightElement(queryText);
+
 document.getElementById("hent").addEventListener("click",function ()  {
 if (document.getElementById("selectDB").value=="Velg Database") {
    document.getElementById("feilmelding").innerHTML="Velg en database å hente data fra ...";
@@ -11,6 +13,7 @@ if (document.getElementById("selectDB").value=="Velg Database") {
 });
 
 document.getElementById("queryText").addEventListener("keyup", function (event) {
+
 if (event.ctrlKey && event.keyCode == 13) {
 if (document.getElementById("selectDB").value=="Velg Database") {
    document.getElementById("feilmelding").innerHTML="Velg en database å hente data fra ...";
@@ -21,6 +24,10 @@ if (document.getElementById("selectDB").value=="Velg Database") {
     document.getElementById("query").value = renQueryText;
   document.getElementById("sql").submit();
 }
+} else if(event.shiftKey && event.keyCode==13) {
+
+hljs.highlightElement(queryText);
+
 }
 });
 

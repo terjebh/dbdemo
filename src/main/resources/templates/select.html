@@ -23,7 +23,7 @@
         </select>
         </form>
     </span>
-        <span id="skrivSelect">Skriv Select-setning:</span>
+        <span id="skrivSelect">Formater og sjekk koden med: shift+enter</span>
         <span id="feilmelding"></span>
         </div>
         <form id="sql" method="post" action="/select">
@@ -31,7 +31,7 @@
             <input type="hidden" name="db" id="db"/>
             <input type="hidden" id="query" name="query"/>
             <br/>
-            <div id="queryText" contenteditable></div>
+            <div id="queryText" class="code sql" contenteditable></div>
         </form>
         <br>
         <button class="btn btn-success" style="margin-top:5px;" id="hent">Hent data</button>
@@ -44,8 +44,14 @@
 
 </main>
 <script>
-    document.getElementById("queryText").focus();
-    hljs.highlightAll();
+    var queryText = document.getElementById("queryText");
+    queryText.focus();
+
+    document.querySelectorAll('div.code').forEach(el => {
+  // then highlight each
+       hljs.highlightElement(el);
+});
+
 </script>
 </body>
 </html>

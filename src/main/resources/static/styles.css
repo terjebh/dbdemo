@@ -18,6 +18,7 @@ a {
   height: 200px;
   border: solid 1px silver;
   border-radius: 5px;
+   white-space: pre;
 }
 
 
@@ -93,4 +94,8 @@ text-align: baseline;
 float:left;
 margin-right:10px;
 margin-bottom:5px;
+}
+
+div.code {
+  white-space: pre;
 }
