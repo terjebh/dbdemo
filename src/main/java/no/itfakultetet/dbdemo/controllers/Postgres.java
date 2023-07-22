@@ -15,7 +15,6 @@ import java.util.List;
 
 public class Postgres {
     private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
-
         public static ResultSet createResultset(String db, String query, String username,String pwd ) {
             System.out.println("username: "+ username);
             System.out.println("pwd: "+ pwd);
@@ -81,9 +80,5 @@ public class Postgres {
         }
         return tableList.stream().toList();
     }
-
-// get list of tables
-    // SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';
-
 
 }

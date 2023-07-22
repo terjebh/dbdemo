@@ -40,10 +40,10 @@ public class Select {
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
-            model.addAttribute("rdbms","postgres");
+            //model.addAttribute("rdbms","postgres");
         } catch (SQLException e) {
             // throw new RuntimeException(e);
-            model.addAttribute("feilmeding",e.getMessage());
+            model.addAttribute("feilmelding",e);
             return "error";
         }
 
