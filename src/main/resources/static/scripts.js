@@ -51,6 +51,12 @@ function strip(html){
    return doc.body.textContent || "";
 }
 
+function redigerSQL() {
+let sql = document.getElementById("sql").innerHTML;
+let db = document.getElementById("db").innerHTML;
+document.location.href='/select/postgres?db='+db+'&sql='+sql;
+}
+
 const UrlParam = new URLSearchParams(window.location.search);
 
 if( UrlParam.get('sql')) {

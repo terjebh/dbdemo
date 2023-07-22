@@ -18,7 +18,7 @@ public class Select {
     @Value("${app.pwd}")
     private String pwd;
 
-    @GetMapping(value = "/select")
+    @GetMapping(value = "/select/postgres")
     public String hentSql(Model model) {
         String database = "dbdemo";
         String databaseQuery = "select datname from pg_database WHERE has_database_privilege('"+username+"', datname, 'CONNECT') and datistemplate = false";
@@ -30,7 +30,7 @@ public class Select {
         return "select";
     }
 
-    @PostMapping(value = "/select")
+    @PostMapping(value = "/select/postgres")
     public String hentData(Model model, @RequestParam(value = "db") String db, @RequestParam(value = "query") String query) {
 
         ResultSet resultSet = Postgres.createResultset(db,query,username,pwd);
@@ -40,6 +40,7 @@ public class Select {
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
+            model.addAttribute("rdbms","postgres");
         } catch (SQLException e) {
             // throw new RuntimeException(e);
             model.addAttribute("feilmeding",e.getMessage());

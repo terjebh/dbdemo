@@ -11,7 +11,7 @@
 <div th:replace="~{meny :: meny}"></div>
 <main>
     <h1>DBApp
-        <button class="btn btn-primary" onclick="document.location.href='/select'">Ny SQL</button>
+        <button class="btn btn-primary" onclick="document.location.href='/select/postgres'">Ny SQL</button>
         <button class="btn btn-success" onclick="redigerSQL()">Rediger SQL</button>
     </h1>
     <h4>
@@ -46,11 +46,7 @@ Object.assign(DataTable.defaults, {
 });
     let table = new DataTable('#tabell');
 
-function redigerSQL() {
-let sql = document.getElementById("sql").innerHTML;
-let db = document.getElementById("db").innerHTML;
-document.location.href='/select?db='+db+'&sql='+sql;
-}
+
 
 </script>
 
