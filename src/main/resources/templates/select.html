@@ -7,10 +7,14 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <div id="info" style="float:left">
-    <span><form id="dbForm" method="get" action="/select" >
+    <div id="DBHead">SQL</div>
+
+    <div id="input">
+        <div id="inputHead">
+            <span>
+        <form id="dbForm" method="get" action="/select" >
         <select id="selectDB">
-            <option value="">Velg Database</option>
+            <option>Velg Database</option>
             <div style="float:left" th:each="db : ${dbList}">
                 <option>
                     <th:block th:text="${db}"/>
@@ -19,24 +23,20 @@
         </select>
         </form>
     </span>
-        <br/><br/>
-        <div id="tabellListe"></div>
-    </div>
-
-    <div id="input">
-        <div id="inputHead">
-        <span id="DBHead">DBApp</span>
         <span id="skrivSelect">Skriv Select-setning:</span>
         <span id="feilmelding"></span>
         </div>
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <input type="hidden" name="db" id="db"/>
-            <textarea type="text" style="width:700px;height:200px" name="query" id="query"></textarea>
+            <textarea type="text" style="width:800px;height:200px" name="query" id="query"></textarea>
         </form>
         <br>
         <button class="btn btn-success" style="margin-top:5px;" id="hent">Hent data</button>
 
+    </div>
+    <div id="info" style="float:left">
+        <div id="tabellListe"></div>
     </div>
     <p></p>
 

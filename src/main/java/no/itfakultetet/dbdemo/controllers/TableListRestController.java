@@ -24,21 +24,22 @@ public class TableListRestController {
 
         List<String> tabellListe = new ArrayList<>();
 
-        String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-        try (ResultSet resultsetTables = Postgres.createResultset(database, tableQuery, username, pwd)) {
-            tabellListe = Postgres.createTableList(resultsetTables);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if(!database.equals("Velg Database")) {
+            String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
+            try (ResultSet resultsetTables = Postgres.createResultset(database, tableQuery, username, pwd)) {
+                tabellListe = Postgres.createTableList(resultsetTables);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-
         StringBuilder tabeller = new StringBuilder();
 
         tabeller.append("<h4>Tabeller og views</h4>\n");
-        tabeller.append("<ul");
+       // tabeller.append("<ul>");
         for( String tabell: tabellListe) {
-            tabeller.append("<li>"+tabell+"</li>\n");
+            tabeller.append(tabell+"<br/>\n");
         }
-        tabeller.append("</ul");
+        //tabeller.append("</ul");
 
         System.out.println(tabeller.toString());
         return tabeller.toString();

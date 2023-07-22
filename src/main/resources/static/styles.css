@@ -5,7 +5,7 @@ body {
 
 main {
   padding:40px;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 a {
@@ -20,7 +20,8 @@ textarea {
 
 #info {
 float: right;
-margin-right: 20px;
+margin-left: 20px;
+
 }
 
 #tabellListe {
@@ -60,12 +61,11 @@ vertical-align: bottom;
 }
 
 #inputHead {
-line-height: 35px;
+
 }
 
 #DBHead {
 font-size: 30px;
-float: left;
 padding-right:5px;
 vertical-align: bottom;
 }
@@ -88,4 +88,6 @@ height: 30px;
 font-size: 18px;
 text-align: baseline;
 float:left;
+margin-right:10px;
+margin-bottom:5px;
 }
