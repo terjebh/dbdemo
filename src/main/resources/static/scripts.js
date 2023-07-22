@@ -27,5 +27,8 @@ document.getElementById("selectDB").addEventListener("change", function () {
   document.getElementById("db").value = document.getElementById("selectDB").value;
   document.getElementById("query").focus();
 
+  fetch("/rest/get/tablelist/"+document.getElementById("selectDB").value)
+  .then(tabeller => tabeller.text())
+  .then(liste => document.getElementById("tabellListe").innerHTML=liste );
 
 });

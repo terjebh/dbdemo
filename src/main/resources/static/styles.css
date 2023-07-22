@@ -20,8 +20,12 @@ textarea {
 
 #info {
 float: right;
+margin-right: 20px;
 }
 
+#tabellListe {
+
+}
 table {
   margin-top: 20px;
   border: solid 1px #333;

@@ -20,15 +20,7 @@
         </form>
     </span>
         <br/><br/>
-        <h4>Tabeller og Views</h4>
-        <ul>
-            <span th:each="table : ${dbTables}">
-                <Li>
-                    <th:block th:text="${table}"/>
-                </Li>
-            </span>
-
-        </ul>
+        <div id="tabellListe"></div>
     </div>
 
     <div id="input">
