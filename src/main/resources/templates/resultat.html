@@ -15,9 +15,9 @@
         <button class="btn btn-primary" onclick="document.location.href='/select/postgres'">Ny SQL</button>
         <button class="btn btn-success" onclick="redigerSQL()">Rediger SQL</button>
     </h1>
-    <h4>
+    <h7>
         <span id="db"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>
-    </h4>
+    </h7>
     <div id="queryResult">
         <table id="tabell" class="table table-striped">
             <thead>
@@ -46,8 +46,6 @@ Object.assign(DataTable.defaults, {
     ]
 });
     let table = new DataTable('#tabell');
-
-
 
 </script>
 

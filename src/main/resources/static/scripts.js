@@ -28,6 +28,10 @@ if (document.getElementById("selectDB").value=="Velg Database") {
 
 hljs.highlightElement(queryText);
 
+} else if(event.keyCode==13) {
+   document.execCommand('insertHTML', false, ' \n');
+   event.preventDefault();
+   return false;
 }
 });
 
@@ -53,6 +57,8 @@ function strip(html){
 
 function redigerSQL() {
 let sql = document.getElementById("sql").innerHTML;
+sql = sql.replace("&lt;","<");
+sql = sql.replace("&gt;",">");
 let db = document.getElementById("db").innerHTML;
 document.location.href='/select/postgres?db='+db+'&sql='+sql;
 }

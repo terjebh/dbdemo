@@ -15,11 +15,15 @@ a {
 #queryText {
   font-size: 18px;
   width: 800px;
-  height: 200px;
+  height: auto;
+  min-height: 200px;
   border: solid 1px silver;
   border-radius: 5px;
   white-space: pre;
   padding: 10px;
+  overflow-wrap: break-all;
+  overflow-y: scroll;
+  word-break: break-all;
 }
 
 
@@ -100,3 +104,4 @@ margin-bottom:5px;
 div.code {
   white-space: pre;
 }
+
