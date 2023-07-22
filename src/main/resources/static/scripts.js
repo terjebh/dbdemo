@@ -36,14 +36,32 @@ document.getElementById("selectDB").addEventListener("change", function () {
   document.getElementById("feilmelding").innerHTML="";
   document.getElementById("db").value = document.getElementById("selectDB").value;
   document.getElementById("queryText").focus();
+  fetchTableList();
 
+});
+
+function fetchTableList() {
   fetch("/rest/get/tablelist/"+document.getElementById("selectDB").value)
   .then(tabeller => tabeller.text())
   .then(liste => document.getElementById("tabellListe").innerHTML=liste );
-
-});
+}
 
 function strip(html){
    let doc = new DOMParser().parseFromString(html, 'text/html');
    return doc.body.textContent || "";
+}
+
+const UrlParam = new URLSearchParams(window.location.search);
+
+if( UrlParam.get('sql')) {
+let sql = UrlParam.get('sql');
+document.getElementById("queryText").innerHTML = sql;
+hljs.highlightElement(queryText);
+}
+
+if(UrlParam.get('db')) {
+let db = UrlParam.get('db');
+document.getElementById("selectDB").value = db;
+document.getElementById("db").value = db;
+fetchTableList();
 }
