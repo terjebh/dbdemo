@@ -18,7 +18,8 @@ a {
   height: 200px;
   border: solid 1px silver;
   border-radius: 5px;
-   white-space: pre;
+  white-space: pre;
+  padding: 10px;
 }
 
 
