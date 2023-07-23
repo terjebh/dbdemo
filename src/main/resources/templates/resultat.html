@@ -11,10 +11,11 @@
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <h1>DBApp
-        <button class="btn btn-primary" onclick="document.location.href='/select/postgres'">Ny SQL</button>
+    <h3><span><th:block th:text="${rdbms}"/></span>
+        <button class="btn btn-primary" onclick="nySQL()">Ny SQL</button>
         <button class="btn btn-success" onclick="redigerSQL()">Rediger SQL</button>
-    </h1>
+        <span id="rdbms_sti" style="visibility:hidden"><th:block th:text="${rdbms_sti}"/></span>
+    </h3>
     <h7>
         <span id="db"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>
     </h7>
@@ -46,7 +47,6 @@ Object.assign(DataTable.defaults, {
     ]
 });
     let table = new DataTable('#tabell');
-
 </script>
 
 </body>

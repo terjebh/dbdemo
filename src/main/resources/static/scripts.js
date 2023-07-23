@@ -6,8 +6,9 @@ if (document.getElementById("selectDB").value=="Velg Database") {
 } else if (document.getElementById("queryText").innerHTML=="") {
    document.getElementById("feilmelding").innerHTML="Skriv en SQL-setning å hente data med...";
 } else {
-  let renQueryText = strip(document.getElementById("queryText").innerHTML)
+  let renQueryText = strip(document.getElementById("queryText").innerHTML);
   document.getElementById("query").value = renQueryText;
+  document.getElementById("sql").action = document.getElementById("rdbms_sti").innerHTML
   document.getElementById("sql").submit();
 }
 });
@@ -56,11 +57,17 @@ function strip(html){
 }
 
 function redigerSQL() {
+let rdbms_sti = document.getElementById("rdbms_sti").innerHTML;
 let sql = document.getElementById("sql").innerHTML;
 sql = sql.replace("&lt;","<");
 sql = sql.replace("&gt;",">");
 let db = document.getElementById("db").innerHTML;
-document.location.href='/select/postgres?db='+db+'&sql='+sql;
+document.location.href='/select/'+rdbms_sti+'?db='+db+'&sql='+sql;
+}
+
+function nySQL() {
+let rdbms_sti = document.getElementById("rdbms_sti").innerHTML;
+document.location.href='/select/'+rdbms_sti;
 }
 
 const UrlParam = new URLSearchParams(window.location.search);

@@ -14,25 +14,27 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Hjem</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/logout">Logg ut</a>
-        </li>
+
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             SQL
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-            <li><a class="dropdown-item "  href="/select">Hent data med Select</a></li>
+            <li><a class="dropdown-item "  href="/select/postgres">Hent data med PostgreSQL</a></li>
+            <li><a class="dropdown-item "  href="/select/microsoft">Hent data med Microsoft SQL Server</a></li>
+            <li><a class="dropdown-item "  href="/select/oracle">Hent data med Oracle</a></li>
+            <li><a class="dropdown-item "  href="/select/mysql">Hent data med MySQL</a></li>
 
           </ul>
         </li>
-
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+        <span class="d-flex">
+        <li class="nav-item">
+          <button class="btn btn-outline-danger" onclick="document.location.href='/logout'">Logout</button>
+        </li>
+        </span>
+
     </div>
   </div>
 </nav>
