@@ -1,6 +1,8 @@
 package no.itfakultetet.dbdemo.controllers;
 
 import jakarta.websocket.OnError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,20 +14,45 @@ import java.sql.SQLException;
 @Controller
 public class Select {
 
-    @Value("${app.username}")
+    private static final Logger logger = LoggerFactory.getLogger(Select.class);
+    @Value("${pg.username}")
     private String username;
 
-    @Value("${app.pwd}")
+    @Value("${pg.pwd}")
     private String pwd;
 
-    @GetMapping(value = "/select/postgres")
-    public String hentSql(Model model) {
-        String database = "dbdemo";
-        String databaseQuery = "select datname from pg_database WHERE has_database_privilege('"+username+"', datname, 'CONNECT') and datistemplate = false";
+    @GetMapping(value = "/select/{rdbms_sti}")
+    public String hentSql(Model model, @RequestParam(value = "rdbms_sti") String rdbms_sti) {
+        String database;
+        String databaseQuery;
+        String rdbms;
+
+        if(rdbms_sti.equals("postgres")) {
+            database = "dbdemo";
+            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+            rdbms = "PostgreSQL";
+        } else if(rdbms_sti.equals("microsoft")) {
+            database = "hr";
+            databaseQuery = "";
+            rdbms = "Microsoft SQL Server";
+        } else if(rdbms_sti.equals("oracle")) {
+            database = "kurs";
+            databaseQuery = "";
+            rdbms = "Oracle";
+        } else if (rdbms_sti.equals("mysql")) {
+            database = "hr";
+            databaseQuery = "";
+            rdbms = "MySQL/MariaDB";
+        } else {
+            database = "unknown";
+            databaseQuery = "unknown";
+            rdbms = "unknown";
+            logger.error("Ukjent databasehåndteringssystem: "+rdbms_sti);
+        }
+
         try ( ResultSet resultSetDbs = Postgres.createResultset(database,databaseQuery,username,pwd);) {
-            model.addAttribute("dbList", Postgres.createDbList(resultSetDbs));
-            model.addAttribute("rdbms","PostgreSQL");
-            model.addAttribute("rdbms_sti","postgres");
+            model.addAttribute("rdbms",rdbms);
+            model.addAttribute("rdbms_sti",rdbms_sti);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -35,7 +62,6 @@ public class Select {
     @PostMapping(value = "/select/postgres")
     public String hentData(Model model,
            @RequestParam(value = "db") String db,
-           @RequestParam(value = "dbList") String[] dbList,
            @RequestParam(value = "query") String query) {
 
         ResultSet resultSet = Postgres.createResultset(db,query,username,pwd);
@@ -45,7 +71,6 @@ public class Select {
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
-            model.addAttribute("dbList",dbList);
             model.addAttribute("rdbms","PostgreSQL");
             model.addAttribute("rdbms_sti","postgres");
 
@@ -62,7 +87,6 @@ public class Select {
     @PostMapping(value = "/select/edit")
     public String redigerData(Model model,
               @RequestParam(value = "db") String db,
-              @RequestParam(value = "dbList") String dbList,
               @RequestParam(value = "query") String query,
               @RequestParam(value = "rdbms") String rdbms,
               @RequestParam(value = "rdbms_sti") String rdbms_sti) {
@@ -71,7 +95,6 @@ public class Select {
         model.addAttribute("db", db);
         model.addAttribute("rdbms", rdbms);
         model.addAttribute("rdbms_sti", rdbms_sti);
-        model.addAttribute("dbList", dbList);
 
         return "select";
     }
