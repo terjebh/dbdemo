@@ -14,7 +14,14 @@
     <h3><span><th:block th:text="${rdbms}"/></span>
         <button class="btn btn-primary" onclick="nySQL()">Ny SQL</button>
         <button class="btn btn-success" onclick="redigerSQL()">Rediger SQL</button>
-        <span id="rdbms_sti" style="visibility:hidden"><th:block th:text="${rdbms_sti}"/></span>
+        <form id="editQueryForm" method="post" action="/select/edit">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" id="rdbms_sti" name="rdbms_sti" th:value="${rdbms_sti}"/>
+        <input type="hidden" name="rdbms"  th:value="${rdbms}"/>
+        <input type="hidden" name="dbList"  th:value="${dblist}"/>
+        <input type="hidden" name="db"   th:value="${db}"/>
+        <input type="hidden" name="query"  th:value="${query}"/>
+        </form>
     </h3>
     <h7>
         <span id="db"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>

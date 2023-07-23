@@ -33,7 +33,10 @@ public class Select {
     }
 
     @PostMapping(value = "/select/postgres")
-    public String hentData(Model model, @RequestParam(value = "db") String db, @RequestParam(value = "query") String query) {
+    public String hentData(Model model,
+           @RequestParam(value = "db") String db,
+           @RequestParam(value = "dbList") String[] dbList,
+           @RequestParam(value = "query") String query) {
 
         ResultSet resultSet = Postgres.createResultset(db,query,username,pwd);
 
@@ -42,8 +45,10 @@ public class Select {
             model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
+            model.addAttribute("dbList",dbList);
             model.addAttribute("rdbms","PostgreSQL");
             model.addAttribute("rdbms_sti","postgres");
+
         } catch (SQLException e) {
             // throw new RuntimeException(e);
             model.addAttribute("feilmelding",e);
@@ -54,8 +59,26 @@ public class Select {
     }
 
 
+    @PostMapping(value = "/select/edit")
+    public String redigerData(Model model,
+              @RequestParam(value = "db") String db,
+              @RequestParam(value = "dbList") String dbList,
+              @RequestParam(value = "query") String query,
+              @RequestParam(value = "rdbms") String rdbms,
+              @RequestParam(value = "rdbms_sti") String rdbms_sti) {
+
+        model.addAttribute("query", query);
+        model.addAttribute("db", db);
+        model.addAttribute("rdbms", rdbms);
+        model.addAttribute("rdbms_sti", rdbms_sti);
+        model.addAttribute("dbList", dbList);
+
+        return "select";
+    }
+
+
     @GetMapping(value = "/select/microsoft")
-    public String hentSqlMs(Model model) {
+         public String hentSqlMs(Model model) {
         String database = "hr";
         String databaseQuery = "Select * from Sys.Databases";
         try ( ResultSet resultSetDbs = Microsoft.createResultset(database,databaseQuery,"kurs1",":)Kurs123");) {

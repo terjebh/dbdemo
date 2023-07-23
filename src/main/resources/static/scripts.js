@@ -57,30 +57,12 @@ function strip(html){
 }
 
 function redigerSQL() {
-let rdbms_sti = document.getElementById("rdbms_sti").innerHTML;
-let sql = document.getElementById("sql").innerHTML;
-sql = sql.replace("&lt;","<");
-sql = sql.replace("&gt;",">");
-let db = document.getElementById("db").innerHTML;
-document.location.href='/select/'+rdbms_sti+'?db='+db+'&sql='+sql;
+document.getElementById("editQueryForm").submit();
 }
 
 function nySQL() {
-let rdbms_sti = document.getElementById("rdbms_sti").innerHTML;
+let rdbms_sti = document.getElementById("rdbms_sti").value;
 document.location.href='/select/'+rdbms_sti;
 }
 
-const UrlParam = new URLSearchParams(window.location.search);
 
-if( UrlParam.get('sql')) {
-let sql = UrlParam.get('sql');
-document.getElementById("queryText").innerHTML = sql;
-hljs.highlightElement(queryText);
-}
-
-if(UrlParam.get('db')) {
-let db = UrlParam.get('db');
-document.getElementById("selectDB").value = db;
-document.getElementById("db").value = db;
-fetchTableList();
-}
