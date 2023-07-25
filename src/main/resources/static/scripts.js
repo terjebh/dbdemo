@@ -65,4 +65,19 @@ let rdbms_sti = document.getElementById("rdbms_sti").value;
 document.location.href='/select/'+rdbms_sti;
 }
 
+/*
 
+bygg select-dropdown fra fetch- array
+ let data = ["Ram", "Shyam",
+                    "Sita", "Gita"];
+        let list =
+            document.getElementById("myList");
+
+        data.forEach((item) => {
+            let li =
+                document.createElement("li");
+            li.innerText = item;
+            list.appendChild(li);
+        });
+
+  */
