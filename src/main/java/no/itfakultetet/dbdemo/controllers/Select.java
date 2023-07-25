@@ -1,6 +1,5 @@
 package no.itfakultetet.dbdemo.controllers;
 
-import jakarta.websocket.OnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,41 +22,25 @@ public class Select {
 
     @GetMapping(value = "/select/{rdbms_sti}")
     public String hentSql(Model model, @RequestParam(value = "rdbms_sti") String rdbms_sti) {
-        String database;
-        String databaseQuery;
         String rdbms;
 
         if(rdbms_sti.equals("postgres")) {
-            database = "dbdemo";
-            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
             rdbms = "PostgreSQL";
-
         } else if(rdbms_sti.equals("microsoft")) {
-            database = "hr";
-            databaseQuery = "";
             rdbms = "Microsoft SQL Server";
         } else if(rdbms_sti.equals("oracle")) {
-            database = "kurs";
-            databaseQuery = "";
             rdbms = "Oracle";
         } else if (rdbms_sti.equals("mysql")) {
-            database = "hr";
-            databaseQuery = "";
             rdbms = "MySQL/MariaDB";
         } else {
-            database = "unknown";
-            databaseQuery = "unknown";
             rdbms = "unknown";
             logger.error("Ukjent databasehåndteringssystem: "+rdbms_sti);
         }
 
-        try ( ResultSet resultSetDbs = Postgres.createResultset(database,databaseQuery,username,pwd);) {
             model.addAttribute("rdbms",rdbms);
             model.addAttribute("rdbms_sti",rdbms_sti);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return "select";
+
+            return "select";
     }
 
     @PostMapping(value = "/select/postgres")
@@ -65,11 +48,11 @@ public class Select {
            @RequestParam(value = "db") String db,
            @RequestParam(value = "query") String query) {
 
-        ResultSet resultSet = Postgres.createResultset(db,query,username,pwd);
+        ResultSet resultSet = Dao.createResultset(db,query,username,pwd, pwd);
 
         try {
-            model.addAttribute("tableHeader", Postgres.createHeader(resultSet));
-            model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
+            model.addAttribute("tableHeader", Dao.createHeader(resultSet));
+            model.addAttribute("tableContent", Dao.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
             model.addAttribute("rdbms","PostgreSQL");
@@ -121,8 +104,8 @@ public class Select {
         ResultSet resultSet = Microsoft.createResultset(db,query,"kurs1",":)Kurs123");
 
         try {
-            model.addAttribute("tableHeader", Postgres.createHeader(resultSet));
-            model.addAttribute("tableContent", Postgres.createTabledata(resultSet));
+            model.addAttribute("tableHeader", Dao.createHeader(resultSet));
+            model.addAttribute("tableContent", Dao.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
             model.addAttribute("rdbms","Microsoft SQL Server");

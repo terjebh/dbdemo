@@ -13,9 +13,9 @@ import java.util.List;
  * @author Terje Berg-Hansen
  */
 
-public class Postgres {
-    private static final Logger logger = LoggerFactory.getLogger(Postgres.class);
-        public static ResultSet createResultset(String db, String query, String username,String pwd ) {
+public class Dao {
+    private static final Logger logger = LoggerFactory.getLogger(Dao.class);
+        public static ResultSet createResultset(String db, String query, String username, String pwd, String s) {
             System.out.println("username: "+ username);
             System.out.println("pwd: "+ pwd);
         String url = "jdbc:postgresql://noderia.com/"+db+"?user="+username+"&password="+pwd+"&ssl=false";

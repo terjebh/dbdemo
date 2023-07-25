@@ -1,5 +1,7 @@
 package no.itfakultetet.dbdemo.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,44 +14,72 @@ import java.util.List;
 
 @RestController
 public class DBListRestController {
+    private static final Logger logger = LoggerFactory.getLogger(DBListRestController.class);
+    @Value("${pg.username}")
+    private String pgUsername;
 
-    @Value("${app.username}")
-    private String username;
+    @Value("${pg.pwd}")
+    private String pgPwd;
 
-    @Value("${app.pwd}")
-    private String pwd;
+    @Value("${ms.username}")
+    private String msUsername;
+
+    @Value("${ms.pwd}")
+    private String msPwd;
+    @Value("${or.username}")
+    private String orUsername;
+
+    @Value("${or.pwd}")
+    private String orPwd;
+    @Value("${my.username}")
+    private String myUsername;
+
+    @Value("${my.pwd}")
+    private String myPwd;
 
     @GetMapping(value = "/rest/get/dblist/{rdbms}")
-    public String hentTabeller(@PathVariable("rdbms") String rdbms) {
-
+    public String hentDBListe(@PathVariable("rdbms") String rdbms_sti) {
+        String database;
+        String databaseQuery;
+        String username;
+        String pwd;
+        String dbListe = "";
         List<String> DBListe = new ArrayList<>();
 
-        if(rdbms.equals("postgres")) {
-
-            String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-            try (ResultSet resultsetTables = Postgres.createDbList(database, tableQuery, username, pwd)) {
-                tabellListe = Postgres.createTableList(resultsetTables);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        if (rdbms_sti.equals("postgres")) {
+            username = pgUsername;
+            pwd = pgPwd;
+            database = "dbdemo";
+            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+        } else if (rdbms_sti.equals("microsoft")) {
+            username = msUsername;
+            pwd = msPwd;
+            database = "hr";
+            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+        } else if (rdbms_sti.equals("oracle")) {
+            username = orUsername;
+            pwd = orPwd;
+            database = "kurs";
+            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+        } else if (rdbms_sti.equals("mysql")) {
+            username = myUsername;
+            pwd = myPwd;
+            database = "hr";
+            databaseQuery = "show databases";
+        } else {
+            logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
+            return "Ukjent databasehåndteringssystem: " + rdbms_sti;
         }
-        StringBuilder tabeller = new StringBuilder();
 
-        tabeller.append("<h4>Tabeller og views</h4>\n");
-       // tabeller.append("<ul>");
-        for( String tabell: tabellListe) {
-            tabeller.append(tabell+"<br/>\n");
+        try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
+            dbListe = Dao.createDbList(resultSetDbs);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        //tabeller.append("</ul");
 
-        System.out.println(tabeller.toString());
-        return tabeller.toString();
+
+        return dbListe;
     }
 
-
-
 }
-
-
-
 

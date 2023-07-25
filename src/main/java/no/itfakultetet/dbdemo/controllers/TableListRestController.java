@@ -26,8 +26,8 @@ public class TableListRestController {
 
         if(!database.equals("Velg Database")) {
             String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-            try (ResultSet resultsetTables = Postgres.createResultset(database, tableQuery, username, pwd)) {
-                tabellListe = Postgres.createTableList(resultsetTables);
+            try (ResultSet resultsetTables = Dao.createResultset(database, tableQuery, username, pwd, pwd)) {
+                tabellListe = Dao.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
