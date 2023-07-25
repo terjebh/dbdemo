@@ -31,6 +31,7 @@ public class Select {
             database = "dbdemo";
             databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
             rdbms = "PostgreSQL";
+
         } else if(rdbms_sti.equals("microsoft")) {
             database = "hr";
             databaseQuery = "";

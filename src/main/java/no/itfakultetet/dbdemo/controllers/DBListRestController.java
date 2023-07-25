@@ -25,8 +25,9 @@ public class DBListRestController {
         List<String> DBListe = new ArrayList<>();
 
         if(rdbms.equals("postgres")) {
+
             String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-            try (ResultSet resultsetTables = Postgres.create(database, tableQuery, username, pwd)) {
+            try (ResultSet resultsetTables = Postgres.createDbList(database, tableQuery, username, pwd)) {
                 tabellListe = Postgres.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
