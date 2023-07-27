@@ -1,5 +1,6 @@
-package no.itfakultetet.dbdemo.controllers;
+package no.itfakultetet.dbdemo.model;
 
+import no.itfakultetet.dbdemo.model.Dao;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,5 +1,6 @@
-package no.itfakultetet.dbdemo.controllers;
+package no.itfakultetet.dbdemo.controller;
 
+import no.itfakultetet.dbdemo.model.Dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,8 +67,7 @@ public class Select {
 
         return "resultat";
     }
-
-
+    
     @PostMapping(value = "/select/edit")
     public String redigerData(Model model,
               @RequestParam(value = "db") String db,

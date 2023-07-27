@@ -1,4 +1,4 @@
-package no.itfakultetet.dbdemo.controllers;
+package no.itfakultetet.dbdemo.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
