@@ -1,4 +1,4 @@
-package no.itfakultetet.dbdemo.model;
+package no.itfakultetet.dbdemo.controller;
 
 import no.itfakultetet.dbdemo.model.Dao;
 import org.springframework.beans.factory.annotation.Value;

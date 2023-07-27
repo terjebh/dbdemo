@@ -84,7 +84,7 @@ public class Select {
     }
 
 
-    @GetMapping(value = "/select/microsoft")
+    @GetMapping(value = "/select/microso  ft")
          public String hentSqlMs(Model model) {
         String database = "hr";
         String databaseQuery = "Select * from Sys.Databases";

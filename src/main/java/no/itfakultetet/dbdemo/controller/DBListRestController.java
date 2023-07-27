@@ -1,5 +1,6 @@
-package no.itfakultetet.dbdemo.model;
+package no.itfakultetet.dbdemo.controller;
 
+import no.itfakultetet.dbdemo.model.Dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,13 +39,13 @@ public class DBListRestController {
     private String myPwd;
 
     @GetMapping(value = "/rest/get/dblist/{rdbms}")
-    public String hentDBListe(@PathVariable("rdbms") String rdbms_sti) {
-        String database;
-        String databaseQuery;
-        String username;
-        String pwd;
-        String dbListe = "";
-        List<String> DBListe = new ArrayList<>();
+    public ResultSet hentDBListe(@PathVariable("rdbms") String rdbms_sti) {
+        String database = null;
+        String databaseQuery = null;
+        String username = null;
+        String pwd = null;
+        ResultSet dbListe;
+
 
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
@@ -68,11 +69,11 @@ public class DBListRestController {
             databaseQuery = "show databases";
         } else {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
-            return "Ukjent databasehåndteringssystem: " + rdbms_sti;
+            
         }
 
         try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
-            dbListe = Dao.createDbList(resultSetDbs);
+            dbListe = resultSetDbs;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
