@@ -68,19 +68,16 @@ document.location.href='/select/'+rdbms_sti;
 function byggDBListe() {
 
 let rdbms_sti = document.getElementById("rdbms_sti").value;
-        let option =
-            document.getElementById("selectDB");
 
-  fetch("/rest/get/dbliste/"+rdbms_sti)
-  .then(dbs => dbs.text())
+   let select = document.getElementById("selectDB");
+
+  fetch("/rest/get/dblist/"+rdbms_sti)
+  .then(dbs => dbs.json())
   .then(liste => liste.forEach((item) => {
          let option = document.createElement("option");
          option.innerText = item;
          select.appendChild(option);
-         });
+         }));
 }
 
-
-
-}
-
+byggDBListe();
