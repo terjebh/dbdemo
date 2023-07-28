@@ -39,12 +39,12 @@ public class DBListRestController {
     private String myPwd;
 
     @GetMapping(value = "/rest/get/dblist/{rdbms}")
-    public ResultSet hentDBListe(@PathVariable("rdbms") String rdbms_sti) {
+    public List hentDBListe(@PathVariable("rdbms") String rdbms_sti) {
         String database = null;
         String databaseQuery = null;
         String username = null;
         String pwd = null;
-        ResultSet dbListe;
+        List dbListe;
 
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
@@ -75,11 +75,11 @@ public class DBListRestController {
         }
 
         try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
-            dbListe = resultSetDbs;
+            dbListe = Dao.createDbList(resultSetDbs);
+    logger.info("dbListe: "+dbListe);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
 
         return dbListe;
     }
