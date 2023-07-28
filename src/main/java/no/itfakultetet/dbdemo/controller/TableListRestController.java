@@ -1,6 +1,8 @@
 package no.itfakultetet.dbdemo.controller;
 
 import no.itfakultetet.dbdemo.model.Dao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,20 +16,61 @@ import java.util.List;
 @RestController
 public class TableListRestController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TableListRestController.class);
     @Value("${pg.username}")
-    private String username;
-
+    private String pgUsername;
     @Value("${pg.pwd}")
-    private String pwd;
+    private String pgPwd;
+    @Value("${ms.username}")
+    private String msUsername;
+    @Value("${ms.pwd}")
+    private String msPwd;
+    @Value("${or.username}")
+    private String orUsername;
+    @Value("${or.pwd}")
+    private String orPwd;
+    @Value("${my.username}")
+    private String myUsername;
+    @Value("${my.pwd}")
+    private String myPwd;
 
-    @GetMapping(value = "/rest/get/tablelist/{db}")
-    public String hentTabeller(@PathVariable("db") String database) {
+    @GetMapping(value = "/rest/get/tablelist/{rdbms_sti}/{db}")
+    public String hentTabeller(@PathVariable("rdbms_sti") String rdbms_sti, @PathVariable("db") String database) {
+
+        String tableQuery = null;
+        String username = null;
+        String pwd = null;
+        List tableList;
+
+
+        if (rdbms_sti.equals("postgres")) {
+            username = pgUsername;
+            logger.info("pgUsername er: "+pgUsername);
+            pwd = pgPwd;
+            logger.info("pgPwd er: "+pgPwd);
+            tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
+            logger.info("dbQuery er: "+tableQuery);
+        } else if (rdbms_sti.equals("microsoft")) {
+            username = msUsername;
+            pwd = msPwd;
+            tableQuery = "";
+        } else if (rdbms_sti.equals("oracle")) {
+            username = orUsername;
+            pwd = orPwd;
+            tableQuery = "";
+        } else if (rdbms_sti.equals("mysql")) {
+            username = myUsername;
+            pwd = myPwd;
+            tableQuery = "show tables";
+        } else {
+            logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
+        }
+
 
         List<String> tabellListe = new ArrayList<>();
 
         if(!database.equals("Velg Database")) {
-            String tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-            try (ResultSet resultsetTables = Dao.createResultset(database, tableQuery, username, pwd, pwd)) {
+            try (ResultSet resultsetTables = Dao.createResultset(rdbms_sti,database, tableQuery, username, pwd)) {
                 tabellListe = Dao.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);

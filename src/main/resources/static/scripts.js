@@ -46,7 +46,7 @@ document.getElementById("selectDB").addEventListener("change", function () {
 });
 
 function fetchTableList() {
-  fetch("/rest/get/tablelist/"+document.getElementById("selectDB").value)
+  fetch("/rest/get/tablelist/"+document.getElementById("rdbms_sti").value+"/"+document.getElementById("selectDB").value)
   .then(tabeller => tabeller.text())
   .then(liste => document.getElementById("tabellListe").innerHTML=liste );
 }

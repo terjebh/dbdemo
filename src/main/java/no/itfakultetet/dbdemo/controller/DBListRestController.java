@@ -29,7 +29,6 @@ public class DBListRestController {
     private String msPwd;
     @Value("${or.username}")
     private String orUsername;
-
     @Value("${or.pwd}")
     private String orPwd;
     @Value("${my.username}")
@@ -48,12 +47,12 @@ public class DBListRestController {
 
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
-            logger.info("pgUsername er: "+pgUsername);
+//            logger.info("pgUsername er: "+pgUsername);
             pwd = pgPwd;
-            logger.info("pgPwd er: "+pgPwd);
+//            logger.info("pgPwd er: "+pgPwd);
             database = "dbdemo";
             databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
-            logger.info("dbQuery er: "+databaseQuery);
+//            logger.info("dbQuery er: "+databaseQuery);
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;
@@ -71,12 +70,11 @@ public class DBListRestController {
             databaseQuery = "show databases";
         } else {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
-            
         }
 
         try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
             dbListe = Dao.createDbList(resultSetDbs);
-            logger.info("dbListe: "+dbListe);
+//          logger.info("dbListe: "+dbListe);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
