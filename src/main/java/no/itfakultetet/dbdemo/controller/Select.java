@@ -22,7 +22,7 @@ public class Select {
     private String pwd;
 
     @GetMapping(value = "/select/{rdbms_sti}")
-    public String hentSql(Model model, @RequestParam(value = "rdbms_sti") String rdbms_sti) {
+    public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti) {
         String rdbms;
 
         if(rdbms_sti.equals("postgres")) {
