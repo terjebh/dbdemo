@@ -76,7 +76,7 @@ public class DBListRestController {
 
         try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
             dbListe = Dao.createDbList(resultSetDbs);
-    logger.info("dbListe: "+dbListe);
+            logger.info("dbListe: "+dbListe);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
