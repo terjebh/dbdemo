@@ -65,8 +65,9 @@ let rdbms_sti = document.getElementById("rdbms_sti").value;
 document.location.href='/select/'+rdbms_sti;
 }
 
-function byggDBListe (String rdbms_sti) {
+function byggDBListe() {
 
+let rdbms_sti = document.getElementById("rdbms_sti").value;
         let option =
             document.getElementById("selectDB");
 
