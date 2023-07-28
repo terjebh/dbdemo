@@ -14,10 +14,10 @@ import java.util.List;
 @RestController
 public class TableListRestController {
 
-    @Value("${app.username}")
+    @Value("${pg.username}")
     private String username;
 
-    @Value("${app.pwd}")
+    @Value("${pg.pwd}")
     private String pwd;
 
     @GetMapping(value = "/rest/get/tablelist/{db}")

@@ -46,12 +46,14 @@ public class DBListRestController {
         String pwd = null;
         ResultSet dbListe;
 
-
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
+            logger.info("pgUsername er: "+pgUsername);
             pwd = pgPwd;
+            logger.info("pgPwd er: "+pgPwd);
             database = "dbdemo";
             databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+            logger.info("dbQuery er: "+databaseQuery);
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;

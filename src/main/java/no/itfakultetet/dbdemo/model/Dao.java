@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Dao {
     private static final Logger logger = LoggerFactory.getLogger(Dao.class);
-        public static ResultSet createResultset(String db, String query, String username, String pwd, String s) {
+        public static ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
             System.out.println("username: "+ username);
             System.out.println("pwd: "+ pwd);
         String url = "jdbc:postgresql://noderia.com/"+db+"?user="+username+"&password="+pwd+"&ssl=false";
