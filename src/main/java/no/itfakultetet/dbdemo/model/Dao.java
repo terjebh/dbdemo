@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Klasse som kobler til Postgres og lager resultatsett og header og content til tabeller i Thymeleaf.
+ * Klasse som kobler til Databaser og lager resultatsett og header og content til tabeller i Thymeleaf.
  *
  * @author Terje Berg-Hansen
  */
@@ -23,7 +23,7 @@ public class Dao {
         } else if (rdbms_sti.equals("microsoft")) {
             url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user="+username+";password="+pwd+";encrypt=false";
         } else if (rdbms_sti.equals("oracle")) {
-            url="jdbc:oracle:thin:"+username+":"+pwd+"@noderia.com:1521:FREE";
+            url="jdbc:oracle:thin:@noderia.com:1521:FREE";
         } else if (rdbms_sti.equals("mysql")) {
             url = "jdbc:mysql://noderia.com/"+ db + "?user=" + username + "&password=" + pwd ;
         } else {
@@ -31,7 +31,12 @@ public class Dao {
         }
         ResultSet rs = null;
         try {
-            Connection conn = DriverManager.getConnection(url);
+            Connection conn;
+            if(rdbms_sti.equals("oracle")) {
+                conn = DriverManager.getConnection(url,username,pwd);
+            } else {
+                conn = DriverManager.getConnection(url);
+            }
             Statement st = conn.createStatement();
             rs = st.executeQuery(query);
             // ResultSetMetaData rsmd = rs.getMetaData();

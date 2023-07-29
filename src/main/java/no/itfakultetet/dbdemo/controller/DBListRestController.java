@@ -62,7 +62,7 @@ public class DBListRestController {
             username = orUsername;
             pwd = orPwd;
             database = "kurs";
-            databaseQuery = "SELECT * FROM dba_pdbs";
+            databaseQuery = "SELECT USERNAME FROM ALL_USERS where username like 'K%' ORDER BY USERNAME";
         } else if (rdbms_sti.equals("mysql")) {
             username = myUsername;
             pwd = myPwd;
