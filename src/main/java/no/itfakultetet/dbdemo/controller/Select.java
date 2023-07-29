@@ -44,12 +44,13 @@ public class Select {
             return "select";
     }
 
-    @PostMapping(value = "/select/postgres")
+    @PostMapping(value = "/select")
     public String hentData(Model model,
            @RequestParam(value = "db") String db,
-           @RequestParam(value = "query") String query) {
+           @RequestParam(value = "query") String query,
+           @RequestParam(value = "rdbms_sti") String rdbms_sti) {
 
-        ResultSet resultSet = Dao.createResultset(db,query,username,pwd, pwd);
+        ResultSet resultSet = Dao.createResultset(rdbms_sti, db,query,username,pwd);
 
         try {
             model.addAttribute("tableHeader", Dao.createHeader(resultSet));

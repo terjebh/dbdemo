@@ -8,7 +8,7 @@ if (document.getElementById("selectDB").value=="Velg Database") {
 } else {
   let renQueryText = strip(document.getElementById("queryText").innerHTML);
   document.getElementById("query").value = renQueryText;
-  document.getElementById("sql").action = document.getElementById("rdbms_sti").innerHTML
+  document.getElementById("sql").action = "/select/"+document.getElementById("rdbms_sti").value
   document.getElementById("sql").submit();
 }
 });
@@ -22,6 +22,7 @@ if (document.getElementById("selectDB").value=="Velg Database") {
      document.getElementById("feilmelding").innerHTML="Skriv en SQL-setning å hente data med...";
 } else {
   let renQueryText = strip(document.getElementById("queryText").innerHTML)
+  document.getElementById("sql").action = "/select/"+document.getElementById("rdbms_sti").value
     document.getElementById("query").value = renQueryText;
   document.getElementById("sql").submit();
 }
