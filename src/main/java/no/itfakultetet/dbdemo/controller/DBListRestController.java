@@ -57,17 +57,17 @@ public class DBListRestController {
             username = msUsername;
             pwd = msPwd;
             database = "hr";
-            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+            databaseQuery = "Select * from Sys.Databases";
         } else if (rdbms_sti.equals("oracle")) {
             username = orUsername;
             pwd = orPwd;
             database = "kurs";
-            databaseQuery = "select datname from pg_database WHERE has_database_privilege('" + username + "', datname, 'CONNECT') and datistemplate = false";
+            databaseQuery = "SELECT * FROM dba_pdbs";
         } else if (rdbms_sti.equals("mysql")) {
             username = myUsername;
             pwd = myPwd;
             database = "hr";
-            databaseQuery = "show databases";
+            databaseQuery = "SELECT schema_name FROM information_schema.schemata";
         } else {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
         }
