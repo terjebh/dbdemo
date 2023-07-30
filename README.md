@@ -14,4 +14,5 @@ Nexus jar-fil: [https://nexus.itfakultetet.no](https://nexus.itfakultetet.no/#br
 Send meg gjerne info om bugs, pull-requests etc.
 
 @ your service
+
 Terje
