@@ -61,7 +61,7 @@ public class TableListRestController {
         } else if (rdbms_sti.equals("mysql")) {
             username = myUsername;
             pwd = myPwd;
-            tableQuery = "show tables";
+            tableQuery = "SELECT table_schema, table_name, table_type FROM information_schema.tables WHERE table_schema = '"+database+"'";
         } else {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
         }
