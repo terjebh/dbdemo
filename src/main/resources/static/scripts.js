@@ -1,5 +1,3 @@
-hljs.highlightElement(queryText);
-
 document.getElementById("hent").addEventListener("click",function ()  {
 if (document.getElementById("selectDB").value=="Velg Database") {
    document.getElementById("feilmelding").innerHTML="Velg en database å hente data fra ...";
@@ -22,7 +20,7 @@ if (document.getElementById("selectDB").value=="Velg Database") {
      document.getElementById("feilmelding").innerHTML="Skriv en SQL-setning å hente data med...";
 } else {
   let renQueryText = strip(document.getElementById("queryText").innerHTML)
-  document.getElementById("sql").action = "/select/"+document.getElementById("rdbms_sti").value
+ document.getElementById("sql").action = "/select/"+document.getElementById("rdbms_sti").value
     document.getElementById("query").value = renQueryText;
   document.getElementById("sql").submit();
 }

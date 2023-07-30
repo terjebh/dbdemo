@@ -45,11 +45,11 @@ public class TableListRestController {
 
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
-            logger.info("pgUsername er: "+pgUsername);
+        //  logger.info("pgUsername er: "+pgUsername);
             pwd = pgPwd;
-            logger.info("pgPwd er: "+pgPwd);
+        //  logger.info("pgPwd er: "+pgPwd);
             tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-            logger.info("dbQuery er: "+tableQuery);
+        //   logger.info("dbQuery er: "+tableQuery);
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;
@@ -85,7 +85,6 @@ public class TableListRestController {
         }
         //tabeller.append("</ul");
 
-        System.out.println(tabeller.toString());
         return tabeller.toString();
     }
 

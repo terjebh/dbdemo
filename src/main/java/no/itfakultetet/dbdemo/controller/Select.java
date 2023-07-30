@@ -16,14 +16,27 @@ public class Select {
 
     private static final Logger logger = LoggerFactory.getLogger(Select.class);
     @Value("${pg.username}")
-    private String username;
-
+    private String pgUsername;
     @Value("${pg.pwd}")
-    private String pwd;
+    private String pgPwd;
+    @Value("${ms.username}")
+    private String msUsername;
+    @Value("${ms.pwd}")
+    private String msPwd;
+    @Value("${or.username}")
+    private String orUsername;
+    @Value("${or.pwd}")
+    private String orPwd;
+    @Value("${my.username}")
+    private String myUsername;
+    @Value("${my.pwd}")
+    private String myPwd;
 
     @GetMapping(value = "/select/{rdbms_sti}")
     public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti) {
         String rdbms;
+        String username = null;
+        String pwd = null;
 
         if(rdbms_sti.equals("postgres")) {
             rdbms = "PostgreSQL";
@@ -44,24 +57,54 @@ public class Select {
             return "select";
     }
 
-    @PostMapping(value = "/select")
+    @PostMapping(value = "/select/{rdbms_sti}")
     public String hentData(Model model,
+           @PathVariable("rdbms_sti") String rdbms_sti,
            @RequestParam(value = "db") String db,
-           @RequestParam(value = "query") String query,
-           @RequestParam(value = "rdbms_sti") String rdbms_sti) {
+           @RequestParam(value = "query") String query) {
 
-        ResultSet resultSet = Dao.createResultset(rdbms_sti, db,query,username,pwd);
+        logger.info("rdbms_sti fra select/post: "+rdbms_sti);
+
+        String rdbms;
+        String username = null;
+        String pwd = null;
+
+        if(rdbms_sti.equals("postgres")) {
+            rdbms = "PostgreSQL";
+            username = pgUsername;
+            pwd = pgPwd;
+        } else if(rdbms_sti.equals("microsoft")) {
+            rdbms = "Microsoft SQL Server";
+            username = msUsername;
+            pwd = msPwd;
+        } else if(rdbms_sti.equals("oracle")) {
+            rdbms = "Oracle";
+            username = orUsername;
+            pwd = orPwd;
+        } else if (rdbms_sti.equals("mysql")) {
+            rdbms = "MySQL/MariaDB";
+            username = myUsername;
+            pwd = myPwd;
+        } else {
+            rdbms = "unknown";
+            username = "unknown";
+            pwd = "unknown";
+            logger.error("Ukjent databasehåndteringssystem: "+rdbms_sti+"og brukernavn/passord: "+username+" - "+pwd);
+        }
+
+        ResultSet resultSet = Dao.createResultset(rdbms_sti, db, query,username,pwd);
 
         try {
             model.addAttribute("tableHeader", Dao.createHeader(resultSet));
             model.addAttribute("tableContent", Dao.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
-            model.addAttribute("rdbms","PostgreSQL");
-            model.addAttribute("rdbms_sti","postgres");
-
+            model.addAttribute("rdbms",rdbms);
+            model.addAttribute("rdbms_sti",rdbms_sti);
+            logger.info("modell-laget og sendt til resultat.html");
         } catch (SQLException e) {
             // throw new RuntimeException(e);
+            logger.error("Feil ved laging av header og tabledata:"+e.getMessage());
             model.addAttribute("feilmelding",e);
             return "error";
         }
@@ -98,27 +141,5 @@ public class Select {
         }
         return "select";
     }
-
-    @PostMapping(value = "/select/microsoft")
-    public String hentDataMS(Model model, @RequestParam(value = "db") String db, @RequestParam(value = "query") String query) {
-
-        ResultSet resultSet = Microsoft.createResultset(db,query,"kurs1",":)Kurs123");
-
-        try {
-            model.addAttribute("tableHeader", Dao.createHeader(resultSet));
-            model.addAttribute("tableContent", Dao.createTabledata(resultSet));
-            model.addAttribute("query", query);
-            model.addAttribute("db",db);
-            model.addAttribute("rdbms","Microsoft SQL Server");
-            model.addAttribute("rdbms_sti","microsoft");
-        } catch (SQLException e) {
-            // throw new RuntimeException(e);
-            model.addAttribute("feilmelding",e);
-            return "error";
-        }
-
-        return "resultat";
-    }
-
 
 }

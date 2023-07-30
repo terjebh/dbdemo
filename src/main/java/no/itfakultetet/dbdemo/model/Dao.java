@@ -16,7 +16,19 @@ import java.util.List;
 public class Dao {
     private static final Logger logger = LoggerFactory.getLogger(Dao.class);
 
+    /**
+     * Creates a resultset from a supplied SQL statement
+     *
+     * @param rdbms_sti
+     * @param db
+     * @param query
+     * @param username
+     * @param pwd
+     * @return
+     */
     public static ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
+
+        // Get connection strings
         String url = "";
         if (rdbms_sti.equals("postgres")) {
             url = "jdbc:postgresql://noderia.com/" + db + "?user=" + username + "&password=" + pwd + "&ssl=false";
@@ -40,12 +52,12 @@ public class Dao {
             Statement st = conn.createStatement();
             rs = st.executeQuery(query);
             // ResultSetMetaData rsmd = rs.getMetaData();
-
         } catch (SQLException e) {
             //throw new RuntimeException(e);
             // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
-            logger.error("Noe gikk galt. Feilmelding: " + e.getMessage());
+            logger.error("Noe gikk galt i createResultSet. Feilmelding: " + e.getMessage());
         }
+
         return rs;
     }
 

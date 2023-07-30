@@ -18,13 +18,10 @@ public class DBListRestController {
     private static final Logger logger = LoggerFactory.getLogger(DBListRestController.class);
     @Value("${pg.username}")
     private String pgUsername;
-
     @Value("${pg.pwd}")
     private String pgPwd;
-
     @Value("${ms.username}")
     private String msUsername;
-
     @Value("${ms.pwd}")
     private String msPwd;
     @Value("${or.username}")
@@ -33,7 +30,6 @@ public class DBListRestController {
     private String orPwd;
     @Value("${my.username}")
     private String myUsername;
-
     @Value("${my.pwd}")
     private String myPwd;
 
