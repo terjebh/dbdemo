@@ -53,11 +53,11 @@ public class TableListRestController {
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;
-            tableQuery = "";
+            tableQuery = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='"+database+"'";
         } else if (rdbms_sti.equals("oracle")) {
             username = orUsername;
             pwd = orPwd;
-            tableQuery = "";
+            tableQuery = "SELECT owner, table_name, 'TABLE' FROM all_tables where owner='"+username.toUpperCase()+"' union Select owner, view_name, 'VIEW' from all_views where owner='"+username.toUpperCase()+"'";
         } else if (rdbms_sti.equals("mysql")) {
             username = myUsername;
             pwd = myPwd;
