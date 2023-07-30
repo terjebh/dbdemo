@@ -127,19 +127,4 @@ public class Select {
         return "select";
     }
 
-
-    @GetMapping(value = "/select/microsoft")
-         public String hentSqlMs(Model model) {
-        String database = "hr";
-        String databaseQuery = "Select * from Sys.Databases";
-        try ( ResultSet resultSetDbs = Microsoft.createResultset(database,databaseQuery,"kurs1",":)Kurs123");) {
-            model.addAttribute("dbList", Microsoft.createDbList(resultSetDbs));
-            model.addAttribute("rdbms","Microsoft SQL Server");
-            model.addAttribute("rdbms_sti","microsoft");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return "select";
-    }
-
 }
