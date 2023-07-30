@@ -5,7 +5,7 @@ Disse databasene støttes per nå:
 - PostgreSQL
 - Oracle
 - Microsoft SQL Server
-- MySQL/NMariaDB
+- MySQL/MariaDB
 
 Docker:  docker run -d --name dbapp -p 8080:8080 terjebh/dbdemo
 
