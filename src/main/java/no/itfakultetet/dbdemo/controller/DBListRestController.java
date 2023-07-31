@@ -67,9 +67,10 @@ public class DBListRestController {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
         }
 
-        try (ResultSet resultSetDbs = Dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
-            dbListe = Dao.createDbList(resultSetDbs);
-//          logger.info("dbListe: "+dbListe);
+        Dao dao = new Dao();
+        try (ResultSet resultSetDbs = dao.createResultset(rdbms_sti, database, databaseQuery, username, pwd);) {
+            dbListe = dao.createDbList(resultSetDbs);
+            //          logger.info("dbListe: "+dbListe);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

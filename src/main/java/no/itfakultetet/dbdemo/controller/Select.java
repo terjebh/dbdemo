@@ -92,9 +92,11 @@ public class Select {
             logger.error("Ukjent databasehåndteringssystem: "+rdbms_sti+"og brukernavn/passord: "+username+" - "+pwd);
         }
 
-        try (ResultSet resultSet = Dao.createResultset(rdbms_sti, db, query,username,pwd);) {
-            model.addAttribute("tableHeader", Dao.createHeader(resultSet));
-            model.addAttribute("tableContent", Dao.createTabledata(resultSet));
+        Dao dao = new Dao();
+
+        try (ResultSet resultSet = dao.createResultset(rdbms_sti, db, query,username,pwd);) {
+            model.addAttribute("tableHeader", dao.createHeader(resultSet));
+            model.addAttribute("tableContent", dao.createTabledata(resultSet));
             model.addAttribute("query", query);
             model.addAttribute("db",db);
             model.addAttribute("rdbms",rdbms);

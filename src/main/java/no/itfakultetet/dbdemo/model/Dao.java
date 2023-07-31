@@ -26,7 +26,7 @@ public class Dao {
      * @param pwd
      * @return
      */
-    public static ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
+    public ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
 
         // Get connection strings
         String url = "";
@@ -61,8 +61,7 @@ public class Dao {
         return rs;
     }
 
-    public static Object createHeader(ResultSet resultSet) throws SQLException {
-
+    public  Object createHeader(ResultSet resultSet) throws SQLException {
         ResultSetMetaData metadata = resultSet.getMetaData();
         final int count = metadata.getColumnCount();
         final List<String> header = new ArrayList<>(count);
@@ -72,7 +71,7 @@ public class Dao {
         return header;
     }
 
-    public static List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
+    public  List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
 
         ResultSetMetaData metadata = resultSet.getMetaData();
         int numberOfColumns = metadata.getColumnCount();
@@ -89,22 +88,24 @@ public class Dao {
         return tabell;
     }
 
-    public static List<String> createDbList(ResultSet resultSet) throws SQLException {
+    public List<String> createDbList(ResultSet resultSet) throws SQLException {
         List<String> dbList = new ArrayList<>();
 
         while (resultSet.next()) {
             dbList.add(resultSet.getString(1));
         }
+        resultSet.close();
 
-        return dbList.stream().sorted().toList();
+         return dbList.stream().sorted().toList();
     }
 
-    public static List<String> createTableList(ResultSet resultSetTables) throws SQLException {
+    public  List<String> createTableList(ResultSet resultSetTables) throws SQLException {
         List<String> tableList = new ArrayList<>();
 
         while (resultSetTables.next()) {
             tableList.add(resultSetTables.getString(1) + ": " + resultSetTables.getString(2) + " (" + resultSetTables.getString(3) + ")");
         }
+        resultSetTables.close();
         return tableList.stream().toList();
     }
 

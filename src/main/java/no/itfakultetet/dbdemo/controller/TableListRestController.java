@@ -45,33 +45,34 @@ public class TableListRestController {
 
         if (rdbms_sti.equals("postgres")) {
             username = pgUsername;
-        //  logger.info("pgUsername er: "+pgUsername);
+            //  logger.info("pgUsername er: "+pgUsername);
             pwd = pgPwd;
-        //  logger.info("pgPwd er: "+pgPwd);
+            //  logger.info("pgPwd er: "+pgPwd);
             tableQuery = "select table_schema, table_name, table_type from information_schema.tables where not table_schema in ('pg_catalog','information_schema')  order by table_schema, table_type, table_name";
-        //   logger.info("dbQuery er: "+tableQuery);
+            //   logger.info("dbQuery er: "+tableQuery);
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;
-            tableQuery = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='"+database+"'";
+            tableQuery = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='" + database + "'";
         } else if (rdbms_sti.equals("oracle")) {
             username = orUsername;
             pwd = orPwd;
-            tableQuery = "SELECT owner, table_name, 'TABLE' FROM all_tables where owner='"+username.toUpperCase()+"' union Select owner, view_name, 'VIEW' from all_views where owner='"+username.toUpperCase()+"'";
+            tableQuery = "SELECT owner, table_name, 'TABLE' FROM all_tables where owner='" + username.toUpperCase() + "' union Select owner, view_name, 'VIEW' from all_views where owner='" + username.toUpperCase() + "'";
         } else if (rdbms_sti.equals("mysql")) {
             username = myUsername;
             pwd = myPwd;
-            tableQuery = "SELECT table_schema, table_name, table_type FROM information_schema.tables WHERE table_schema = '"+database+"'";
+            tableQuery = "SELECT table_schema, table_name, table_type FROM information_schema.tables WHERE table_schema = '" + database + "'";
         } else {
             logger.error("Ukjent databasehåndteringssystem: " + rdbms_sti);
         }
 
 
         List<String> tabellListe = new ArrayList<>();
+        Dao dao = new Dao();
 
-        if(!database.equals("Velg Database")) {
-            try (ResultSet resultsetTables = Dao.createResultset(rdbms_sti,database, tableQuery, username, pwd)) {
-                tabellListe = Dao.createTableList(resultsetTables);
+        if (!database.equals("Velg Database")) {
+            try (ResultSet resultsetTables = dao.createResultset(rdbms_sti, database, tableQuery, username, pwd)) {
+                tabellListe = dao.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -79,15 +80,14 @@ public class TableListRestController {
         StringBuilder tabeller = new StringBuilder();
 
         tabeller.append("<h4>Tabeller og views</h4>\n");
-       // tabeller.append("<ul>");
-        for( String tabell: tabellListe) {
-            tabeller.append(tabell+"<br/>\n");
+        // tabeller.append("<ul>");
+        for (String tabell : tabellListe) {
+            tabeller.append(tabell + "<br/>\n");
         }
         //tabeller.append("</ul");
 
         return tabeller.toString();
     }
-
 
 
 }
