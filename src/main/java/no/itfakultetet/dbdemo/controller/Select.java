@@ -105,7 +105,7 @@ public class Select {
         } catch (SQLException e) {
             // throw new RuntimeException(e);
             logger.error("Feil ved laging av header og tabledata:"+e.getMessage());
-            model.addAttribute("feilmelding",e);
+            model.addAttribute("feilmelding",e.getMessage());
             return "error";
         }
 
