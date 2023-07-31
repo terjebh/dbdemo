@@ -68,11 +68,11 @@ public class TableListRestController {
 
 
         List<String> tabellListe = new ArrayList<>();
-        Dao dao = new Dao();
+        Dao tabellListeDao = new Dao();
 
         if (!database.equals("Velg Database")) {
-            try (ResultSet resultsetTables = dao.createResultset(rdbms_sti, database, tableQuery, username, pwd)) {
-                tabellListe = dao.createTableList(resultsetTables);
+            try (ResultSet resultsetTables = tabellListeDao.createResultset(rdbms_sti, database, tableQuery, username, pwd)) {
+                tabellListe = tabellListeDao.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

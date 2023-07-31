@@ -15,6 +15,39 @@ import java.util.List;
 
 public class Dao {
     private static final Logger logger = LoggerFactory.getLogger(Dao.class);
+    private String rdbms_sti, db, username, pwd;
+    private Connection conn;
+
+    private Connection getConn() {
+        // Get connection strings
+        String url = "";
+        if (rdbms_sti.equals("postgres")) {
+            url = "jdbc:postgresql://noderia.com/" + db + "?user=" + username + "&password=" + pwd + "&ssl=false";
+        } else if (rdbms_sti.equals("microsoft")) {
+            url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user=" + username + ";password=" + pwd + ";encrypt=false";
+        } else if (rdbms_sti.equals("oracle")) {
+            url = "jdbc:oracle:thin:@noderia.com:1521:FREE";
+        } else if (rdbms_sti.equals("mysql")) {
+            url = "jdbc:mysql://noderia.com/" + db + "?user=" + username + "&password=" + pwd;
+        } else {
+            logger.error("Ukjent databasehåndteringssystem...: " + rdbms_sti);
+        }
+
+
+        try {
+
+            if (rdbms_sti.equals("oracle")) {
+                conn = DriverManager.getConnection(url, username, pwd);
+            } else {
+                conn = DriverManager.getConnection(url);
+            }
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return conn;
+    }
+
 
     /**
      * Creates a resultset from a supplied SQL statement
@@ -27,31 +60,18 @@ public class Dao {
      * @return
      */
     public ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
+        this.rdbms_sti = rdbms_sti;
+        this.username = username;
+        this.db = db;
+        this.pwd = pwd;
 
-        // Get connection strings
-        String url = "";
-        if (rdbms_sti.equals("postgres")) {
-            url = "jdbc:postgresql://noderia.com/" + db + "?user=" + username + "&password=" + pwd + "&ssl=false";
-        } else if (rdbms_sti.equals("microsoft")) {
-            url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user="+username+";password="+pwd+";encrypt=false";
-        } else if (rdbms_sti.equals("oracle")) {
-            url="jdbc:oracle:thin:@noderia.com:1521:FREE";
-        } else if (rdbms_sti.equals("mysql")) {
-            url = "jdbc:mysql://noderia.com/"+ db + "?user=" + username + "&password=" + pwd ;
-        } else {
-            logger.error("Ukjent databasehåndteringssystem...: "+rdbms_sti);
-        }
         ResultSet rs = null;
+        Connection conn = getConn();
         try {
-            Connection conn;
-            if(rdbms_sti.equals("oracle")) {
-                conn = DriverManager.getConnection(url,username,pwd);
-            } else {
-                conn = DriverManager.getConnection(url);
-            }
             Statement st = conn.createStatement();
             rs = st.executeQuery(query);
             // ResultSetMetaData rsmd = rs.getMetaData();
+
         } catch (SQLException e) {
             //throw new RuntimeException(e);
             // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
@@ -61,7 +81,7 @@ public class Dao {
         return rs;
     }
 
-    public  Object createHeader(ResultSet resultSet) throws SQLException {
+    public Object createHeader(ResultSet resultSet) throws SQLException {
         ResultSetMetaData metadata = resultSet.getMetaData();
         final int count = metadata.getColumnCount();
         final List<String> header = new ArrayList<>(count);
@@ -71,7 +91,7 @@ public class Dao {
         return header;
     }
 
-    public  List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
+    public List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
 
         ResultSetMetaData metadata = resultSet.getMetaData();
         int numberOfColumns = metadata.getColumnCount();
@@ -85,27 +105,30 @@ public class Dao {
             }
             tabell.add(rad);
         }
+        conn.close();
+        resultSet.close();
         return tabell;
     }
 
-    public List<String> createDbList(ResultSet resultSet) throws SQLException {
+    public List<String> createDbList(ResultSet resultSetDB) throws SQLException {
         List<String> dbList = new ArrayList<>();
 
-        while (resultSet.next()) {
-            dbList.add(resultSet.getString(1));
+        while (resultSetDB.next()) {
+            dbList.add(resultSetDB.getString(1));
         }
-        resultSet.close();
-
-         return dbList.stream().sorted().toList();
+        resultSetDB.close();
+        conn.close();
+        return dbList.stream().sorted().toList();
     }
 
-    public  List<String> createTableList(ResultSet resultSetTables) throws SQLException {
+    public List<String> createTableList(ResultSet resultSetTables) throws SQLException {
         List<String> tableList = new ArrayList<>();
 
         while (resultSetTables.next()) {
             tableList.add(resultSetTables.getString(1) + ": " + resultSetTables.getString(2) + " (" + resultSetTables.getString(3) + ")");
         }
         resultSetTables.close();
+        conn.close();
         return tableList.stream().toList();
     }
 
