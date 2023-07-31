@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @SpringBootApplication
 public class DbdemoApplication {
 
-
     public static void main(String[] args) {
         SpringApplication.run(DbdemoApplication.class, args);
 
