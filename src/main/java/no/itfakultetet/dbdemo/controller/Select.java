@@ -63,7 +63,7 @@ public class Select {
            @RequestParam(value = "db") String db,
            @RequestParam(value = "query") String query) {
 
-        logger.info("rdbms_sti fra select/post: "+rdbms_sti);
+       // logger.info("rdbms_sti fra select/post: "+rdbms_sti);
 
         String rdbms;
         String username = null;
@@ -101,7 +101,7 @@ public class Select {
             model.addAttribute("db",db);
             model.addAttribute("rdbms",rdbms);
             model.addAttribute("rdbms_sti",rdbms_sti);
-            logger.info("modell-laget og sendt til resultat.html");
+          //  logger.info("modell-laget og sendt til resultat.html");
         } catch (SQLException e) {
             // throw new RuntimeException(e);
             logger.error("Feil ved laging av header og tabledata:"+e.getMessage());
