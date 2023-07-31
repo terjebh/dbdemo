@@ -75,6 +75,10 @@ let rdbms_sti = document.getElementById("rdbms_sti").value;
   .then(liste => liste.forEach((item) => {
          let option = document.createElement("option");
          option.innerText = item;
+         option.value = item;
+         if(item == document.getElementById("db").value) {
+         option.selected = true;
+         }
          select.appendChild(option);
          }));
 }
