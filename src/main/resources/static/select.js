@@ -8,6 +8,7 @@ function handleOnDocumentLoaded() {
   const rdbms_sti = document.getElementById("rdbms_sti");
   const db = document.getElementById("db");
   const tabellListe = document.getElementById("tabellListe");
+  let dbsti = "";
 
   const handleOnHentClick = function hentData() {
     const hasSelectedDB = selectDB.value !== "Velg Database";
@@ -35,14 +36,14 @@ function handleOnDocumentLoaded() {
 
     // console.log(cursorPosition);
 
-    // Flytter også markøren til begynnelsen av linjen - derfor kommentert ut
+  /*  // Flytter også markøren til begynnelsen av linjen - derfor kommentert ut
     if(isSpaceKey) {
       hljs.highlightElement(queryText);
       const nedpil = new KeyboardEvent('keydown', { key : 40 } );
       queryText.dispatchEvent(nedpil);
       return;
     }
-
+*/
     if (!isEnterKey) return;
 
     if (isControlKey) {
@@ -64,12 +65,12 @@ function handleOnDocumentLoaded() {
     feilMelding.innerHTML = "";
     db.value = selectDB.value;
     queryText.focus();
-    fetchTableList();
+    fetchTableList(selectDB.value);
   };
 
-  function fetchTableList() {
-    if (!rdbms_sti.value || !selectDB.value) return;
-    const url = `/rest/get/tablelist/${rdbms_sti.value}/${selectDB.value}`;
+  function fetchTableList(dbsti) {
+    if (!rdbms_sti.value) return;
+    const url = `/rest/get/tablelist/${rdbms_sti.value}/${dbsti}`;
     const tilTekst = (response) => response.text();
     const lagListe = (liste) => (tabellListe.innerHTML = liste);
     fetch(url).then(tilTekst).then(lagListe);
@@ -101,7 +102,7 @@ function handleOnDocumentLoaded() {
   queryText.onkeyup = handleOnQueryKeyUp;
   selectDB.onchange = handleOnSelectDBChange;
   byggDBListe();
-  fetchTableList();
+  fetchTableList(db.value);
 }
 
 document.addEventListener("DOMContentLoaded", handleOnDocumentLoaded);
