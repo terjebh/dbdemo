@@ -69,7 +69,7 @@ function handleOnDocumentLoaded() {
   };
 
   function fetchTableList(dbsti) {
-    if (!rdbms_sti.value) return;
+    if (!rdbms_sti.value || !dbsti) return;
     const url = `/rest/get/tablelist/${rdbms_sti.value}/${dbsti}`;
     const tilTekst = (response) => response.text();
     const lagListe = (liste) => (tabellListe.innerHTML = liste);
