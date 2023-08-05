@@ -13,6 +13,7 @@ function handleOnDocumentLoaded() {
   const handleOnHentClick = function hentData() {
     const hasSelectedDB = selectDB.value !== "Velg Database";
     const hasQuery = queryText.innerHTML !== "";
+    const hasFeilmelding = feilMelding.innerHTML !=="";
 
     feilMelding.innerHTML = !hasSelectedDB
       ? "Velg en database å hente data fra ..."
@@ -20,7 +21,14 @@ function handleOnDocumentLoaded() {
       ? "Skriv en SQL-setning å hente data med..."
       : "";
 
-    if (feilMelding.innerHTML) return;
+    if (feilMelding.innerHTML) {
+    feilMelding.style.visibility = "visible";
+    return;
+    } else {
+        feilMelding.style.visibility = "hidden";
+    }
+
+
 
     const renQueryText = strip(queryText.innerHTML);
     query.value = renQueryText;
@@ -33,6 +41,7 @@ function handleOnDocumentLoaded() {
     const isControlKey = event.ctrlKey;
     const isShiftKey = event.shiftKey;
     const isSpaceKey = event.code == "Space";
+
 
     // console.log(cursorPosition);
 
@@ -63,6 +72,7 @@ function handleOnDocumentLoaded() {
 
   const handleOnSelectDBChange = function handleOnDBChange() {
     feilMelding.innerHTML = "";
+    feilMelding.style.visibility = "hidden";
     db.value = selectDB.value;
     queryText.focus();
     fetchTableList(selectDB.value);
@@ -103,6 +113,8 @@ function handleOnDocumentLoaded() {
   selectDB.onchange = handleOnSelectDBChange;
   byggDBListe();
   fetchTableList(db.value);
+
+  feilMelding.innerHTML? feilMelding.style.visibility = "visible" : feilMelding.style.visibility = "hidden";
 }
 
 document.addEventListener("DOMContentLoaded", handleOnDocumentLoaded);
