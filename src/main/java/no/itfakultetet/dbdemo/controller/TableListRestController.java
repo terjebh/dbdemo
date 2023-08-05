@@ -71,7 +71,7 @@ public class TableListRestController {
         Dao tabellListeDao = new Dao();
 
         if (!database.equals("Velg Database")) {
-            try (ResultSet resultsetTables = tabellListeDao.createResultset(rdbms_sti, database, tableQuery, username, pwd)) {
+            try (ResultSet resultsetTables = (ResultSet) tabellListeDao.createResultset(rdbms_sti, database, tableQuery, username, pwd)) {
                 tabellListe = tabellListeDao.createTableList(resultsetTables);
             } catch (SQLException e) {
                 throw new RuntimeException(e);

@@ -19,7 +19,7 @@
         </form>
     </span>
         <span id="skrivSelect">Formater og sjekk koden med: shift+enter</span>
-        <span id="feilmelding"></span>
+        <span id="feilmelding"><th:block th:text="${feil}"/></span>
         </div>
         <form id="sql" method="post" action="/select">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

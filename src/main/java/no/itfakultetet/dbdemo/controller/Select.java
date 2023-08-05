@@ -94,19 +94,31 @@ public class Select {
 
         Dao dao = new Dao();
 
-        try (ResultSet resultSet = dao.createResultset(rdbms_sti, db, query,username,pwd);) {
-            model.addAttribute("tableHeader", dao.createHeader(resultSet));
-            model.addAttribute("tableContent", dao.createTabledata(resultSet));
-            model.addAttribute("query", query);
-            model.addAttribute("db",db);
-            model.addAttribute("rdbms",rdbms);
-            model.addAttribute("rdbms_sti",rdbms_sti);
-          //  logger.info("modell-laget og sendt til resultat.html");
-        } catch (SQLException e) {
+        try {
+            Object resultSet = dao.createResultset(rdbms_sti, db, query,username,pwd);
+            if(resultSet instanceof ResultSet) {
+                model.addAttribute("tableHeader", dao.createHeader((ResultSet) resultSet));
+                model.addAttribute("tableContent", dao.createTabledata((ResultSet) resultSet));
+                model.addAttribute("query", query);
+                model.addAttribute("db",db);
+                model.addAttribute("rdbms",rdbms);
+                model.addAttribute("rdbms_sti",rdbms_sti);
+            } else {
+              String feilmelding = (String) resultSet;
+                logger.error("Returnert feilmelding: "+feilmelding);
+                model.addAttribute("feil",feilmelding);
+                model.addAttribute("query",query);
+                model.addAttribute("db",db);
+                model.addAttribute("rdbms",rdbms);
+                model.addAttribute("rdbms_sti",rdbms_sti);
+                return "select";
+            }
+
+            //  logger.info("modell-laget og sendt til resultat.html");
+        } catch (Exception e) {
             // throw new RuntimeException(e);
             logger.error("Feil ved laging av header og tabledata:"+e.getMessage());
-            model.addAttribute("feilmelding",e.getMessage());
-            return "error";
+
         }
 
         return "resultat";

@@ -59,7 +59,7 @@ public class Dao {
      * @param pwd
      * @return
      */
-    public ResultSet createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
+    public Object createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
         this.rdbms_sti = rdbms_sti;
         this.username = username;
         this.db = db;
@@ -76,6 +76,7 @@ public class Dao {
             //throw new RuntimeException(e);
             // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
             logger.error("Noe gikk galt i createResultSet. Feilmelding: " + e.getMessage());
+            return e.getMessage();
         }
 
         return rs;
