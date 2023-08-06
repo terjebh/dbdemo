@@ -126,7 +126,7 @@ public class Dao {
         List<String> tableList = new ArrayList<>();
 
         while (resultSetTables.next()) {
-            tableList.add(resultSetTables.getString(1) + ": " + resultSetTables.getString(2) + " (" + resultSetTables.getString(3) + ")");
+            tableList.add("<tr><td>"+resultSetTables.getString(1) + "</td><td>" + resultSetTables.getString(2) + "</td><td>" + resultSetTables.getString(3) + "</td></tr>");
         }
         resultSetTables.close();
         conn.close();

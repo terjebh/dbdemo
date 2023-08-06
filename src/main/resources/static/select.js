@@ -8,11 +8,12 @@ function handleOnDocumentLoaded() {
   const rdbms_sti = document.getElementById("rdbms_sti");
   const db = document.getElementById("db");
   const tabellListe = document.getElementById("tabellListe");
-
+  const skinCSS = document.getElementById('skin');
+  const skinSelect = document.getElementById('skinSelect');
   const handleOnHentClick = function hentData() {
-    const hasSelectedDB = selectDB.value !== "Velg Database";
-    const hasQuery = queryText.innerHTML !== "";
-    const hasFeilmelding = feilMelding.innerHTML !=="";
+  const hasSelectedDB = selectDB.value !== "Velg Database";
+  const hasQuery = queryText.innerHTML !== "";
+  const hasFeilmelding = feilMelding.innerHTML !=="";
 
     feilMelding.innerHTML = !hasSelectedDB
       ? "Velg en database å hente data fra ..."
@@ -64,6 +65,10 @@ function handleOnDocumentLoaded() {
     fetchTableList(selectDB.value);
   };
 
+  const handleOnSkinSelectChange = function handleOnSkinChange() {
+     skinCSS.href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/"+skinSelect.value+".min.css";
+  }
+
   function fetchTableList(database) {
     if (!db.value && selectDB.value == "Velg Database" ) return;
     const url = `/rest/get/tablelist/${rdbms_sti.value}/${database}`;
@@ -97,6 +102,7 @@ function handleOnDocumentLoaded() {
   hent.onclick = handleOnHentClick;
   queryText.onkeyup = handleOnQueryKeyUp;
   selectDB.onchange = handleOnSelectDBChange;
+  skinSelect.onchange = handleOnSkinSelectChange;
   byggDBListe();
 
   fetchTableList(db.value);

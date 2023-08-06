@@ -4,14 +4,67 @@ body {
 }
 
 main {
-  padding:40px;
+  padding:30px;
   padding-top: 20px;
   float:left;
 }
 
 aside {
-  padding-top: 32px;
+  padding-top: 74px;
   float:left;
+}
+
+#tabellListeContainer {
+  padding:4px;
+  min-height: 250px;
+}
+
+#tabellListeHeading {
+ font-size: 16px;
+ text-align: center;
+ padding:5px;
+ margin-bottom: 7px;
+}
+
+#tabellListe {
+ padding-left:10px;
+ padding-right: 10px;
+ padding-bottom: 5px;
+ padding-top: 0px;
+ margin-top: 0px;
+}
+
+#tabeller td {
+  padding-bottom:2px;
+  padding-right:4px;
+  padding-left:4px
+}
+
+#DBHead {
+padding-top: 5px;
+padding-right:10px;
+padding-bottom: 0px;
+margin-bottom: 0px;
+vertical-align: bottom;
+float:left;
+}
+
+#inputHead {
+max-width:300px;
+float:left;
+verical-align: bottom;
+}
+
+#selectDB {
+vertical-align: bottom;
+float:left;
+margin-left:10px;
+margin-bottom:5px;
+max-width: 200px;
+}
+
+#selectSkin {
+float: right
 }
 
 a {
@@ -41,19 +94,13 @@ margin-left: 20px;
 
 }
 
-#tabellListe {
- float:left;
-}
 
-
-table {
+#resultTable {
   margin-top: 20px;
   border: solid 1px #333;
   box-shadow: 5px 5px 20px #444;
   margin-bottom: 50px;
-
 }
-
 
 td {
   padding: 5px;;
@@ -72,26 +119,17 @@ text-align: bottom;
 vertical-align: bottom;
 }
 
-#inputHead {
-max-width:300px;
-float:left;
-}
 
-#DBHead {
-padding-right:5px;
-vertical-align: bottom;
-float:left;
-}
 
 #feilmelding {
 font-weight: bold;
-margin-top:15px;
+margin-top:10px;
 padding: 10px;
-max-width: 800px;
+width: 800px;
 overflow-wrap: break-all;
 overflow-y: scroll;
+float:left
 }
-
 
 #infotekst {
 width: 800px;
@@ -100,8 +138,6 @@ vertical-align: middle;
 margin-top:10px;
 float:left;
 }
-
-
 
 #skrivSelect {
 font-size: 16px;
@@ -113,15 +149,7 @@ float:right;
 float:left;
 }
 
-#selectDB {
-text-align: baseline;
-float:left;
-margin-right:10px;
-margin-bottom:5px;
-max-width: 200px;
-}
 
 div.code {
   white-space: pre;
 }
-

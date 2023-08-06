@@ -27,7 +27,7 @@
         <span id="db"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>
     </h7>
     <div id="queryResult">
-        <table id="tabell" class="table table-striped">
+        <table id="resultTable" class="table table-striped">
             <thead>
             <tr>
                 <th th:each="header : ${tableHeader}" style="background-color:black;">
@@ -53,7 +53,7 @@ Object.assign(DataTable.defaults, {
         [10, 25, 50, 'All']
     ]
 });
-    let table = new DataTable('#tabell');
+    let table = new DataTable('#resultTable');
 </script>
 
 </body>

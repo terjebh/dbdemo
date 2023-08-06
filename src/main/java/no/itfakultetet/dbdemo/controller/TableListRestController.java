@@ -53,7 +53,7 @@ public class TableListRestController {
         } else if (rdbms_sti.equals("microsoft")) {
             username = msUsername;
             pwd = msPwd;
-            tableQuery = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='" + database + "'";
+            tableQuery = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='" + database + "' ORDER BY TABLE_TYPE";
         } else if (rdbms_sti.equals("oracle")) {
             username = orUsername;
             pwd = orPwd;
@@ -78,13 +78,11 @@ public class TableListRestController {
             }
         }
         StringBuilder tabeller = new StringBuilder();
-
-        tabeller.append("<h4>Tabeller og views</h4>\n");
-        // tabeller.append("<ul>");
-        for (String tabell : tabellListe) {
-            tabeller.append(tabell + "<br/>\n");
+        tabeller.append("<table id=\"tabeller\">\n");
+        for (String rad : tabellListe) {
+            tabeller.append(rad + "\n");
         }
-        //tabeller.append("</ul");
+        tabeller.append("</table>\n");
 
         return tabeller.toString();
     }
