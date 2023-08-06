@@ -70,7 +70,7 @@ vertical-align: bottom;
 }
 
 #inputHead {
-
+max-width:300px;
 }
 
 #DBHead {
@@ -80,7 +80,7 @@ vertical-align: bottom;
 
 #feilmelding {
 font-weight: bold;
-margin-top:10px;
+margin-top:15px;
 padding: 10px;
 max-width: 800px;
 overflow-wrap: break-all;
@@ -88,10 +88,21 @@ overflow-y: scroll;
 }
 
 
+#infotekst {
+width: 800px;
+text-align: right;
+vertical-align: middle;
+}
+
+
 #skrivSelect {
-float:left;
 font-size: 16px;
 vertical-align: bottom;
+float:right;
+}
+
+#hent {
+float:left;
 }
 
 #selectDB {
@@ -99,6 +110,7 @@ text-align: baseline;
 float:left;
 margin-right:10px;
 margin-bottom:5px;
+max-width: 200px;
 }
 
 div.code {
