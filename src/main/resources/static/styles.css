@@ -16,7 +16,7 @@ aside {
 
 #tabellListeContainer {
   padding:4px;
-  min-height: 250px;
+  min-height: 350px;
 }
 
 #tabellListeHeading {
@@ -75,7 +75,7 @@ a {
   font-size: 18px;
   width: 800px;
   height: auto;
-  min-height: 250px;
+  min-height: 350px;
   border: solid 1px silver;
   border-radius: 5px;
   white-space: pre;

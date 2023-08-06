@@ -67,6 +67,7 @@ function handleOnDocumentLoaded() {
 
   const handleOnSkinSelectChange = function handleOnSkinChange() {
      skinCSS.href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/"+skinSelect.value+".min.css";
+     queryText.focus();
   }
 
   function fetchTableList(database) {
