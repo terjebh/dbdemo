@@ -8,8 +8,6 @@
 <div th:replace="~{meny :: meny}"></div>
 <main>
     <h3 id="DBHead"><th:block th:text="${rdbms}"/></h3>
-
-    <div id="input">
     <div id="inputHead">
         <form id="dbForm" method="get" >
         <select id="selectDB" class="form-select">
@@ -23,25 +21,25 @@
             <input type="hidden" name="dbList" th:value="${dbList}"/>
             <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}" />
             <input type="hidden" id="query" name="query"/>
-            <br />
+            <br><br><br>
             <div id="queryText" class="code sql" contenteditable><th:block th:text="${query}"/></div>
         </form>
-        <br>
+        <br><br><br>
         <div id="infotekst">
             <button class="btn btn-success"  id="hent">Hent data</button>
-            <span id="skrivSelect">Formater og sjekk koden med: shift+enter. Kjør koden med: ctrl+enter</span>
+            <span id="skrivSelect">Formater og sjekk koden med: <i>shift+enter</i>. Kjør koden med: <i>ctrl+enter</i></span>
         </div>
         <br><br>
         <div id="feilmelding" class="alert alert-danger"><th:block th:text="${feil}"/></div>
 
     </div>
 
-    <div id="info" style="float:left">
-        <div id="tabellListe"></div>
-    </div>
-    <p></p>
 
 </main>
+<aside>
+    <div id="tabellListe"></div>
+</aside>
+
 <script>
     var queryText = document.getElementById("queryText");
     queryText.focus();

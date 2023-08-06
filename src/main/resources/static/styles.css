@@ -6,6 +6,12 @@ body {
 main {
   padding:40px;
   padding-top: 20px;
+  float:left;
+}
+
+aside {
+  padding-top: 32px;
+  float:left;
 }
 
 a {
@@ -16,7 +22,7 @@ a {
   font-size: 18px;
   width: 800px;
   height: auto;
-  min-height: 200px;
+  min-height: 250px;
   border: solid 1px silver;
   border-radius: 5px;
   white-space: pre;
@@ -24,6 +30,8 @@ a {
   overflow-wrap: break-all;
   overflow-y: scroll;
   word-break: break-all;
+  float:left;
+  margin-top:5px;
 }
 
 
@@ -34,8 +42,10 @@ margin-left: 20px;
 }
 
 #tabellListe {
-
+ float:left;
 }
+
+
 table {
   margin-top: 20px;
   border: solid 1px #333;
@@ -44,13 +54,6 @@ table {
 
 }
 
-tr {
-  background-color: #efefef;
-}
-
-tr:nth-child(even) {
-  background-color: #ddd;
-}
 
 td {
   padding: 5px;;
@@ -71,11 +74,13 @@ vertical-align: bottom;
 
 #inputHead {
 max-width:300px;
+float:left;
 }
 
 #DBHead {
 padding-right:5px;
 vertical-align: bottom;
+float:left;
 }
 
 #feilmelding {
@@ -92,7 +97,10 @@ overflow-y: scroll;
 width: 800px;
 text-align: right;
 vertical-align: middle;
+margin-top:10px;
+float:left;
 }
+
 
 
 #skrivSelect {
