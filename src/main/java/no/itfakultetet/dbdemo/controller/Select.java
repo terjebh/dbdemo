@@ -33,7 +33,8 @@ public class Select {
     private String myPwd;
 
     @GetMapping(value = "/select/{rdbms_sti}")
-    public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti) {
+    public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti,
+                          @CookieValue(value = "skin", defaultValue = "agate") String skin) {
         String rdbms;
         String username = null;
         String pwd = null;
@@ -53,6 +54,7 @@ public class Select {
 
             model.addAttribute("rdbms",rdbms);
             model.addAttribute("rdbms_sti",rdbms_sti);
+            model.addAttribute("skin",skin);
 
             return "select";
     }
