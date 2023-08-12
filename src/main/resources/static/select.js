@@ -28,6 +28,7 @@ function handleOnDocumentLoaded() {
         feilMelding.style.visibility = "hidden";
     }
 
+
     const renQueryText = strip(queryText.innerHTML);
     query.value = renQueryText;
     sql.action = `/select/${rdbms_sti.value}`;
@@ -67,6 +68,7 @@ function handleOnDocumentLoaded() {
 
   const handleOnSkinSelectChange = function handleOnSkinChange() {
      skinCSS.href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/"+skinSelect.value+".min.css";
+     localStorage.setItem('skin', skinSelect.value);
      queryText.focus();
   }
 
@@ -105,10 +107,12 @@ function handleOnDocumentLoaded() {
   selectDB.onchange = handleOnSelectDBChange;
   skinSelect.onchange = handleOnSkinSelectChange;
   byggDBListe();
-
   fetchTableList(db.value);
-
   feilMelding.innerHTML? feilMelding.style.visibility = "visible" : feilMelding.style.visibility = "hidden";
+  skinSelect.value = localStorage.getItem('skin')? localStorage.getItem('skin') : "agate";
+  skinCSS.href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/"+skinSelect.value+".min.css";
+
+
 }
 
 document.addEventListener("DOMContentLoaded", handleOnDocumentLoaded);
