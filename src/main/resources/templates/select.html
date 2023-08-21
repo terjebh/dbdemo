@@ -6,55 +6,144 @@
 </head>
 <body>
 <div th:replace="~{meny :: meny}"></div>
-<main>
-    <h4 id="DBHead"><th:block th:text="${rdbms}"/></h4>
-    <div id="inputHead">
-        <form id="dbForm" method="get" >
-        <select id="selectDB" class="form-select">
-            <option>Velg Database</option>
-        </select>
-        </form>
-    </div>
-    <div id="skinSelectDiv">
-        <select id="skinSelect" class="form-select">
-            <option>a11y-dark</option><option>a11y-light</option><option>agate</option><option>an-old-hope</option><option>androidstudio</option><option>arduino-light</option><option>arta</option><option>ascetic</option><option>atom-one-dark-reasonable</option><option>atom-one-dark</option><option>atom-one-light</option><option>brown-paper</option><option>codepen-embed</option><option>color-brewer</option><option>dark</option><option>default</option><option>devibeans</option><option>docco</option><option>far</option><option>felipec</option><option>foundation</option><option>github-dark-dimmed</option><option>github-dark</option><option>github</option><option>gml</option><option>googlecode</option><option>gradient-dark</option><option>gradient-light</option><option>grayscale</option><option>hybrid</option><option>idea</option><option>intellij-light</option><option>ir-black</option><option>isbl-editor-dark</option><option>isbl-editor-light</option><option>kimbie-dark</option><option>kimbie-light</option><option>lightfair</option><option>lioshi</option><option>magula</option><option>mono-blue</option><option>monokai-sublime</option><option>monokai</option><option>night-owl</option><option>nnfx-dark</option><option>nnfx-light</option><option>nord</option><option>obsidian</option><option>panda-syntax-dark</option><option>panda-syntax-light</option><option>paraiso-dark</option><option>paraiso-light</option><option>pojoaque</option><option>purebasic</option><option>qtcreator-dark</option><option>qtcreator-light</option><option>rainbow</option><option>routeros</option><option>school-book</option><option>shades-of-purple</option><option>srcery</option><option>stackoverflow-dark</option><option>stackoverflow-light</option><option>sunburst</option><option>tokyo-night-dark</option><option>tokyo-night-light</option><option>tomorrow-night-blue</option><option>tomorrow-night-bright</option><option>vs</option><option>vs2015</option><option>xcode</option><option>xt256</option>        </select>
-    </div>
-        <form id="sql" method="post" action="/select">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <input type="hidden" name="db" id="db" th:value="${db}" />
-            <input type="hidden" name="dbList" th:value="${dbList}"/>
-            <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}" />
-            <input type="hidden" id="query" name="query"/>
-            <br><br><br>
-            <div id="queryText" class="code sql" contenteditable><th:block th:text="${query}"/></div>
-        </form>
-        <br><br><br>
-        <div id="infotekst">
-            <button class="btn btn-success"  id="hent">Hent data</button>
-            <span id="skrivSelect">Formater og sjekk koden med: <i>shift+enter</i>. Kjør koden med: <i>ctrl+enter</i></span>
+<main class="flex">
+
+    <div class="select-main-wrapper flex">
+            <div class="select-head flex">
+                <h4 id="DBHead">
+                    <th:block th:text="${rdbms}"/>
+                </h4>
+                <div id="inputHead">
+                    <form id="dbForm" method="get">
+                        <select id="selectDB" class="form-select">
+                            <option>Velg Database</option>
+                        </select>
+                    </form>
+                    <div id="skinSelectDiv">
+                        <select id="skinSelect" class="form-select">
+                            <option>a11y-dark</option>
+                            <option>a11y-light</option>
+                            <option>agate</option>
+                            <option>an-old-hope</option>
+                            <option>androidstudio</option>
+                            <option>arduino-light</option>
+                            <option>arta</option>
+                            <option>ascetic</option>
+                            <option>atom-one-dark-reasonable</option>
+                            <option>atom-one-dark</option>
+                            <option>atom-one-light</option>
+                            <option>brown-paper</option>
+                            <option>codepen-embed</option>
+                            <option>color-brewer</option>
+                            <option>dark</option>
+                            <option>default</option>
+                            <option>devibeans</option>
+                            <option>docco</option>
+                            <option>far</option>
+                            <option>felipec</option>
+                            <option>foundation</option>
+                            <option>github-dark-dimmed</option>
+                            <option>github-dark</option>
+                            <option>github</option>
+                            <option>gml</option>
+                            <option>googlecode</option>
+                            <option>gradient-dark</option>
+                            <option>gradient-light</option>
+                            <option>grayscale</option>
+                            <option>hybrid</option>
+                            <option>idea</option>
+                            <option>intellij-light</option>
+                            <option>ir-black</option>
+                            <option>isbl-editor-dark</option>
+                            <option>isbl-editor-light</option>
+                            <option>kimbie-dark</option>
+                            <option>kimbie-light</option>
+                            <option>lightfair</option>
+                            <option>lioshi</option>
+                            <option>magula</option>
+                            <option>mono-blue</option>
+                            <option>monokai-sublime</option>
+                            <option>monokai</option>
+                            <option>night-owl</option>
+                            <option>nnfx-dark</option>
+                            <option>nnfx-light</option>
+                            <option>nord</option>
+                            <option>obsidian</option>
+                            <option>panda-syntax-dark</option>
+                            <option>panda-syntax-light</option>
+                            <option>paraiso-dark</option>
+                            <option>paraiso-light</option>
+                            <option>pojoaque</option>
+                            <option>purebasic</option>
+                            <option>qtcreator-dark</option>
+                            <option>qtcreator-light</option>
+                            <option>rainbow</option>
+                            <option>routeros</option>
+                            <option>school-book</option>
+                            <option>shades-of-purple</option>
+                            <option>srcery</option>
+                            <option>stackoverflow-dark</option>
+                            <option>stackoverflow-light</option>
+                            <option>sunburst</option>
+                            <option>tokyo-night-dark</option>
+                            <option>tokyo-night-light</option>
+                            <option>tomorrow-night-blue</option>
+                            <option>tomorrow-night-bright</option>
+                            <option>vs</option>
+                            <option>vs2015</option>
+                            <option>xcode</option>
+                            <option>xt256</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        <div class="select-form flex">
+            <div class="form flex">
+                <form id="sql" method="post" action="/select">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="db" id="db" th:value="${db}"/>
+                    <input type="hidden" name="dbList" th:value="${dbList}"/>
+                    <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
+                    <input type="hidden" id="query" name="query"/>
+
+                    <div id="queryText" class="code sql" contenteditable>
+                        <th:block th:text="${query}"/>
+                    </div>
+                </form>
+                <div id="tabellListeContainer" >
+                    <div id="tabellListeHeading" class="alert alert-dark">Tabeller og views</div>
+                    <div id="tabellListe" class="flex"></div>
+                </div>
+            </div>
+
+            <div id="infotekst" class="flex">
+                <button class="btn btn-success" id="hent">Hent data</button>
+                <span id="skrivSelect">Formater og sjekk koden med: <i>shift+enter</i>. Kjør koden med: <i>ctrl+enter</i></span>
+            </div>
+
         </div>
-        <br>
-        <div id="feilmelding" class="alert alert-danger"><th:block th:text="${feil}"/></div>
+
+
     </div>
+
+    <div id="feilmelding" class="alert alert-danger">
+        <th:block th:text="${feil}"/>
+    </div>
+
 </main>
 
-<aside>
-    <div id="tabellListeContainer" class="alert alert-secondary">
-    <div id="tabellListeHeading" class="alert alert-dark">Tabeller og views</div>
-    <div id="tabellListe" ></div>
-    </div>
-</aside>
 
 <script>
     var queryText = document.getElementById("queryText");
     queryText.focus();
 
     document.querySelectorAll('div.code').forEach(el => {
-  // then highlight each
-       hljs.highlightElement(el);
-});
+        // then highlight each
+        hljs.highlightElement(el);
+    });
 
-hljs.highlightElement(queryText);
+    hljs.highlightElement(queryText);
 
 </script>
 </body>

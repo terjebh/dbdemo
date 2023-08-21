@@ -1,155 +1,217 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
 body {
-  padding: 0px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 main {
-  padding:30px;
-  padding-top: 20px;
-  float:left;
+    padding: 2rem 3rem;
+    flex-direction: column;
 }
 
-aside {
-  padding-top: 74px;
-  float:left;
+.flex {
+    display: flex;
 }
 
-#tabellListeContainer {
-  padding:4px;
-  min-height: 350px;
+.select-main-wrapper {
+    flex-direction: column;
+    width: 80%;
+
 }
 
-#tabellListeHeading {
- font-size: 16px;
- text-align: center;
- padding:5px;
- margin-bottom: 7px;
-}
-
-#tabellListe {
- padding-left:10px;
- padding-right: 10px;
- padding-bottom: 5px;
- padding-top: 0px;
- margin-top: 0px;
-}
-
-#tabeller td {
-  padding-bottom:2px;
-  padding-right:4px;
-  padding-left:4px
+.select-head {
+    align-items: center;
+    width: 80%;
+    height: 5rem;
+    margin-bottom: 1rem;
 }
 
 #DBHead {
-padding-top: 5px;
-padding-right:10px;
-padding-bottom: 0px;
-margin-bottom: 0px;
-vertical-align: bottom;
-float:left;
+    width: 30%;
+    margin-right: 10px;
 }
 
+
+.select-form {
+    flex-direction: column;
+
+}
+
+
+#tabellListeContainer {
+    min-height: 400px;
+    width: 20%;
+    min-width: 17rem;
+    justify-content: space-between;
+    color: #41464b;
+    background-color: #e2e3e5;
+    padding: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+
+}
+
+.form {
+   gap: 1.5rem;
+}
+
+#tabellListeHeading {
+    font-size: 16px;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 7px;
+}
+
+#tabellListe {
+    flex-direction: column;
+    align-items: center;
+
+}
+
+#tabeller td {
+    text-align: center;
+    border: 1px solid lightgrey;
+}
+
+
 #inputHead {
-max-width:300px;
-float:left;
-verical-align: bottom;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
 }
 
 #selectDB {
-vertical-align: bottom;
-float:left;
-margin-left:10px;
-margin-bottom:5px;
-max-width: 200px;
+    margin-right: 10px;
+    width: fit-content;
 }
 
-#skinSelectDiv {
-float: right
-}
 
 a {
-  color: navy;
+    color: navy;
 }
 
 #queryText {
-  font-size: 18px;
-  width: 800px;
-  height: auto;
-  min-height: 350px;
-  border: solid 1px silver;
-  border-radius: 5px;
-  white-space: pre;
-  padding: 10px;
-  overflow-wrap: break-all;
-  overflow-y: scroll;
-  word-break: break-all;
-  float:left;
-  margin-top:5px;
+    font-size: 18px;
+    width: 100%;
+    height: auto;
+    min-height: 420px;
+    border: solid 1px silver;
+    border-radius: 5px;
+    white-space: pre;
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-y: scroll;
+    word-break: break-all;
+}
+
+#sql {
+    width: 80%;
 }
 
 
 #info {
-float: right;
-margin-left: 20px;
+    margin-left: 20px;
 
 }
 
-
-#resultTable {
-  margin-top: 20px;
-  border: solid 1px #333;
-  box-shadow: 5px 5px 20px #444;
-  margin-bottom: 50px;
-}
-
-td {
-  padding: 5px;;
+.dataTables_filter, .dataTables_length{
+    margin-bottom: 1rem;
 }
 
 .th, th {
-  font-weight: bold;
-  background-color: #333;
-  color: white;
-  padding:5px;
+    font-weight: bold;
+    background-color: #333;
+    color: white;
 }
 
 #input {
-float: left;
-text-align: bottom;
-vertical-align: bottom;
+    vertical-align: bottom;
 }
-
 
 
 #feilmelding {
-font-weight: bold;
-margin-top:10px;
-padding: 10px;
-width: 800px;
-overflow-wrap: break-all;
-overflow-y: scroll;
-float:left
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px;
+    width: 80%;
+    overflow-wrap: anywhere;
+    overflow-y: scroll;
+
 }
 
 #infotekst {
-width: 800px;
-text-align: right;
-vertical-align: middle;
-margin-top:10px;
-float:left;
+    margin: 1rem 0;
+    align-items: center;
+    width: 80%;
+    justify-content: space-between;
 }
+
+
 
 #skrivSelect {
-font-size: 16px;
-vertical-align: bottom;
-float:right;
-}
+    font-size: 16px;
+    vertical-align: bottom;
 
-#hent {
-float:left;
 }
 
 
 div.code {
-  white-space: pre;
+    white-space: pre;
+}
+
+@media only screen and (max-width: 1400px) {
+    .select-main-wrapper {
+        width: 90%;
+
+    }
+
+
+}
+
+@media only screen and (max-width: 990px) {
+
+    .select-main-wrapper {
+        flex-direction: column;
+        width: 100%;
+
+    }
+    .select-head {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 20%;
+        text-align: center;
+    }
+
+    #DBHead {
+        margin: 1rem;
+
+    }
+
+    .form {
+        flex-direction: column;
+    }
+
+    #sql {
+        width: 100%;
+    }
+
+    #tabellListeContainer {
+        width: 100%;
+        min-height: 200px;
+    }
+
+    #infotekst {
+        width: 100%;
+    }
+    #feilmelding{
+        width: 100%;
+    }
+    #hent {
+        margin: 1rem;
+    }
 }

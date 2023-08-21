@@ -8,3 +8,6 @@ function redigerSQL() {
 function nySQL() {
   document.location.href = `/select/${rdbms_sti.value}`;
 }
+
+
+
