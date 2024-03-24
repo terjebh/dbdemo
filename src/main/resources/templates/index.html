@@ -1,46 +1,38 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <div th:replace="~{head :: head}"></div>
-  </head>
-  <body>
-    <div th:replace="~{meny :: meny}"></div>
-    <main>
-      <h1>DBApp</h1>
-      <h4>En enkel app for å hente data fra databaser med SQL.</h4>
-      <div class="alert alert-primary" style="width: 600px">
+</head>
+<body>
+<div th:replace="~{meny :: meny}"></div>
+<main>
+    <h1>DBApp</h1>
+    <h4>En enkel app for å hente data fra databaser med SQL.</h4>
+    <div class="alert alert-primary" style="width: 600px">
         <h4>Teknologier brukt:</h4>
         <ul>
-          <li>
-            <a
-              href="https://www.oracle.com/cis/java/technologies/java-se-glance.html"
-              target="_blank"
-              >Java SE</a
-            >
-          </li>
-          <li>
-            <a href="https://start.spring.io" target="_blank">Spring Boot</a>
-          </li>
-          <li>
-            <a href="https://getbootstrap.com" target="_blank">Bootstrap</a>
-          </li>
-          <li>
-            <a href="https://highlightjs.org/" target="_blank">Highlight js</a>
-          </li>
+            <li>
+                <a href="https://www.oracle.com/cis/java/technologies/java-se-glance.html"
+                   target="_blank">Java SE</a>
+            </li>
+            <li>
+                <a href="https://start.spring.io" target="_blank">Spring Boot</a>
+            </li>
+            <li>
+                <a href="https://getbootstrap.com" target="_blank">Bootstrap</a>
+            </li>
+            <li>
+                <a href="https://highlightjs.org/" target="_blank">Highlight js</a>
+            </li>
         </ul>
-
-        <p>
-          Koden til denne appen kan hentes herfra:
-          <a href="https://github.com/terjebh/dbdemo" target="_blank"
-            >https://github.com/terjebh/dbdemo</a
-          >
+        <p>Koden til denne appen kan hentes herfra: <a href="https://github.com/terjebh/dbdemo" target="_blank">https://github.com/terjebh/dbdemo</a>
         </p>
         <p><b>Utvikler:</b> Terje Berg-Hansen</p>
         <p>
-          <b>Epost: </b>
-          <a href="mailto:terje@itfakultetet.no">terje@itfakultetet.no</a>
+            <b>Epost: </b>
+            <a href="mailto:terje@itfakultetet.no">terje@itfakultetet.no</a>
         </p>
-      </div>
-    </main>
-  </body>
+    </div>
+</main>
+</body>
 </html>
