@@ -3,7 +3,7 @@ pipeline {
           imagename = 'terjebh/dbdemo'
           registryCredential = 'dockerhub'
           dockerImage = ''
-          JAVA_HOME = '/usr/lib/jvm/java-20-openjdk'
+          JAVA_HOME = '/usr/lib/jvm/java-22-openjdk'
         }
 
    agent {
