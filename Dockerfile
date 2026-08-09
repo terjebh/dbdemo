@@ -9,8 +9,9 @@ WORKDIR /app
 ARG JAR_FILE=target/dbdemo-*.jar
 COPY ${JAR_FILE} dbdemo.jar
 
-# Kjør som ikke-root-bruker
-RUN useradd --create-home --shell /bin/bash appuser \
+# Kjør som ikke-root-bruker med FAST UID 1001 (slik at volume-eierskap
+# på verten kan settes en gang for alle: chown -R 1001:1001 <volume>)
+RUN useradd --create-home --shell /bin/bash -u 1001 appuser \
     && mkdir -p /app/logs && chown -R appuser:appuser /app
 USER appuser
 
