@@ -36,3 +36,7 @@ build/
 /*.log
 /*.gz
 
+
+### App-spesifikt
+logs/
+*.jar

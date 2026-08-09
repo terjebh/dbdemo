@@ -3,7 +3,7 @@ pipeline {
           imagename = 'terjebh/dbdemo'
           registryCredential = 'dockerhub'
           dockerImage = ''
-          JAVA_HOME = '/usr/lib/jvm/java-22-openjdk'
+          JAVA_HOME = '/usr/lib/jvm/java-17-openjdk'
         }
 
    agent {
@@ -21,7 +21,7 @@ pipeline {
 
      stage("Save Artifact") {
         steps {
-         archiveArtifacts artifacts: "target/dbdemo-0.0.3-SNAPSHOT.jar", fingerprint: true
+         archiveArtifacts artifacts: "target/dbdemo-*.jar", fingerprint: true
         }
 
      }
@@ -53,7 +53,8 @@ pipeline {
               }
             }
 
-          stage('Upload jar to Nexus') {
+          stage('Upload jar to Nexus (valgfritt)') {
+               when { expression { params.SKIP_NEXUS == false } }
                steps {
                  nexusArtifactUploader artifacts: [[artifactId: 'DBDemo', classifier: '', file: 'target/dbdemo-0.0.3-SNAPSHOT.jar', type: 'jar']],
                  credentialsId: '72654080-f2e8-42cf-b93d-b38038fbb381',
@@ -67,14 +68,17 @@ pipeline {
           }
 
      }
+     parameters {
+        booleanParam(name: 'SKIP_NEXUS', defaultValue: true, description: 'Hopp over Nexus-opplasting (Nexus er ikke installert ennå)')
+     }
           post {
                  success {
-                   mattermostSend channel: '@itfakultetet, jenkins, town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon av DBDemo på Nexus og hub.docker.com  :white_check_mark:'
+                   mattermostSend channel: 'admin-app', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### Bare hyggelig! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER}  :tada:", text: '### Ny versjon av DBDemo på Nexus og hub.docker.com  :white_check_mark:'
                    emailext body: "Dette er en mail fra Jenkins pipeline\nJenkins sier:  Jobb: ${env.JOB_NAME}\nByggnummer:  ${env.BUILD_NUMBER} gikk bra!", subject: 'DBDEMO - Ny versjon!', to: 'terje@itfakultetet.no'
                  }
 
                  failure {
-                   mattermostSend channel: '@itfakultetet, jenkins,town-square', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### OOOps! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER} :x:", text: '### Ny versjon av Jenkins-test feilet  :x:'
+                   mattermostSend channel: 'admin-app', endpoint: 'http://mattermost.itfakultetet.no:8065/hooks/f98qq9oar3reueq4p9e9m9d9dr', message: "### OOOps! \n- Jenkins sier:  \nJob:  ${env.JOB_NAME}   \nByggnummer:  ${env.BUILD_NUMBER} :x:", text: '### Ny versjon av Jenkins-test feilet  :x:'
                    emailext body: "Dette er en mail fra Jenkins pipeline<p>Jenkins sier<p>: <br><b>Jobb</b>: ${env.JOB_NAME}<br><b>Byggnummer:</b>  ${env.BUILD_NUMBER} mislyktes!", subject: 'Bygging av DBDemo feilet', to: 'terje@itfakultetet.no'
                  }
           }

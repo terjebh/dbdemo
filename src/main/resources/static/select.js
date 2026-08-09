@@ -49,14 +49,45 @@ function handleOnDocumentLoaded() {
     }
 
     if (isShiftKey) {
-      hljs.highlightElement(queryText);
+      formaterOgHighlight();
       return;
     }
 
     event.preventDefault();
-    document.execCommand("insertHTML", false, " \n");
+    settInnLinjeskift();
     return;
   };
+
+  // Erstattning for deprecated document.execCommand("insertHTML")
+  function settInnLinjeskift() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const br = document.createElement("br");
+    range.insertNode(br);
+    // Plasser markøren etter <br>
+    const nyRange = document.createRange();
+    nyRange.setStartAfter(br);
+    nyRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(nyRange);
+    // Re-highlight
+    hljs.highlightElement(queryText);
+  }
+
+  // Formaterer SQL med sql-formatter (hvis tilgjengelig) og re-highlighter
+  function formaterOgHighlight() {
+    const ren = strip(queryText.innerHTML).trim();
+    if (ren && window.sqlFormatter) {
+      const språk = { postgres: "postgresql", microsoft: "tsql", oracle: "plsql", mysql: "sql" }[rdbms_sti.value] || "sql";
+      const format = (sql, lang) => sqlFormatter.format(sql, { language: lang });
+      const valg = språk === "plsql" || språk === "tsql" ? format(ren, språk) : format(ren, språk);
+      queryText.textContent = valg;
+    }
+    hljs.highlightElement(queryText);
+    queryText.focus();
+  }
 
   const handleOnSelectDBChange = function handleOnDBChange() {
     feilMelding.innerHTML = "";
@@ -74,10 +105,50 @@ function handleOnDocumentLoaded() {
 
   function fetchTableList(database) {
     if (!db.value && selectDB.value == "Velg Database" ) return;
-    const url = `/rest/get/tablelist/${rdbms_sti.value}/${database}`;
-    const tilTekst = (response) => response.text();
-    const lagListe = (liste) => (tabellListe.innerHTML = liste);
-    fetch(url).then(tilTekst).then(lagListe);
+    const url = `/rest/get/tablelist/${rdbms_sti.value}/${encodeURIComponent(database)}`;
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) throw new Error("Kunne ikke hente tabelliste");
+        return response.json();
+      })
+      .then(byggTabellListe)
+      .catch((err) => {
+        tabellListe.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+      });
+  }
+
+  // Bygger tabell-listen XSS-sikkert: all tekst settes via textContent
+  function byggTabellListe(rader) {
+    tabellListe.innerHTML = "";
+    if (!Array.isArray(rader) || rader.length === 0) {
+      tabellListe.textContent = "Ingen tabeller funnet";
+      return;
+    }
+    const table = document.createElement("table");
+    table.id = "tabeller";
+    table.className = "table table-sm table-striped";
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    ["Skjema", "Navn", "Type"].forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rader.forEach((rad) => {
+      const tr = document.createElement("tr");
+      rad.forEach((celle) => {
+        const td = document.createElement("td");
+        td.textContent = celle == null ? "" : String(celle);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tabellListe.appendChild(table);
   }
 
   function strip(html) {
@@ -87,9 +158,17 @@ function handleOnDocumentLoaded() {
 
   function byggDBListe() {
     const url = `/rest/get/dblist/${rdbms_sti.value}`;
-    const tilJSON = (response) => response.json();
+    const tilJSON = (response) => {
+      if (!response.ok) throw new Error("Kunne ikke hente databaseliste");
+      return response.json();
+    };
 
     const fyllSelect = (liste) => {
+      if (!Array.isArray(liste)) {
+        feilMelding.innerHTML = String(liste);
+        feilMelding.style.visibility = "visible";
+        return;
+      }
       liste.forEach((item) => {
         const option = document.createElement("option");
         option.innerText = item;
@@ -99,7 +178,10 @@ function handleOnDocumentLoaded() {
       });
     };
 
-    fetch(url).then(tilJSON).then(fyllSelect);
+    fetch(url).then(tilJSON).then(fyllSelect).catch((err) => {
+      feilMelding.innerHTML = err.message;
+      feilMelding.style.visibility = "visible";
+    });
   }
 
   hent.onclick = handleOnHentClick;

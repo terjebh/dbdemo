@@ -2,135 +2,240 @@ package no.itfakultetet.dbdemo.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
- * Klasse som kobler til Databaser og lager resultatsett og header og content til tabeller i Thymeleaf.
+ * Kobler til databaser og utfører SQL.
+ * <p>
+ * Sikkerhets- og kvalitetsforbedringer (2026-08-09):
+ * <ul>
+ *   <li>Ingen passord i JDBC-URL-er — Properties-objekt til DriverManager.</li>
+ *   <li>try-with-resources: Connection, Statement og ResultSet lukkes alltid.</li>
+ *   <li>PreparedStatement for katalog-spørringer (ingen SQL-injeksjon).</li>
+ *   <li>queryTimeout + maxRows på ALLE spørringer (student kan ikke henge serveren).</li>
+ *   <li>Read-only-kobling som standard (hindrer uhell som DROP/UPDATE).</li>
+ *   <li>Feil kastes som SQLException — håndteres i controller, ikke som Object-retur.</li>
+ * </ul>
  *
  * @author Terje Berg-Hansen
  */
-
+@Component
 public class Dao {
+
     private static final Logger logger = LoggerFactory.getLogger(Dao.class);
-    private String rdbms_sti, db, username, pwd;
-    private Connection conn;
 
-    private Connection getConn() {
-        // Get connection strings
-        String url = "";
-        if (rdbms_sti.equals("postgres")) {
-            url = "jdbc:postgresql://noderia.com/" + db + "?user=" + username + "&password=" + pwd + "&ssl=false";
-        } else if (rdbms_sti.equals("microsoft")) {
-            url = "jdbc:sqlserver://noderia.com:1433;databaseName=hr;user=" + username + ";password=" + pwd + ";encrypt=false";
-        } else if (rdbms_sti.equals("oracle")) {
-            url = "jdbc:oracle:thin:@noderia.com:1521:FREE";
-        } else if (rdbms_sti.equals("mysql")) {
-            url = "jdbc:mysql://noderia.com/" + db + "?user=" + username + "&password=" + pwd;
-        } else {
-            logger.error("Ukjent databasehåndteringssystem...: " + rdbms_sti);
-        }
+    @Value("${db.host:noderia.com}")
+    private String host;
 
+    @Value("${db.port.oracle:1521}")
+    private int oraclePort;
 
-        try {
+    @Value("${db.port.mssql:1433}")
+    private int mssqlPort;
 
-            if (rdbms_sti.equals("oracle")) {
-                conn = DriverManager.getConnection(url, username, pwd);
-            } else {
-                conn = DriverManager.getConnection(url);
+    @Value("${db.oracle.service:FREE}")
+    private String oracleService;
+
+    @Value("${db.query.timeout.seconds:15}")
+    private int queryTimeoutSeconds;
+
+    @Value("${db.query.max.rows:10000}")
+    private int maxRows;
+
+    @Value("${db.readonly:true}")
+    private boolean readOnly;
+
+    /** Resultat av en vilkårlig SQL-spørring: kolonneoverskrifter + rader. */
+    public record QueryResult(List<String> header, List<List<String>> rows) {
+    }
+
+    /**
+     * Åpner en tilkobling til angitt RDBMS/database.
+     * Passord sendes via Properties — aldri i URL-en.
+     */
+    private Connection connect(String rdbms, String db, String username, String pwd) throws SQLException {
+        String url = buildUrl(rdbms, db);
+        Properties props = new Properties();
+        props.setProperty("user", username);
+        props.setProperty("password", pwd);
+
+        Connection conn = DriverManager.getConnection(url, props);
+        if (readOnly) {
+            try {
+                conn.setReadOnly(true);
+            } catch (SQLException e) {
+                logger.debug("setReadOnly støttes ikke av {}: {}", rdbms, e.getMessage());
             }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
         }
         return conn;
     }
 
+    /** Bygger JDBC-URL uten brukernavn/passord. */
+    private String buildUrl(String rdbms, String db) {
+        return switch (rdbms) {
+            case "postgres" -> "jdbc:postgresql://" + host + "/" + db + "?ssl=false";
+            case "microsoft" -> "jdbc:sqlserver://" + host + ":" + mssqlPort
+                    + ";databaseName=" + db + ";encrypt=false";
+            case "oracle" -> "jdbc:oracle:thin:@" + host + ":" + oraclePort + ":" + oracleService;
+            case "mysql" -> "jdbc:mysql://" + host + "/" + db;
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
+        };
+    }
+
+    /** Setter timeout og maxRows på et statement. */
+    private void begrens(Statement st) throws SQLException {
+        st.setQueryTimeout(queryTimeoutSeconds);
+        st.setMaxRows(maxRows);
+    }
 
     /**
-     * Creates a resultset from a supplied SQL statement
-     *
-     * @param rdbms_sti
-     * @param db
-     * @param query
-     * @param username
-     * @param pwd
-     * @return
+     * Kjører en vilkårlig SQL-spørring (studentens egen SQL) og returnerer
+     * header + rader. Read-only, timeout og maxRows beskytter serveren.
      */
-    public Object createResultset(String rdbms_sti, String db, String query, String username, String pwd) {
-        this.rdbms_sti = rdbms_sti;
-        this.username = username;
-        this.db = db;
-        this.pwd = pwd;
+    public QueryResult executeQuery(String rdbms, String db, String query,
+                                    String username, String pwd) throws SQLException {
+        try (Connection conn = connect(rdbms, db, username, pwd);
+             Statement st = conn.createStatement()) {
+            begrens(st);
+            long start = System.currentTimeMillis();
+            try (ResultSet rs = st.executeQuery(query)) {
+                long elapsed = System.currentTimeMillis() - start;
+                ResultSetMetaData meta = rs.getMetaData();
+                int kolonner = meta.getColumnCount();
 
-        ResultSet rs = null;
-        Connection conn = getConn();
-        try {
-            Statement st = conn.createStatement();
-            rs = st.executeQuery(query);
-            // ResultSetMetaData rsmd = rs.getMetaData();
+                List<String> header = new ArrayList<>(kolonner);
+                for (int i = 1; i <= kolonner; i++) {
+                    header.add(meta.getColumnLabel(i));
+                }
 
-        } catch (SQLException e) {
-            //throw new RuntimeException(e);
-            // System.out.println("Noe gikk galt: \nFeilkode:" + e.getErrorCode() + "\nFeilmelding: " + e.getMessage());
-            logger.error("Noe gikk galt i createResultSet. Feilmelding: " + e.getMessage());
-            return e.getMessage();
-        }
-
-        return rs;
-    }
-
-    public Object createHeader(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData metadata = resultSet.getMetaData();
-        final int count = metadata.getColumnCount();
-        final List<String> header = new ArrayList<>(count);
-        for (int i = 1; i <= count; i++) {
-            header.add(metadata.getColumnName(i));
-        }
-        return header;
-    }
-
-    public List<List<String>> createTabledata(ResultSet resultSet) throws SQLException {
-
-        ResultSetMetaData metadata = resultSet.getMetaData();
-        int numberOfColumns = metadata.getColumnCount();
-
-        List<List<String>> tabell = new ArrayList<>();
-
-        while (resultSet.next()) {
-            List<String> rad = new ArrayList<>();
-            for (int i = 1; i <= numberOfColumns; i++) {
-                rad.add(resultSet.getString(i));
+                List<List<String>> rader = new ArrayList<>();
+                while (rs.next()) {
+                    List<String> rad = new ArrayList<>(kolonner);
+                    for (int i = 1; i <= kolonner; i++) {
+                        rad.add(rs.getString(i));
+                    }
+                    rader.add(rad);
+                }
+                logger.info("Query mot {} ({}) tok {} ms, {} rader", rdbms, db, elapsed, rader.size());
+                return new QueryResult(header, rader);
             }
-            tabell.add(rad);
         }
-        conn.close();
-        resultSet.close();
-        return tabell;
     }
 
-    public List<String> createDbList(ResultSet resultSetDB) throws SQLException {
-        List<String> dbList = new ArrayList<>();
+    /**
+     * Lister databaser/skjemaer brukeren har tilgang til i det valgte systemet.
+     * Katalog-spørringene er per RDBMS og bruker PreparedStatement.
+     */
+    public List<String> getDatabases(String rdbms, String username, String pwd) throws SQLException {
+        String sql;
+        String db = switch (rdbms) {
+            case "postgres" -> "postgres";
+            case "microsoft" -> "master";
+            case "oracle" -> "";
+            case "mysql" -> "";
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
+        };
 
-        while (resultSetDB.next()) {
-            dbList.add(resultSetDB.getString(1));
+        switch (rdbms) {
+            case "postgres" -> sql = "SELECT datname FROM pg_database "
+                    + "WHERE has_database_privilege(?, datname, 'CONNECT') AND NOT datistemplate "
+                    + "ORDER BY datname";
+            case "microsoft" -> sql = "SELECT name FROM sys.databases WHERE HAS_DBACCESS(name) = 1 ORDER BY name";
+            case "oracle" -> sql = "SELECT owner FROM ("
+                    + "  SELECT owner FROM all_tables "
+                    + "  UNION SELECT owner FROM all_views"
+                    + ") WHERE owner NOT IN ('SYS','SYSTEM','CTXSYS','DBSNMP','MDSYS','OLAPSYS',"
+                    + "'ORDSYS','OUTLN','WMSYS','XDB','APPQOSSYS','AUDSYS','DVSYS','LBACSYS',"
+                    + "'ORDDATA','ORDPLUGINS','SI_INFORMTN_SCHEMA','SYSBACKUP','SYSDG','SYSKM','SYSMAN') "
+                    + "ORDER BY owner";
+            case "mysql" -> sql = "SHOW DATABASES";
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         }
-        resultSetDB.close();
-        conn.close();
-        return dbList.stream().sorted().toList();
+
+        try (Connection conn = connect(rdbms, db, username, pwd);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if ("postgres".equals(rdbms)) {
+                ps.setString(1, username);
+            }
+            begrens(ps);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<String> dbList = new ArrayList<>();
+                while (rs.next()) {
+                    String navn = rs.getString(1);
+                    // Skjul system-databaser for MySQL
+                    if ("mysql".equals(rdbms) && List.of("information_schema", "mysql",
+                            "performance_schema", "sys").contains(navn)) {
+                        continue;
+                    }
+                    dbList.add(navn);
+                }
+                return dbList.stream().sorted().toList();
+            }
+        }
     }
 
-    public List<String> createTableList(ResultSet resultSetTables) throws SQLException {
-        List<String> tableList = new ArrayList<>();
+    /**
+     * Lister tabeller + views i valgt database/skjema.
+     * Returnerer data (schema, navn, type) — ikke HTML (XSS-sikkert).
+     */
+    public List<List<String>> getTables(String rdbms, String db, String username, String pwd) throws SQLException {
+        String sql;
+        String tilkoblingsDb;
 
-        while (resultSetTables.next()) {
-            tableList.add("<tr><td>"+resultSetTables.getString(1) + "</td><td>" + resultSetTables.getString(2) + "</td><td>" + resultSetTables.getString(3) + "</td></tr>");
+        switch (rdbms) {
+            case "postgres" -> {
+                sql = "SELECT table_schema, table_name, table_type FROM information_schema.tables "
+                        + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
+                        + "ORDER BY table_schema, table_type, table_name";
+                tilkoblingsDb = db;
+            }
+            case "microsoft" -> {
+                sql = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
+                        + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_TYPE";
+                tilkoblingsDb = db;
+            }
+            case "oracle" -> {
+                sql = "SELECT owner, table_name, 'TABLE' FROM all_tables WHERE owner = ? "
+                        + "UNION SELECT owner, view_name, 'VIEW' FROM all_views WHERE owner = ? "
+                        + "ORDER BY 1, 2";
+                tilkoblingsDb = db;
+            }
+            case "mysql" -> {
+                sql = "SELECT table_schema, table_name, table_type FROM information_schema.tables "
+                        + "WHERE table_schema = ? ORDER BY table_type";
+                tilkoblingsDb = db;
+            }
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         }
-        resultSetTables.close();
-        conn.close();
-        return tableList.stream().toList();
-    }
 
+        try (Connection conn = connect(rdbms, tilkoblingsDb, username, pwd);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if ("microsoft".equals(rdbms)) {
+                ps.setString(1, db);
+            } else if ("oracle".equals(rdbms)) {
+                ps.setString(1, db);
+                ps.setString(2, db);
+            } else if ("mysql".equals(rdbms)) {
+                ps.setString(1, db);
+            }
+            begrens(ps);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<List<String>> tabeller = new ArrayList<>();
+                while (rs.next()) {
+                    List<String> rad = new ArrayList<>(3);
+                    rad.add(rs.getString(1));
+                    rad.add(rs.getString(2));
+                    rad.add(rs.getString(3));
+                    tabeller.add(rad);
+                }
+                return tabeller;
+            }
+        }
+    }
 }
