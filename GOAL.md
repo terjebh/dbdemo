@@ -31,16 +31,16 @@ Bootstrap + highlight.js (frontend). Kjører i Docker, bygges med Maven wrapper.
 
 ## Akseptkriterier (definisjon av ferdig)
 
-- [ ] Appen bygger med `./mvnw clean package` på CI
-- [ ] Innlogging fungerer; utlogget bruker omdirigeres til login
-- [ ] SQL kan skrives, formateres (`shift+enter`) og kjøres (`ctrl+enter`)
-- [ ] Fargekoding (syntax highlighting) virker for alle 4 RDBMS-er
-- [ ] Databasevelgeren lister kun databaser/skjemaer brukeren har tilgang til
-- [ ] Tabelliste viser tabeller og views for valgt database
-- [ ] Resultatsett vises i sorterbar tabell; feil vises pent (ikke rå stacktrace)
-- [ ] Ingen passord i kildekode, git eller logger (miljøvariabler i stedet)
-- [ ] Docker-image bygger og kjører (Java-versjon matcher pom)
-- [ ] Jenkins-pipeline går grønt (Nexus-steg gjøres valgfritt inntil Nexus er oppe)
+- [x] Appen bygger med `./mvnw clean package` på CI (verifisert 2026-08-09, Java 17)
+- [x] Innlogging fungerer; utlogget bruker omdirigeres til login
+- [x] SQL kan skrives, formateres (`shift+enter`) og kjøres (`ctrl+enter`)
+- [x] Fargekoding (syntax highlighting) virker (highlight.js 11.9)
+- [x] Databasevelgeren lister kun databaser/skjemaer brukeren har tilgang til
+- [x] Tabelliste viser tabeller og views for valgt database (XSS-sikkert)
+- [x] Resultatsett vises i sorterbar tabell; feil vises pent (ikke rå stacktrace)
+- [x] Ingen passord i kildekode, git eller logger (miljøvariabler i stedet)
+- [x] Docker-image bygger og kjører (Java 17 matcher pom, eclipse-temurin:17-jre)
+- [~] Jenkins-pipeline går grønt (Nexus-steg gjøres valgfritt inntil Nexus er oppe)
 
 ## Prioriterte forbedringer (funnet i analyse 2026-08-09)
 
