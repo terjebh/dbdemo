@@ -13,14 +13,16 @@ import java.util.Properties;
 /**
  * Kobler til databaser og utfører SQL.
  * <p>
- * Sikkerhets- og kvalitetsforbedringer (2026-08-09):
+ * Tilkoblingsinformasjonen kommer fra {@link DbConnection}-objekter
+ * (konfigurert i first-run-veiviseren), ikke fra properties.
+ * <p>
+ * Sikkerhet:
  * <ul>
  *   <li>Ingen passord i JDBC-URL-er — Properties-objekt til DriverManager.</li>
  *   <li>try-with-resources: Connection, Statement og ResultSet lukkes alltid.</li>
  *   <li>PreparedStatement for katalog-spørringer (ingen SQL-injeksjon).</li>
  *   <li>queryTimeout + maxRows på ALLE spørringer (student kan ikke henge serveren).</li>
  *   <li>Read-only-kobling som standard (hindrer uhell som DROP/UPDATE).</li>
- *   <li>Feil kastes som SQLException — håndteres i controller, ikke som Object-retur.</li>
  * </ul>
  *
  * @author Terje Berg-Hansen
@@ -29,21 +31,6 @@ import java.util.Properties;
 public class Dao {
 
     private static final Logger logger = LoggerFactory.getLogger(Dao.class);
-
-    @Value("${db.host:noderia.com}")
-    private String host;
-
-    @Value("${db.host.oracle:itfakultetet.no}")
-    private String oracleHost;
-
-    @Value("${db.port.oracle:1521}")
-    private int oraclePort;
-
-    @Value("${db.port.mssql:1433}")
-    private int mssqlPort;
-
-    @Value("${db.oracle.service:HR}")
-    private String oracleService;
 
     @Value("${db.query.timeout.seconds:15}")
     private int queryTimeoutSeconds;
@@ -58,37 +45,65 @@ public class Dao {
     public record QueryResult(List<String> header, List<List<String>> rows) {
     }
 
-    /**
-     * Åpner en tilkobling til angitt RDBMS/database.
-     * Passord sendes via Properties — aldri i URL-en.
-     */
-    private Connection connect(String rdbms, String db, String username, String pwd) throws SQLException {
-        String url = buildUrl(rdbms, db);
-        Properties props = new Properties();
-        props.setProperty("user", username);
-        props.setProperty("password", pwd);
-
-        Connection conn = DriverManager.getConnection(url, props);
-        if (readOnly) {
-            try {
-                conn.setReadOnly(true);
-            } catch (SQLException e) {
-                logger.debug("setReadOnly støttes ikke av {}: {}", rdbms, e.getMessage());
-            }
-        }
-        return conn;
+    /** Standardporter per RDBMS (brukes i setup-skjemaet som forslag). */
+    public static int defaultPort(String rdbms) {
+        return switch (rdbms) {
+            case "postgres" -> 5432;
+            case "microsoft" -> 1433;
+            case "oracle" -> 1521;
+            case "mysql" -> 3306;
+            default -> 0;
+        };
     }
 
-    /** Bygger JDBC-URL uten brukernavn/passord. */
-    private String buildUrl(String rdbms, String db) {
+    /**
+     * Åpner en tilkobling via en DbConnection.
+     * Passord sendes via Properties — aldri i URL-en.
+     */
+    private Connection connect(DbConnection conn) throws SQLException {
+        if (conn == null || !conn.isValid()) {
+            throw new SQLException("Tilkoblingen er ikke konfigurert (RDBMS/host/bruker/passord mangler)");
+        }
+        String url = buildUrl(conn);
+        Properties props = new Properties();
+        props.setProperty("user", conn.getUsername());
+        props.setProperty("password", conn.getPassword());
+
+        Connection c = DriverManager.getConnection(url, props);
+        if (readOnly) {
+            try {
+                c.setReadOnly(true);
+            } catch (SQLException e) {
+                logger.debug("setReadOnly støttes ikke av {}: {}", conn.getRdbms(), e.getMessage());
+            }
+        }
+        return c;
+    }
+
+    /** Bygger JDBC-URL fra en DbConnection (uten brukernavn/passord). */
+    public String buildUrl(DbConnection conn) {
+        String rdbms = conn.getRdbms();
         return switch (rdbms) {
-            case "postgres" -> "jdbc:postgresql://" + host + "/" + db + "?ssl=false";
-            case "microsoft" -> "jdbc:sqlserver://" + host + ":" + mssqlPort
-                    + ";databaseName=" + db + ";encrypt=false";
-            case "oracle" -> "jdbc:oracle:thin:@//" + oracleHost + ":" + oraclePort + "/" + oracleService;
-            case "mysql" -> "jdbc:mysql://" + host + "/" + db;
+            case "postgres" -> "jdbc:postgresql://" + conn.getHost() + ":" + conn.getPort()
+                    + "/" + conn.getDatabase() + "?ssl=false";
+            case "microsoft" -> "jdbc:sqlserver://" + conn.getHost() + ":" + conn.getPort()
+                    + ";databaseName=" + conn.getDatabase() + ";encrypt=false";
+            case "oracle" -> "jdbc:oracle:thin:@//" + conn.getHost() + ":" + conn.getPort()
+                    + "/" + conn.getDatabase();
+            case "mysql" -> "jdbc:mysql://" + conn.getHost() + ":" + conn.getPort()
+                    + "/" + conn.getDatabase();
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
+    }
+
+    /** Tester om en tilkobling er gyldig (kobler til og lukker). Returnerer null ved suksess. */
+    public String testConnection(DbConnection conn) {
+        try (Connection c = connect(conn)) {
+            return null; // OK
+        } catch (SQLException e) {
+            logger.warn("Tilkoblingstest feilet ({}): {}", conn.getRdbms(), e.getMessage());
+            return e.getMessage();
+        }
     }
 
     /** Setter timeout og maxRows på et statement. */
@@ -101,10 +116,15 @@ public class Dao {
      * Kjører en vilkårlig SQL-spørring (studentens egen SQL) og returnerer
      * header + rader. Read-only, timeout og maxRows beskytter serveren.
      */
-    public QueryResult executeQuery(String rdbms, String db, String query,
-                                    String username, String pwd) throws SQLException {
-        try (Connection conn = connect(rdbms, db, username, pwd);
-             Statement st = conn.createStatement()) {
+    public QueryResult executeQuery(DbConnection conn, String db, String query) throws SQLException {
+        // For Oracle betyr "database" egentlig skjema; URL-en bruker service-navnet.
+        // For de andre brukes db direkte i URL-en, så vi lager en kopi med riktig database.
+        DbConnection kobling = conn;
+        if (!"oracle".equals(conn.getRdbms())) {
+            kobling = kopiMedDatabase(conn, db);
+        }
+        try (Connection c = connect(kobling);
+             Statement st = c.createStatement()) {
             begrens(st);
             long start = System.currentTimeMillis();
             try (ResultSet rs = st.executeQuery(query)) {
@@ -125,32 +145,36 @@ public class Dao {
                     }
                     rader.add(rad);
                 }
-                logger.info("Query mot {} ({}) tok {} ms, {} rader", rdbms, db, elapsed, rader.size());
+                logger.info("Query mot {} tok {} ms, {} rader", db, elapsed, rader.size());
                 return new QueryResult(header, rader);
             }
         }
+    }
+
+    private DbConnection kopiMedDatabase(DbConnection conn, String db) {
+        DbConnection kopi = new DbConnection();
+        kopi.setRdbms(conn.getRdbms());
+        kopi.setEnabled(true);
+        kopi.setHost(conn.getHost());
+        kopi.setPort(conn.getPort());
+        kopi.setDatabase(db);
+        kopi.setUsername(conn.getUsername());
+        kopi.setPassword(conn.getPassword());
+        return kopi;
     }
 
     /**
      * Lister databaser/skjemaer brukeren har tilgang til i det valgte systemet.
      * Katalog-spørringene er per RDBMS og bruker PreparedStatement.
      */
-    public List<String> getDatabases(String rdbms, String username, String pwd) throws SQLException {
-        String sql;
-        String db = switch (rdbms) {
-            case "postgres" -> "postgres";
-            case "microsoft" -> "master";
-            case "oracle" -> "";
-            case "mysql" -> "";
-            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
-        };
-
-        switch (rdbms) {
-            case "postgres" -> sql = "SELECT datname FROM pg_database "
+    public List<String> getDatabases(DbConnection conn) throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "postgres" -> "SELECT datname FROM pg_database "
                     + "WHERE has_database_privilege(?, datname, 'CONNECT') AND NOT datistemplate "
                     + "ORDER BY datname";
-            case "microsoft" -> sql = "SELECT name FROM sys.databases WHERE HAS_DBACCESS(name) = 1 ORDER BY name";
-            case "oracle" -> sql = "SELECT owner FROM ("
+            case "microsoft" -> "SELECT name FROM sys.databases WHERE HAS_DBACCESS(name) = 1 ORDER BY name";
+            case "oracle" -> "SELECT owner FROM ("
                     + "  SELECT owner FROM all_tables "
                     + "  UNION SELECT owner FROM all_views"
                     + ") WHERE owner NOT IN ('SYS','SYSTEM','CTXSYS','DBSNMP','MDSYS','OLAPSYS',"
@@ -159,14 +183,14 @@ public class Dao {
                     + "'GSMADMIN_INTERNAL','GSMUSER','GSMROOTUSER','REMOTE_SCHEDULER_AGENT','DBSFWUSER',"
                     + "'DBSNMP','WMSYS','ANONYMOUS','APEX_PUBLIC_USER','FLOWS_FILES') "
                     + "ORDER BY owner";
-            case "mysql" -> sql = "SHOW DATABASES";
+            case "mysql" -> "SHOW DATABASES";
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
-        }
+        };
 
-        try (Connection conn = connect(rdbms, db, username, pwd);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection c = connect(conn);
+             PreparedStatement ps = c.prepareStatement(sql)) {
             if ("postgres".equals(rdbms)) {
-                ps.setString(1, username);
+                ps.setString(1, conn.getUsername());
             }
             begrens(ps);
             try (ResultSet rs = ps.executeQuery()) {
@@ -189,38 +213,24 @@ public class Dao {
      * Lister tabeller + views i valgt database/skjema.
      * Returnerer data (schema, navn, type) — ikke HTML (XSS-sikkert).
      */
-    public List<List<String>> getTables(String rdbms, String db, String username, String pwd) throws SQLException {
-        String sql;
-        String tilkoblingsDb;
-
-        switch (rdbms) {
-            case "postgres" -> {
-                sql = "SELECT table_schema, table_name, table_type FROM information_schema.tables "
-                        + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
-                        + "ORDER BY table_schema, table_type, table_name";
-                tilkoblingsDb = db;
-            }
-            case "microsoft" -> {
-                sql = "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
-                        + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_TYPE";
-                tilkoblingsDb = db;
-            }
-            case "oracle" -> {
-                sql = "SELECT owner, table_name, 'TABLE' FROM all_tables WHERE owner = ? "
-                        + "UNION SELECT owner, view_name, 'VIEW' FROM all_views WHERE owner = ? "
-                        + "ORDER BY 1, 2";
-                tilkoblingsDb = db;
-            }
-            case "mysql" -> {
-                sql = "SELECT table_schema, table_name, table_type FROM information_schema.tables "
-                        + "WHERE table_schema = ? ORDER BY table_type";
-                tilkoblingsDb = db;
-            }
+    public List<List<String>> getTables(DbConnection conn, String db) throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "postgres" -> "SELECT table_schema, table_name, table_type FROM information_schema.tables "
+                    + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
+                    + "ORDER BY table_schema, table_type, table_name";
+            case "microsoft" -> "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
+                    + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_TYPE";
+            case "oracle" -> "SELECT owner, table_name, 'TABLE' FROM all_tables WHERE owner = ? "
+                    + "UNION SELECT owner, view_name, 'VIEW' FROM all_views WHERE owner = ? "
+                    + "ORDER BY 1, 2";
+            case "mysql" -> "SELECT table_schema, table_name, table_type FROM information_schema.tables "
+                    + "WHERE table_schema = ? ORDER BY table_type";
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
-        }
+        };
 
-        try (Connection conn = connect(rdbms, tilkoblingsDb, username, pwd);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection c = connect(conn);
+             PreparedStatement ps = c.prepareStatement(sql)) {
             if ("microsoft".equals(rdbms)) {
                 ps.setString(1, db);
             } else if ("oracle".equals(rdbms)) {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="~{head :: head}"></div>
+    <style>
+        body { background: #f5f7ff; }
+        .login-kort { max-width: 420px; margin: 5rem auto; }
+        .kort-head { background: #212529; color: #fff; border-radius: 10px 10px 0 0; padding: 1rem 1.5rem; }
+        .kort-body { background: #fff; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 10px 10px; padding: 2rem; }
+    </style>
+</head>
+<body>
+<main>
+    <div class="login-kort">
+        <div class="kort-head">
+            <h4 class="mb-0">🏦 DBApp — innlogging</h4>
+        </div>
+        <div class="kort-body">
+            <div th:if="${param.error}" class="alert alert-danger">
+                Feil brukernavn eller passord.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success">
+                Du er nå logget ut.
+            </div>
+            <form method="post" th:action="@{/login}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="mb-3">
+                    <label class="form-label" for="username">Brukernavn</label>
+                    <input type="text" class="form-control" id="username" name="username" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Passord</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Logg inn</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

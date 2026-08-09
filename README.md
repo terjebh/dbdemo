@@ -9,6 +9,25 @@ Støttede databaser:
 - Microsoft SQL Server
 - MySQL/MariaDB
 
+## 🚀 Første gangs kjøring (first-run-oppsett)
+
+Ved første kjøring viser appen en **oppsettsveiviser** på `/setup` der du
+fyller inn:
+
+1. **Admin-bruker** — brukernavn og passord for innlogging til appen
+2. **Databasetilkoblinger** — for hver av de fire RDBMS-ene: vert, port,
+   database (eller service-navn for Oracle), brukernavn og passord
+
+Du kan koble til **én eller flere** databaser — de du ikke fyller ut, er
+ikke aktive. Hver tilkobling kan **testes** før du lagrer.
+
+Konfigurasjonen lagres som JSON i `~/.dbdemo/dbconfig.json` (utenfor repoet,
+med `600`-rettigheter). Overstyr plasseringen med miljøvariabelen
+`DBDEMO_CONFIG`. Admin-passordet lagres som bcrypt-hash — aldri klartekst.
+
+Etter oppsettet redirectes alt til innlogging, og `/setup` viser kun
+«allerede konfigurert».
+
 ## Bygging
 
 ```bash
@@ -23,37 +42,20 @@ docker build -t terjebh/dbdemo .
 docker run -d --name dbapp -p 8080:8080 terjebh/dbdemo
 ```
 
-## Konfigurasjon (miljøvariabler)
-
-**Ingen passord ligger i kildekoden eller git!** Sett dem som miljøvariabler:
+## Konfigurasjon (valgfrie miljøvariabler)
 
 | Variabel | Beskrivelse | Default |
 |---|---|---|
-| `APP_USER` | Innloggingsbrukernavn | `kurs` |
-| `APP_PASSWORD` | Innloggingspassord | `kurs123` |
-| `DB_HOST` | Database-server | `noderia.com` |
-| `DB_PORT_ORACLE` | Oracle-port | `1521` |
-| `DB_PORT_MSSQL` | MS SQL-port | `1433` |
-| `ORACLE_SERVICE` | Oracle service-navn | `FREE` |
-| `PG_USERNAME` / `PG_PWD` | PostgreSQL-bruker | *(må settes)* |
-| `MS_USERNAME` / `MS_PWD` | MS SQL-bruker | *(må settes)* |
-| `OR_USERNAME` / `OR_PWD` | Oracle-bruker | *(må settes)* |
-| `MY_USERNAME` / `MY_PWD` | MySQL-bruker | *(må settes)* |
+| `DBDEMO_CONFIG` | Sti til konfigurasjonsfilen | `~/.dbdemo/dbconfig.json` |
 | `QUERY_TIMEOUT_SECONDS` | Timeout for spørringer | `15` |
 | `QUERY_MAX_ROWS` | Maks antall rader per spørring | `10000` |
 | `DB_READONLY` | Read-only-kobling (hindrer uhell) | `true` |
 
-Eksempel:
-
-```bash
-export PG_USERNAME=dbdemo PG_PWD='hemmelig'
-export MS_USERNAME=kurs1 MS_PWD=':)Kurs123'
-java -jar target/dbdemo-*.jar
-```
-
 ## Sikkerhet
 
-- Passord kun via miljøvariabler — aldri i kode, git eller logger
+- **Ingen passord i kildekoden eller git** — alt fylles inn via `/setup`
+  og lagres i en lokal fil utenfor repoet (600-rettigheter)
+- Admin-passordet lagres som **bcrypt-hash**
 - Read-only-kobling som standard (studenter kan ikke endre/slette data)
 - `queryTimeout` + `maxRows` beskytter serveren mot tunge spørringer
 - PreparedStatement for katalog-spørringer (ingen SQL-injeksjon)
@@ -65,14 +67,11 @@ java -jar target/dbdemo-*.jar
 - Velg database i nedtrekksmenyen — kun databaser du har tilgang til vises
 - Tabeller og views for valgt database vises i sidepanelet
 
-## Nexus
+## Nexus / CI
 
 Jar-fil: https://nexus.itfakultetet.no/#browse/browse:DBDemo
-(Nexus-steg i Jenkins-pipelinen er valgfritt inntil Nexus er installert — se `SKIP_NEXUS`-parameteren.)
-
-## Mål og status
-
-Se [GOAL.md](GOAL.md) for prosjektmålet, akseptkriterier og forbedringsliste.
+Jenkins-pipelinen bygger og laster opp til Nexus (`SKIP_NEXUS`/`SKIP_DOCKER`
+-parametre). Se [GOAL.md](GOAL.md) for prosjektmål og status.
 
 @ your service
 
