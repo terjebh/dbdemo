@@ -68,6 +68,9 @@
     </div>
     <div id="feilmelding" class="alert alert-danger">
         <th:block th:text="${feil}"/>
+        <th:block th:if="${feil}">
+            <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
+        </th:block>
     </div>
 
 </main>

@@ -7,6 +7,7 @@ import no.itfakultetet.dbdemo.model.DbConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,11 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * First-run-veiviser (/setup): skjema der man fyller inn admin-brukeren og
- * tilkoblingsinformasjon for de databasene appen skal knyttes til.
- * <p>
- * Når konfigurasjonen er lagret, redirectes alt til innlogging og /setup
- * viser kun en «allerede konfigurert»-side.
+ * Oppsettsveiviser (/setup):
+ * <ul>
+ *   <li>Før appen er konfigurert: viser first-run-skjemaet (åpent for alle).</li>
+ *   <li>Etter konfigurering: krever innlogging, og viser skjemaet med
+ *       eksisterende verdier fylt ut (redigeringsmodus) — for å oppdatere
+ *       utdatert tilkoblingsinformasjon. Tomme passordfelt = behold gammelt.</li>
+ *   <li>Viser tilkoblingsstatus (test av alle konfigurerte databaser).</li>
+ * </ul>
  */
 @Controller
 public class SetupController {
@@ -40,11 +44,14 @@ public class SetupController {
     }
 
     @GetMapping("/setup")
-    public String setupSkjema(Model model) {
-        if (configService.isConfigured()) {
-            model.addAttribute("alleredeKonfigurert", true);
-            return "setup";
+    public String setupSkjema(Model model, Authentication authentication) {
+        boolean konfigurert = configService.isConfigured();
+
+        if (konfigurert && (authentication == null || !authentication.isAuthenticated())) {
+            // Etter oppsett krever /setup innlogging (kun admin kan endre tilkoblinger)
+            return "redirect:/login";
         }
+
         AppConfig config = configService.load();
         if (config.getConnections().isEmpty()) {
             // Fyll inn standardporter som forslag
@@ -57,31 +64,50 @@ public class SetupController {
             }
             config.setConnections(conns);
         }
+
         model.addAttribute("config", config);
-        model.addAttribute("alleredeKonfigurert", false);
+        model.addAttribute("alleredeKonfigurert", konfigurert);
+        model.addAttribute("redigeringsmodus", konfigurert);
+        model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(config));
         return "setup";
     }
 
     /** Lagrer konfigurasjonen fra skjemaet. */
     @PostMapping("/setup")
     public String lagre(Model model,
+                        Authentication authentication,
                         @RequestParam("adminUsername") String adminUsername,
-                        @RequestParam("adminPassword") String adminPassword,
+                        @RequestParam(value = "adminPassword", required = false) String adminPassword,
                         @RequestParam Map<String, String> alleParametre) {
 
-        if (adminUsername == null || adminUsername.isBlank()
-                || adminPassword == null || adminPassword.isBlank()) {
-            model.addAttribute("feil", "Du må fylle inn både brukernavn og passord for admin-brukeren.");
-            return setupSkjema(model);
+        boolean konfigurert = configService.isConfigured();
+        if (konfigurert && (authentication == null || !authentication.isAuthenticated())) {
+            return "redirect:/login";
+        }
+
+        AppConfig eksisterende = configService.load();
+
+        // Ved redigering: beholder eksisterende passord-hash hvis feltet er tomt
+        String adminPasswordHash;
+        if (adminPassword == null || adminPassword.isBlank()) {
+            if (konfigurert && eksisterende.getAdminPasswordHash() != null
+                    && !eksisterende.getAdminPasswordHash().isBlank()) {
+                adminPasswordHash = eksisterende.getAdminPasswordHash();
+            } else {
+                model.addAttribute("feil", "Du må fylle inn passord for admin-brukeren.");
+                return setupSkjema(model, authentication);
+            }
+        } else {
+            adminPasswordHash = passwordEncoder.encode(adminPassword);
         }
 
         AppConfig config = new AppConfig();
         config.setAdminUsername(adminUsername.trim());
-        config.setAdminPasswordHash(passwordEncoder.encode(adminPassword));
+        config.setAdminPasswordHash(adminPasswordHash);
 
         Map<String, DbConnection> conns = new LinkedHashMap<>();
         for (String rdbms : RDBMSER) {
-            DbConnection c = byggTilkobling(rdbms, alleParametre);
+            DbConnection c = byggTilkobling(rdbms, alleParametre, eksisterende);
             if (c.isValid()) {
                 // Test tilkoblingen før vi lagrer
                 String feil = dao.testConnection(c);
@@ -89,7 +115,9 @@ public class SetupController {
                     model.addAttribute("feil", "Kunne ikke koble til " + ConnectionHelper.rdbmsNavn(rdbms)
                             + ": " + feil);
                     model.addAttribute("config", fyllConfigMed(adminUsername, conns));
-                    model.addAttribute("alleredeKonfigurert", false);
+                    model.addAttribute("alleredeKonfigurert", konfigurert);
+                    model.addAttribute("redigeringsmodus", konfigurert);
+                    model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(config));
                     return "setup";
                 }
             }
@@ -101,12 +129,13 @@ public class SetupController {
             configService.save(config);
             logger.info("Konfigurasjon lagret. Aktive databaser: {}",
                     conns.values().stream().filter(DbConnection::isValid).count());
-            return "redirect:/login";
+            return "redirect:/" + (konfigurert ? "select/postgres" : "login");
         } catch (Exception e) {
             logger.error("Kunne ikke lagre konfigurasjon: {}", e.getMessage());
             model.addAttribute("feil", "Kunne ikke lagre konfigurasjon: " + e.getMessage());
             model.addAttribute("config", config);
-            model.addAttribute("alleredeKonfigurert", false);
+            model.addAttribute("alleredeKonfigurert", konfigurert);
+            model.addAttribute("redigeringsmodus", konfigurert);
             return "setup";
         }
     }
@@ -122,7 +151,22 @@ public class SetupController {
         return ResponseEntity.ok(Map.of("ok", false, "melding", feil));
     }
 
-    private DbConnection byggTilkobling(String rdbms, Map<String, String> p) {
+    /** Tester alle konfigurerte tilkoblinger og returnerer status per RDBMS. */
+    private Map<String, String> testAlleTilkoblinger(AppConfig config) {
+        Map<String, String> status = new LinkedHashMap<>();
+        for (String rdbms : RDBMSER) {
+            DbConnection c = config.getConnection(rdbms);
+            if (c != null && c.isValid()) {
+                String feil = dao.testConnection(c);
+                status.put(rdbms, feil == null ? "OK" : feil);
+            } else if (c != null && c.isEnabled() && !c.getHost().isBlank()) {
+                status.put(rdbms, "Ufullstendig (mangler felt)");
+            }
+        }
+        return status;
+    }
+
+    private DbConnection byggTilkobling(String rdbms, Map<String, String> p, AppConfig eksisterende) {
         DbConnection c = new DbConnection();
         c.setRdbms(rdbms);
         c.setEnabled(bool(p, "enabled_" + rdbms));
@@ -130,7 +174,14 @@ public class SetupController {
         c.setPort(hentInt(p, "port_" + rdbms, Dao.defaultPort(rdbms)));
         c.setDatabase(str(p, "database_" + rdbms));
         c.setUsername(str(p, "username_" + rdbms));
-        c.setPassword(str(p, "password_" + rdbms));
+        String passord = str(p, "password_" + rdbms);
+        if (passord.isEmpty() && eksisterende != null) {
+            DbConnection gammel = eksisterende.getConnection(rdbms);
+            if (gammel != null) {
+                passord = gammel.getPassword(); // behold gammelt passord
+            }
+        }
+        c.setPassword(passord);
         return c;
     }
 

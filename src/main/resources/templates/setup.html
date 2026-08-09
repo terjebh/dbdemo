@@ -20,18 +20,30 @@
 <main>
     <div class="setup-kort">
         <div class="kort-head">
-            <h4 class="mb-0">👋 Velkommen til DBApp — første gangs oppsett</h4>
+            <h4 class="mb-0" th:text="${redigeringsmodus} ? '🔧 Tilkoblingsinnstillinger' : '👋 Velkommen til DBApp — første gangs oppsett'"></h4>
         </div>
         <div class="kort-body">
-            <p class="text-muted">Fyll inn innloggingsinformasjon for admin-brukeren og de databasene du vil knytte appen til. Du kan velge én eller flere — de du ikke fyller ut, er ikke aktive. Informasjonen lagres i en lokal konfigurasjonsfil utenfor repoet.</p>
+            <p class="text-muted" th:text="${redigeringsmodus} ? 'Oppdater tilkoblingsinformasjonen for databasene. Tomme passordfelt betyr at det eksisterende passordet beholdes.' : 'Fyll inn innloggingsinformasjon for admin-brukeren og de databasene du vil knytte appen til. Du kan velge én eller flere — de du ikke fyller ut, er ikke aktive. Informasjonen lagres i en lokal konfigurasjonsfil utenfor repoet.'"></p>
 
-            <div th:if="${alleredeKonfigurert}" class="alert alert-info">
+            <div th:if="${alleredeKonfigurert && !redigeringsmodus}" class="alert alert-info">
                 Appen er allerede konfigurert. Gå til <a th:href="@{/login}">innlogging</a>.
             </div>
 
             <div th:if="${feil}" class="alert alert-danger" th:text="${feil}"></div>
 
-            <form th:if="${!alleredeKonfigurert}" method="post" th:action="@{/setup}">
+            <!-- Tilkoblingsstatus -->
+            <div th:if="${tilkoblingsstatus != null && !tilkoblingsstatus.isEmpty()}" class="mb-3">
+                <h6>Tilkoblingsstatus</h6>
+                <ul class="list-unstyled">
+                    <li th:each="entry : ${tilkoblingsstatus}">
+                        <span th:if="${entry.value == 'OK'}" class="text-success">✅</span>
+                        <span th:unless="${entry.value == 'OK'}" class="text-danger">❌</span>
+                        <span th:text="${' ' + entry.key + ': ' + entry.value}"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <form th:if="${!alleredeKonfigurert || redigeringsmodus}" method="post" th:action="@{/setup}">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
                 <!-- Admin-bruker -->
@@ -45,8 +57,9 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="adminPassword" required
-                                   placeholder="Velg et sterkt passord">
+                            <input type="password" class="form-control" name="adminPassword"
+                                   th:placeholder="${redigeringsmodus} ? 'Behold eksisterende (tomt = uendret)' : 'Velg et sterkt passord'"
+                                   th:required="${!redigeringsmodus}">
                         </div>
                     </div>
                 </div>
@@ -199,7 +212,8 @@
                     <div class="test-resultat" id="resultat-microsoft"></div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-lg w-100">💾 Lagre og fortsett til innlogging</button>
+                <button type="submit" class="btn btn-primary btn-lg w-100"
+                        th:text="${redigeringsmodus} ? '💾 Lagre endringer' : '💾 Lagre og fortsett til innlogging'"></button>
             </form>
         </div>
     </div>
