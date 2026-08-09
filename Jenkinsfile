@@ -3,12 +3,15 @@ pipeline {
           imagename = 'terjebh/dbdemo'
           registryCredential = 'dockerhub'
           dockerImage = ''
-          JAVA_HOME = '/usr/lib/jvm/java-17-openjdk'
         }
 
    agent {
      label "master || maven"
    }
+
+  tools {
+    jdk 'java-22-openjdk'
+  }
 
   stages {
 
@@ -59,7 +62,7 @@ pipeline {
                  nexusArtifactUploader artifacts: [[artifactId: 'DBDemo', classifier: '', file: 'target/dbdemo-0.0.3-SNAPSHOT.jar', type: 'jar']],
                  credentialsId: '72654080-f2e8-42cf-b93d-b38038fbb381',
                  groupId: 'no.itfakultetet',
-                 nexusUrl: 'noderia.com:8081',
+                 nexusUrl: 'server6.noderia.com:8081',
                  nexusVersion: 'nexus3',
                  protocol: 'http',
                  repository: 'DBDemo',
