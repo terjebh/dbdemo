@@ -33,13 +33,16 @@ public class Dao {
     @Value("${db.host:noderia.com}")
     private String host;
 
+    @Value("${db.host.oracle:itfakultetet.no}")
+    private String oracleHost;
+
     @Value("${db.port.oracle:1521}")
     private int oraclePort;
 
     @Value("${db.port.mssql:1433}")
     private int mssqlPort;
 
-    @Value("${db.oracle.service:FREE}")
+    @Value("${db.oracle.service:HR}")
     private String oracleService;
 
     @Value("${db.query.timeout.seconds:15}")
@@ -82,7 +85,7 @@ public class Dao {
             case "postgres" -> "jdbc:postgresql://" + host + "/" + db + "?ssl=false";
             case "microsoft" -> "jdbc:sqlserver://" + host + ":" + mssqlPort
                     + ";databaseName=" + db + ";encrypt=false";
-            case "oracle" -> "jdbc:oracle:thin:@" + host + ":" + oraclePort + ":" + oracleService;
+            case "oracle" -> "jdbc:oracle:thin:@//" + oracleHost + ":" + oraclePort + "/" + oracleService;
             case "mysql" -> "jdbc:mysql://" + host + "/" + db;
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
@@ -152,7 +155,9 @@ public class Dao {
                     + "  UNION SELECT owner FROM all_views"
                     + ") WHERE owner NOT IN ('SYS','SYSTEM','CTXSYS','DBSNMP','MDSYS','OLAPSYS',"
                     + "'ORDSYS','OUTLN','WMSYS','XDB','APPQOSSYS','AUDSYS','DVSYS','LBACSYS',"
-                    + "'ORDDATA','ORDPLUGINS','SI_INFORMTN_SCHEMA','SYSBACKUP','SYSDG','SYSKM','SYSMAN') "
+                    + "'ORDDATA','ORDPLUGINS','SI_INFORMTN_SCHEMA','SYSBACKUP','SYSDG','SYSKM','SYSMAN',"
+                    + "'GSMADMIN_INTERNAL','GSMUSER','GSMROOTUSER','REMOTE_SCHEDULER_AGENT','DBSFWUSER',"
+                    + "'DBSNMP','WMSYS','ANONYMOUS','APEX_PUBLIC_USER','FLOWS_FILES') "
                     + "ORDER BY owner";
             case "mysql" -> sql = "SHOW DATABASES";
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
