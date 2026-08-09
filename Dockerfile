@@ -1,7 +1,7 @@
 # Bygg: mvnw clean package (eller Jenkins)
 # Kjør: java -jar target/dbdemo-*.jar
-# Java 17 matcher pom.xml (maven.compiler.source/target)
-FROM eclipse-temurin:17-jre
+# Java 25 matcher pom.xml (java.version=25)
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
