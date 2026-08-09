@@ -30,6 +30,7 @@ pipeline {
      }
 
      stage('Build docker image') {
+              when { expression { params.SKIP_DOCKER == false } }
               steps{
                 script {
                   dockerImage = docker.build imagename
@@ -38,6 +39,7 @@ pipeline {
      }
 
      stage('Deploy Docker Image to Dockerhub') {
+              when { expression { params.SKIP_DOCKER == false } }
               steps{
                 script {
                   docker.withRegistry( '', registryCredential ) {
@@ -49,6 +51,7 @@ pipeline {
               }
      }
             stage('Remove Unused docker image') {
+              when { expression { params.SKIP_DOCKER == false } }
               steps{
                 sh "docker rmi $imagename:$BUILD_NUMBER"
                  sh "docker rmi $imagename:latest"
@@ -72,7 +75,8 @@ pipeline {
 
      }
      parameters {
-        booleanParam(name: 'SKIP_NEXUS', defaultValue: true, description: 'Hopp over Nexus-opplasting (Nexus er ikke installert ennå)')
+        booleanParam(name: 'SKIP_NEXUS', defaultValue: false, description: 'Hopp over Nexus-opplasting')
+        booleanParam(name: 'SKIP_DOCKER', defaultValue: true, description: 'Hopp over Docker-bygg og Dockerhub-push (brukes når Nexus er hovedmål)')
      }
           post {
                  success {
