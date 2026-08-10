@@ -17,13 +17,17 @@
         <li class="nav-item"><a class="nav-link" href="/select/microsoft">Microsoft SQL</a></li>
         <li class="nav-item"><a class="nav-link" href="/select/oracle">Oracle SQL</a></li>
         <li class="nav-item"><a class="nav-link" href="/select/mysql">MySQL</a></li>
+        <li class="nav-item"><a class="nav-link" href="/sqlite">🗄️ SQLite</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/brukere" title="Administrer brukere">👥 Brukere</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/setup" title="Oppdater databasetilkoblinger">⚙️ Tilkoblinger</a></li>
       </ul>
       <span class="navbar-text d-flex">
         <span class="text-light me-3" sec:authorize="isAuthenticated()"
               th:text="'Logget inn: ' + ${#authentication.name}"></span>
-        <a class="btn btn-outline-danger btn-sm" sec:authorize="isAuthenticated()" href="/logout">Logout</a>
+        <form method="post" th:action="@{/logout}" class="d-inline" sec:authorize="isAuthenticated()">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+        </form>
       </span>
     </div>
   </div>

@@ -2,9 +2,11 @@ package no.itfakultetet.dbdemo.controller;
 
 import no.itfakultetet.dbdemo.model.Dao;
 import no.itfakultetet.dbdemo.model.DbConnection;
+import no.itfakultetet.dbdemo.model.SQLiteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,15 +21,27 @@ public class TableListRestController {
 
     private final Dao dao;
     private final ConnectionHelper connectionHelper;
+    private final SQLiteService sqliteService;
 
-    public TableListRestController(Dao dao, ConnectionHelper connectionHelper) {
+    public TableListRestController(Dao dao, ConnectionHelper connectionHelper, SQLiteService sqliteService) {
         this.dao = dao;
         this.connectionHelper = connectionHelper;
+        this.sqliteService = sqliteService;
     }
 
     @GetMapping(value = "/rest/get/tablelist/{rdbms_sti}/{db}")
     public ResponseEntity<?> hentTabeller(@PathVariable("rdbms_sti") String rdbms_sti,
-                                          @PathVariable("db") String database) {
+                                          @PathVariable("db") String database,
+                                          Authentication authentication) {
+        // SQLite: tabeller i brukerens database
+        if ("sqlite".equals(rdbms_sti)) {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            try {
+                return ResponseEntity.ok(sqliteService.getTables(bruker, database));
+            } catch (SQLException e) {
+                return ResponseEntity.internalServerError().body("Kunne ikke hente tabelliste: " + e.getMessage());
+            }
+        }
         try {
             DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
             if (database == null || database.isBlank() || "Velg Database".equals(database)) {
@@ -46,7 +60,17 @@ public class TableListRestController {
     /** Kolonner per tabell — brukes til intellisense i SQL-editoren. */
     @GetMapping(value = "/rest/get/columns/{rdbms_sti}/{db}")
     public ResponseEntity<?> hentKolonner(@PathVariable("rdbms_sti") String rdbms_sti,
-                                          @PathVariable("db") String database) {
+                                          @PathVariable("db") String database,
+                                          Authentication authentication) {
+        // SQLite: kolonner i brukerens database
+        if ("sqlite".equals(rdbms_sti)) {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            try {
+                return ResponseEntity.ok(sqliteService.getColumns(bruker, database));
+            } catch (SQLException e) {
+                return ResponseEntity.internalServerError().body("Kunne ikke hente kolonneliste: " + e.getMessage());
+            }
+        }
         try {
             DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
             if (database == null || database.isBlank() || "Velg Database".equals(database)) {

@@ -9,7 +9,7 @@ import { history, defaultKeymap, historyKeymap, indentWithTab } from "@codemirro
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, indentOnInput, foldGutter, foldKeymap } from "@codemirror/language";
 import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { sql as sqlLang, PostgreSQL, MySQL, MSSQL, PLSQL } from "@codemirror/lang-sql";
+import { sql as sqlLang, PostgreSQL, MySQL, MSSQL, PLSQL, SQLite } from "@codemirror/lang-sql";
 import { oneDark, oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
 
 // Manuelt oppsett (tilsvarer basicSetup) — bygget med individuelle 6.x-pakker
@@ -54,6 +54,7 @@ const DIALECT = {
   microsoft: MSSQL,
   oracle: PLSQL,
   mysql: MySQL,
+  sqlite: SQLite,
 };
 
 export function initDbDemoEditor() {
@@ -217,38 +218,57 @@ function handleOnDocumentLoaded() {
       });
   }
 
-  // Bygger tabell-listen XSS-sikkert: all tekst settes via textContent
+  // Bygger tabell-listen XSS-sikkert: all tekst settes via textContent.
+  // Tabeller og views vises i to tabeller side om side.
   function byggTabellListe(rader) {
     tabellListe.innerHTML = "";
     if (!Array.isArray(rader) || rader.length === 0) {
       tabellListe.textContent = "Ingen tabeller funnet";
       return;
     }
-    const table = document.createElement("table");
-    table.id = "tabeller";
-    table.className = "table table-sm table-striped";
-    const thead = document.createElement("thead");
-    const headRow = document.createElement("tr");
-    ["Skjema", "Navn", "Type"].forEach((h) => {
-      const th = document.createElement("th");
-      th.textContent = h;
-      headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
 
-    const tbody = document.createElement("tbody");
-    rader.forEach((rad) => {
-      const tr = document.createElement("tr");
-      rad.forEach((celle) => {
+    const tabeller = rader.filter((rad) => String(rad[2]).toUpperCase().includes("TABLE"));
+    const views = rader.filter((rad) => String(rad[2]).toUpperCase().includes("VIEW"));
+
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.gap = "1rem";
+    wrapper.style.width = "100%";
+
+    const lagTabell = (tittel, data) => {
+      const kolonne = document.createElement("div");
+      kolonne.style.flex = "1";
+      kolonne.style.minWidth = "0";
+      const heading = document.createElement("div");
+      heading.className = "text-center fw-bold small mb-1";
+      heading.textContent = tittel + " (" + data.length + ")";
+      kolonne.appendChild(heading);
+      const table = document.createElement("table");
+      table.className = "table table-sm table-striped";
+      const tbody = document.createElement("tbody");
+      data.forEach((rad) => {
+        const tr = document.createElement("tr");
+        // Vis skjema.navn (kort form) — XSS-sikkert via textContent
         const td = document.createElement("td");
-        td.textContent = celle == null ? "" : String(celle);
+        td.textContent = rad[1] == null ? "" : String(rad[1]);
         tr.appendChild(td);
+        tbody.appendChild(tr);
       });
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    tabellListe.appendChild(table);
+      table.appendChild(tbody);
+      kolonne.appendChild(table);
+      return kolonne;
+    };
+
+    if (tabeller.length > 0) {
+      wrapper.appendChild(lagTabell("Tabeller", tabeller));
+    }
+    if (views.length > 0) {
+      wrapper.appendChild(lagTabell("Views", views));
+    }
+    if (tabeller.length === 0 && views.length === 0) {
+      wrapper.textContent = "Ingen tabeller funnet";
+    }
+    tabellListe.appendChild(wrapper);
   }
 
   function byggDBListe() {

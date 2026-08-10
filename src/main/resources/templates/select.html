@@ -50,6 +50,13 @@
             </div>
 
         <div class="select-form flex">
+            <div id="feilmelding" class="alert alert-danger">
+                <th:block th:text="${feil}"/>
+                <th:block th:if="${feil}">
+                    <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
+                </th:block>
+            </div>
+
             <div class="form flex">
                 <form id="sql" method="post" action="/select">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
@@ -72,12 +79,6 @@
         </div>
 
 
-    </div>
-    <div id="feilmelding" class="alert alert-danger">
-        <th:block th:text="${feil}"/>
-        <th:block th:if="${feil}">
-            <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
-        </th:block>
     </div>
 
 </main>
