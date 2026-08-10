@@ -25,14 +25,20 @@ public class Select {
 
     @GetMapping(value = "/select/{rdbms_sti}")
     public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti,
+                          @RequestParam(value = "db", required = false) String db,
                           @CookieValue(value = "skin", defaultValue = "agate") String skin) {
         try {
-            connectionHelper.hentEllerFeil(rdbms_sti);
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            // Forhåndsvelg databasen fra tilkoblingsskjemaet hvis ingen er valgt
+            if (db == null || db.isBlank()) {
+                db = conn.getDatabase();
+            }
         } catch (IllegalArgumentException e) {
             model.addAttribute("feil", e.getMessage());
         }
         model.addAttribute("rdbms", ConnectionHelper.rdbmsNavn(rdbms_sti));
         model.addAttribute("rdbms_sti", rdbms_sti);
+        model.addAttribute("db", db);
         model.addAttribute("skin", skin);
         return "select";
     }

@@ -4,7 +4,7 @@
 // - ctrl+enter kjører, shift+enter formaterer
 
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, dropCursor, rectangularSelection, crosshairCursor } from "@codemirror/view";
-import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
+import { EditorState, Compartment, EditorSelection, Prec } from "@codemirror/state";
 import { history, defaultKeymap, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, indentOnInput, foldGutter, foldKeymap } from "@codemirror/language";
 import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
@@ -70,7 +70,6 @@ window.initDbDemoEditor = initDbDemoEditor;
 
 function handleOnDocumentLoaded() {
   const feilMelding = document.getElementById("feilmelding");
-  const hent = document.getElementById("hent");
   const selectDB = document.getElementById("selectDB");
   const query = document.getElementById("query");
   const sql = document.getElementById("sql");
@@ -110,11 +109,12 @@ function handleOnDocumentLoaded() {
     return true;
   }
 
-  // Keymap: ctrl+enter = kjør, shift+enter = formater
-  const extraKeymap = keymap.of([
+  // Keymap: ctrl+enter = kjør, shift+enter = formater (høy prioritet,
+  // slik at den overstyrer CodeMirrors egne Enter-bindinger)
+  const extraKeymap = Prec.high(keymap.of([
     { key: "Ctrl-Enter", run: kjørSQL },
     { key: "Shift-Enter", run: formaterSQL },
-  ]);
+  ]));
 
   const editor = new EditorView({
     state: EditorState.create({
@@ -279,7 +279,6 @@ function handleOnDocumentLoaded() {
     });
   }
 
-  hent.onclick = handleOnHentClick;
   selectDB.onchange = handleOnSelectDBChange;
   skinSelect.onchange = handleOnSkinSelectChange;
   byggDBListe();
@@ -287,7 +286,11 @@ function handleOnDocumentLoaded() {
   feilMelding.innerHTML ? (feilMelding.style.visibility = "visible") : (feilMelding.style.visibility = "hidden");
   skinSelect.value = localStorage.getItem("skin") ? localStorage.getItem("skin") : "dark";
   settTema(skinSelect.value);
-  if (db.value) oppdaterSchema(db.value);
+  if (db.value) {
+    // Forhåndsvelg db fra config i nedtrekksmenyen
+    selectDB.value = db.value;
+    oppdaterSchema(db.value);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", handleOnDocumentLoaded);

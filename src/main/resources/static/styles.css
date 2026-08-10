@@ -115,7 +115,7 @@ a {
     border: solid 1px #6c757d;
     border-radius: 5px;
     overflow: hidden;
-    background: #1e1e1e;
+    /* Bakgrunn styres av CodeMirror-temaet (oneDark = mørk, default = lys) */
 }
 
 #editorContainer .cm-editor {
