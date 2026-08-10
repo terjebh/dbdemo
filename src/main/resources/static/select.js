@@ -121,14 +121,21 @@ function handleOnDocumentLoaded() {
     return true;
   }
 
-  // Kjører SQL via REST uten side-reload — resultatet vises i panelet under
+  // Kjører SQL via REST uten side-reload — resultatet vises i panelet under.
+  // Hvis brukeren har MARKERT tekst, kjøres kun den markerte setningen
+  // (evt. flere markerte setninger atskilt med semikolon) — ellers hele feltet.
   function kjørSQL() {
-    query.value = editor.state.doc.toString();
-    const q = query.value.trim();
+    const sel = editor.state.selection.main;
+    const harMarkering = !sel.empty;
+    const q = harMarkering
+      ? editor.state.sliceDoc(sel.from, sel.to).trim()
+      : editor.state.doc.toString().trim();
+
     if (!q) {
       visFeil("SQL-spørringen er tom");
       return true;
     }
+    query.value = q;
 
     const url = rdbms === "sqlite"
       ? `/rest/kjor/sqlite`

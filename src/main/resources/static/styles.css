@@ -258,6 +258,44 @@ main {
 #resultatInnhold table.dataTable {
     font-size: 0.85rem;
     width: 100% !important;
+    color: var(--app-tekst);
+}
+
+/* Resultat-tabellen følger temaet (rader og overskrifter) */
+#resultatInnhold .dataTables_wrapper .dataTables_filter input {
+    background: var(--app-flate);
+    color: var(--app-tekst);
+    border: 1px solid var(--app-kant);
+}
+
+#resultatInnhold .dataTables_wrapper .dataTables_length select {
+    background: var(--app-flate);
+    color: var(--app-tekst);
+    border: 1px solid var(--app-kant);
+}
+
+#resultatInnhold .dataTables_wrapper .dataTables_info,
+#resultatInnhold .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: var(--app-tekst) !important;
+}
+
+#resultatInnhold table.dataTable tbody tr {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+}
+
+#resultatInnhold table.dataTable tbody tr:nth-child(odd) {
+    background-color: var(--app-sideflate);
+}
+
+#resultatInnhold table.dataTable tbody tr:hover {
+    background-color: var(--app-hover);
+}
+
+#resultatInnhold table.dataTable thead th {
+    background-color: var(--app-aktiv);
+    color: var(--app-tekst);
+    border-bottom: 1px solid var(--app-kant);
 }
 
 #resultatInnhold .dataTables_wrapper .dataTables_filter,
