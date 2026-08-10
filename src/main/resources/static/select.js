@@ -485,6 +485,11 @@ function handleOnDocumentLoaded() {
               flab.textContent = felt + "  (" + type + ")";
               feltNode.appendChild(fik);
               feltNode.appendChild(flab);
+              // Dobbeltklikk på feltet → sett inn i SQL-editoren på markøren
+              feltNode.addEventListener("dblclick", (e) => {
+                e.stopPropagation();
+                settInnIEditor(felt);
+              });
               barn.appendChild(feltNode);
             });
           }).catch(() => {
@@ -543,12 +548,15 @@ function handleOnDocumentLoaded() {
     tabell.tabIndex = 0;
   }
 
-  // Setter inn tabellnavnet i editoren på markørens posisjon
+  // Setter inn navnet (tabell/felt) i editoren på markørens posisjon.
+  // Hvis navnet består av flere ord eller inneholder punktum, omsluttes
+  // det med doble anførselstegn ("…") slik at SQL-en blir gyldig.
   function settInnIEditor(navn) {
+    const inn = /[\s.]/.test(navn) ? '"' + navn + '"' : navn;
     const cursor = editor.state.selection.main.head;
     editor.dispatch({
-      changes: { from: cursor, insert: navn },
-      selection: { anchor: cursor + navn.length },
+      changes: { from: cursor, insert: inn },
+      selection: { anchor: cursor + inn.length },
     });
     editor.focus();
   }
