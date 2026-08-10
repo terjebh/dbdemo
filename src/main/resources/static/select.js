@@ -105,7 +105,12 @@ function handleOnDocumentLoaded() {
 
   function kjørSQL() {
     query.value = editor.state.doc.toString();
-    sql.action = `/select/${rdbms_sti.value}`;
+    // SQLite submittes til /sqlite/{navn}; andre RDBMS-er til /select/{rdbms}
+    if (rdbms_sti.value === "sqlite") {
+      sql.action = `/sqlite/${encodeURIComponent(db.value)}`;
+    } else {
+      sql.action = `/select/${rdbms_sti.value}`;
+    }
     sql.submit();
     return true;
   }
@@ -215,6 +220,7 @@ function handleOnDocumentLoaded() {
       .then(byggTabellListe)
       .catch((err) => {
         tabellListe.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+        visFeilHvisIkkeSatt(err.message);
       });
   }
 
@@ -280,8 +286,7 @@ function handleOnDocumentLoaded() {
 
     const fyllSelect = (liste) => {
       if (!Array.isArray(liste)) {
-        feilMelding.innerHTML = String(liste);
-        feilMelding.style.visibility = "visible";
+        visFeilHvisIkkeSatt(String(liste));
         return;
       }
       liste.forEach((item) => {
@@ -294,9 +299,18 @@ function handleOnDocumentLoaded() {
     };
 
     fetch(url).then(tilJSON).then(fyllSelect).catch((err) => {
-      feilMelding.innerHTML = err.message;
-      feilMelding.style.visibility = "visible";
+      // Ikke overskriv en eksisterende server-feilmelding (f.eks. tilkoblingsfeil)
+      visFeilHvisIkkeSatt(err.message);
     });
+  }
+
+  // Viser en feilmelding KUN hvis feltet ikke allerede har innhold
+  // (server-rendret feil skal ikke overskrives av JS-feil)
+  function visFeilHvisIkkeSatt(melding) {
+    if (feilMelding.textContent.trim() === "" && feilMelding.innerHTML.trim() === "") {
+      feilMelding.innerHTML = melding;
+      feilMelding.style.visibility = "visible";
+    }
   }
 
   selectDB.onchange = handleOnSelectDBChange;
