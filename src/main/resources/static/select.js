@@ -189,7 +189,9 @@ function handleOnDocumentLoaded() {
 
     const table = document.createElement("table");
     table.id = "resultTable";
-    table.className = "table table-striped table-bordered";
+    // DataTables' egne klasser (stripe/hover) + våre tema-regler — ingen
+    // Bootstrap-table-klasser (de setter hvit bakgrunn på td-cellene)
+    table.className = "display stripe hover";
 
     const thead = document.createElement("thead");
     const trh = document.createElement("tr");
@@ -216,10 +218,13 @@ function handleOnDocumentLoaded() {
 
     if (window.DataTable) {
       dataTable = new DataTable("#resultTable", {
-        order: false,
+        // order: [] = ingen INITIAL sortering, men klikk på kolonneoverskrift
+        // sorterer fortsatt (order: false deaktiverer sorteringen helt)
+        order: [],
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Alle"]],
         pageLength: 10,
       });
+      settOppPiltastNavigasjon();
     }
     resultatStatus.textContent = rader.length + " rader";
     // Resultat vises → feilmeldingen skjules
@@ -510,6 +515,34 @@ function handleOnDocumentLoaded() {
     });
   }
 
+  // Piltast-navigasjon i resultat-tabellen: pil opp/ned flytter en markør
+  // mellom radene (datatables.net-stil). Enter velger raden.
+  function settOppPiltastNavigasjon() {
+    const tabell = document.querySelector("#resultTable");
+    if (!tabell) return;
+    let aktiv = -1;
+
+    tabell.addEventListener("keydown", (e) => {
+      const rader = [...tabell.querySelectorAll("tbody tr")];
+      if (rader.length === 0) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        rader.forEach((r) => r.classList.remove("navigert"));
+        if (e.key === "ArrowDown") {
+          aktiv = Math.min(aktiv + 1, rader.length - 1);
+        } else {
+          aktiv = Math.max(aktiv - 1, 0);
+        }
+        rader[aktiv].classList.add("navigert");
+        rader[aktiv].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter" && aktiv >= 0) {
+        e.preventDefault();
+        rader[aktiv].click();
+      }
+    });
+    tabell.tabIndex = 0;
+  }
+
   // Setter inn tabellnavnet i editoren på markørens posisjon
   function settInnIEditor(navn) {
     const cursor = editor.state.selection.main.head;
@@ -606,7 +639,8 @@ function handleOnDocumentLoaded() {
     { key: "Ctrl-Shift-ArrowDown", run: () => ekstraFont(-2) },
   ]));
 
-  // Resultat-feltets fontstørrelse: Ctrl+Shift+PgUp (større) / PgDn (mindre)
+  // Resultat-feltets fontstørrelse: Alt+Shift+PilOpp (større) / PilNed (mindre).
+  // (Ctrl+Shift+PgUp/PgDn kræsjet med Firefox sine interne kommandoer)
   const justerResultatFont = (delta) => {
     const gjeldende = parseFloat(
       getComputedStyle(resultatInnhold).getPropertyValue("--resultat-font") || "0.85"
@@ -618,10 +652,10 @@ function handleOnDocumentLoaded() {
   };
 
   document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === "PageUp") {
+    if (e.altKey && e.shiftKey && e.key === "ArrowUp") {
       e.preventDefault();
       justerResultatFont(0.05);
-    } else if (e.ctrlKey && e.shiftKey && e.key === "PageDown") {
+    } else if (e.altKey && e.shiftKey && e.key === "ArrowDown") {
       e.preventDefault();
       justerResultatFont(-0.05);
     }
@@ -652,9 +686,10 @@ function handleOnDocumentLoaded() {
   });
   editor.focus();
 
-  // Bytt tema (mørk/lys) — gjelder HELE appen via [data-tema] på body
+  // Bytt tema (mørk/lys) — gjelder HELE appen via [data-tema] på html/body
   const settTema = (verdi) => {
     const mørk = verdi !== "light";
+    document.documentElement.dataset.tema = mørk ? "mork" : "lys";
     document.body.dataset.tema = mørk ? "mork" : "lys";
     editor.dispatch({
       effects: temaCompartment.reconfigure(mørk ? MØRK_TEMA : LYS_TEMA),

@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DB-app</title>
+    <!-- Tema settes FØR CSS-en lastes → ingen lys-blits ved sidebytte.
+         Select.js overskriver senere om nødvendig. -->
+    <script>
+      (function () {
+        try {
+          var skin = localStorage.getItem("skin");
+          document.documentElement.dataset.tema = skin === "light" ? "lys" : "mork";
+        } catch (e) {
+          document.documentElement.dataset.tema = "mork";
+        }
+      })();
+    </script>
     <!-- Bootstrap lastes med defer — blokkerer ikke siden -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

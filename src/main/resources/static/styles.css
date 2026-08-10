@@ -1,6 +1,7 @@
+/* Tema-variabler — styres av [data-tema] på html (satt tidlig i head.html,
+   slik at mørkt tema gjelder fra første bilde uten lys-blits) */
+:root,
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    /* Tema-variabler — styres av [data-tema] på body (se nederst) */
     --app-bg: #f5f7ff;
     --app-flate: #ffffff;
     --app-kant: #d0d4da;
@@ -10,10 +11,9 @@ body {
     --app-aktiv: #cfe2ff;
     --app-aktiv-tekst: #1a4fa0;
     --app-hover: #e2e6ea;
-    background-color: var(--app-bg);
-    color: var(--app-tekst);
 }
 
+:root[data-tema="mork"],
 body[data-tema="mork"] {
     --app-bg: #1a1d23;
     --app-flate: #242830;
@@ -24,6 +24,10 @@ body[data-tema="mork"] {
     --app-aktiv: #2b4a7a;
     --app-aktiv-tekst: #a8c8ff;
     --app-hover: #333947;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--app-bg);
     color: var(--app-tekst);
 }
@@ -298,23 +302,46 @@ main {
     color: var(--app-tekst) !important;
 }
 
-#resultatInnhold table.dataTable tbody tr {
-    background-color: var(--app-flate);
+#resultatInnhold table.dataTable tbody tr,
+#resultatInnhold table.dataTable tbody td {
+    background-color: var(--app-flate) !important;
     color: var(--app-tekst);
 }
 
-#resultatInnhold table.dataTable tbody tr:nth-child(odd) {
-    background-color: var(--app-sideflate);
+#resultatInnhold table.dataTable.stripe tbody tr.odd,
+#resultatInnhold table.dataTable.display tbody tr.odd,
+#resultatInnhold table.dataTable tbody tr:nth-child(odd),
+#resultatInnhold table.dataTable tbody tr:nth-child(odd) td {
+    background-color: var(--app-sideflate) !important;
 }
 
-#resultatInnhold table.dataTable tbody tr:hover {
-    background-color: var(--app-hover);
+#resultatInnhold table.dataTable tbody tr:hover,
+#resultatInnhold table.dataTable tbody tr:hover td {
+    background-color: var(--app-hover) !important;
 }
 
 #resultatInnhold table.dataTable thead th {
-    background-color: var(--app-aktiv);
+    background-color: var(--app-aktiv) !important;
     color: var(--app-tekst);
     border-bottom: 1px solid var(--app-kant);
+}
+
+/* DataTables-sortering: piler og hover på kolonneoverskrifter */
+#resultatInnhold table.dataTable thead th.sorting:hover {
+    background-color: var(--app-hover) !important;
+    cursor: pointer;
+}
+
+#resultatInnhold table.dataTable thead .sorting_asc::after,
+#resultatInnhold table.dataTable thead .sorting_desc::after {
+    color: var(--app-tekst) !important;
+    opacity: 1 !important;
+}
+
+/* Navigasjon i tabellen med piltastene */
+#resultatInnhold table.dataTable tbody tr.navigert {
+    outline: 2px solid var(--app-aktiv);
+    outline-offset: -2px;
 }
 
 #resultatInnhold .dataTables_wrapper .dataTables_filter,
