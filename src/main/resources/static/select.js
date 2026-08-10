@@ -563,9 +563,10 @@ function handleOnDocumentLoaded() {
   });
   editor.focus();
 
-  // Bytt tema (mørk/lys)
+  // Bytt tema (mørk/lys) — gjelder HELE appen via [data-tema] på body
   const settTema = (verdi) => {
     const mørk = verdi !== "light";
+    document.body.dataset.tema = mørk ? "mork" : "lys";
     editor.dispatch({
       effects: temaCompartment.reconfigure(mørk ? MØRK_TEMA : LYS_TEMA),
     });

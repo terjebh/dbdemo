@@ -1,5 +1,31 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Tema-variabler — styres av [data-tema] på body (se nederst) */
+    --app-bg: #f5f7ff;
+    --app-flate: #ffffff;
+    --app-kant: #d0d4da;
+    --app-sideflate: #f0f2f5;
+    --app-tekst: #212529;
+    --app-muted: #6c757d;
+    --app-aktiv: #cfe2ff;
+    --app-aktiv-tekst: #1a4fa0;
+    --app-hover: #e2e6ea;
+    background-color: var(--app-bg);
+    color: var(--app-tekst);
+}
+
+body[data-tema="mork"] {
+    --app-bg: #1a1d23;
+    --app-flate: #242830;
+    --app-kant: #3a3f4a;
+    --app-sideflate: #20242c;
+    --app-tekst: #e6e9ef;
+    --app-muted: #9aa3b2;
+    --app-aktiv: #2b4a7a;
+    --app-aktiv-tekst: #a8c8ff;
+    --app-hover: #333947;
+    background-color: var(--app-bg);
+    color: var(--app-tekst);
 }
 
 main {
@@ -8,6 +34,26 @@ main {
 
 .flex {
     display: flex;
+}
+
+/* Lysere, mer lesbar tekst i toppmenyen mot den blå bakgrunnen */
+.navbar-dark .navbar-nav .nav-link,
+.navbar-dark .navbar-brand {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #d6e4ff;
+}
+
+.navbar-dark .navbar-text .navbar-bruker {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.navbar-dark .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* pgAdmin4-lignende layout: trestruktur til venstre, editor+resultat til høyre */
@@ -22,8 +68,8 @@ main {
     width: 19rem;
     min-width: 12rem;
     max-width: 24rem;
-    background: #f0f2f5;
-    border: 1px solid #d0d4da;
+    background: var(--app-sideflate);
+    border: 1px solid var(--app-kant);
     border-radius: 5px;
     overflow: hidden;
     max-height: calc(100vh - 120px);
@@ -38,6 +84,17 @@ main {
     padding: 0.4rem 0.6rem;
     border-radius: 4px 4px 0 0;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* Database-velger rett til høyre for «Databaser» i venstrespalten */
+.tre-header #selectDB {
+    width: 10rem;
+    font-size: 0.8rem;
+    font-weight: normal;
 }
 
 .tre {
@@ -59,7 +116,8 @@ main {
 }
 
 .tre-node:hover {
-    background: #e2e6ea;
+    background: var(--app-hover);
+    color: var(--app-tekst);
 }
 
 .tre-node.tre-gren {
@@ -72,8 +130,8 @@ main {
 }
 
 .tre-node.tre-valgt {
-    background: #cfe2ff;
-    color: #1a4fa0;
+    background: var(--app-aktiv);
+    color: var(--app-aktiv-tekst);
 }
 
 .tre-barn {
@@ -98,10 +156,12 @@ main {
 #editorContainer {
     width: 100%;
     min-height: 300px;
-    border: solid 1px #6c757d;
+    border: solid 1px var(--app-kant);
     border-radius: 5px;
     overflow: hidden;
     /* Bakgrunn styres av CodeMirror-temaet (oneDark = mørk, default = lys) */
+    /* Høyden er justerbar: dra i nedre kant av feltet */
+    resize: vertical;
 }
 
 #editorContainer .cm-editor {
@@ -140,9 +200,9 @@ main {
 /* Resultatpanel under editoren — justerbart med drag-håndtak */
 #resultatPanel {
     margin-top: 0.4rem;
-    border: 1px solid #d0d4da;
+    border: 1px solid var(--app-kant);
     border-radius: 5px;
-    background: white;
+    background: var(--app-flate);
     display: flex;
     flex-direction: column;
     height: 40vh;
@@ -153,10 +213,11 @@ main {
 
 #resultatStatus {
     padding: 0.35rem 0.6rem;
-    border-bottom: 1px solid #e0e3e8;
-    background: #f8f9fa;
+    border-bottom: 1px solid var(--app-kant);
+    background: var(--app-sideflate);
     flex-shrink: 0;
     font-size: 0.9rem;
+    color: var(--app-muted);
 }
 
 #resultatInnhold {

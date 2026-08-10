@@ -12,37 +12,34 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/">Hjem</a></li>
-        <li class="nav-item"><a class="nav-link" href="/sqlite">🗄️ SQLite</a></li>
+        <li class="nav-item"><a class="nav-link" href="/" sec:authorize="isAuthenticated()">🏠 Start</a></li>
+        <li class="nav-item"><a class="nav-link" href="/sqlite" sec:authorize="isAuthenticated()">🗄️ SQLite</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/brukere" title="Administrer brukere">👥 Brukere</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/setup" title="Oppdater databasetilkoblinger">⚙️ Tilkoblinger</a></li>
+        <li class="nav-item"><a class="nav-link" href="/om">ℹ️ Om DBApp</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal">❓ Hjelp</a></li>
       </ul>
 
-      <!-- Kun på SQL-editoren: system-velger, database-velger og tema -->
-      <div class="d-flex align-items-center gap-2" th:if="${selectSide}">
-        <select id="systemSelect" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Velg databasesystem">
-          <option value="postgres" th:selected="${rdbms_sti == 'postgres'}">PostgreSQL</option>
-          <option value="microsoft" th:selected="${rdbms_sti == 'microsoft'}">Microsoft SQL</option>
-          <option value="oracle" th:selected="${rdbms_sti == 'oracle'}">Oracle SQL</option>
-          <option value="mysql" th:selected="${rdbms_sti == 'mysql'}">MySQL</option>
-          <option value="sqlite" th:selected="${rdbms_sti == 'sqlite'}">🗄️ SQLite</option>
+      <!-- System-velger: alle systemer med tilkoblingsinfo + SQLite (innloggede) -->
+      <div class="d-flex align-items-center gap-2" sec:authorize="isAuthenticated()">
+        <select id="systemSelect" class="form-select form-select-sm" style="width:auto; color:#fff; background-color:#2657a8; border-color:#4a7ac4;" title="Velg databasesystem">
+          <option th:each="sys : ${tilgjengeligeSystemer}"
+                  th:value="${sys}"
+                  th:selected="${rdbms_sti == sys}"
+                  th:text="${systemNavn[sys]}"></option>
         </select>
-        <select id="selectDB" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Velg database">
-          <option>Velg Database</option>
-        </select>
-        <select id="skinSelect" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Tema">
+        <select id="skinSelect" class="form-select form-select-sm" style="width:auto; color:#fff; background-color:#2657a8; border-color:#4a7ac4;" title="Tema">
           <option value="dark">🌙 Mørk</option>
           <option value="light">☀️ Lys</option>
         </select>
       </div>
 
       <span class="navbar-text d-flex ms-3">
-        <span class="text-light me-3" sec:authorize="isAuthenticated()"
+        <span class="navbar-bruker me-3" sec:authorize="isAuthenticated()"
               th:text="'Logget inn: ' + ${#authentication.name}"></span>
         <form method="post" th:action="@{/logout}" class="d-inline" sec:authorize="isAuthenticated()">
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-          <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+          <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
         </form>
       </span>
     </div>
@@ -77,11 +74,14 @@
         tabeller og views. Klikk på en node for å utvide/skjule. Klikk på en database
         for å velge den i editoren.</p>
         <h6>🖥️ Toppmenyen</h6>
-        <p>Velg databasesystem, database og tema (mørk/lys) fra toppmenyen.
+        <p>Velg databasesystem og tema (mørk/lys) fra toppmenyen.
         Resultatet av SQL-kjøringer vises i panelet under editoren — ingen side-reload.</p>
         <h6>🗄️ SQLite</h6>
         <p>Alle brukere kan opprette egne SQLite-databaser med valgfritt navn under
         menyvalget «SQLite». Databasene er private og lagres per bruker.</p>
+        <h6>⏱️ Innlogging</h6>
+        <p>Du forblir innlogget under hele økten (opptil 6 timer) — eller til du
+        logger ut selv.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Lukk</button>
@@ -89,5 +89,32 @@
     </div>
   </div>
 </div>
+
+<!-- Meny-JS: system-bytte + tema på sider uten select.js (select.js overskriver) -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Tema: gjelder hele appen (data-tema på body)
+    const skinSelect = document.getElementById("skinSelect");
+    if (skinSelect) {
+      skinSelect.value = localStorage.getItem("skin") || "dark";
+      const settTema = () => {
+        localStorage.setItem("skin", skinSelect.value);
+        document.body.dataset.tema = skinSelect.value === "light" ? "lys" : "mork";
+      };
+      settTema();
+      skinSelect.addEventListener("change", settTema);
+    }
+    // System-bytte: naviger til valgt system (kun på sider uten select.js —
+    // på SQL-siden håndterer select.js dette)
+    const systemSelect = document.getElementById("systemSelect");
+    if (systemSelect && !document.getElementById("editorContainer")) {
+      systemSelect.addEventListener("change", () => {
+        const valgt = systemSelect.value;
+        if (!valgt) return;
+        window.location.href = valgt === "sqlite" ? "/sqlite" : "/select/" + valgt;
+      });
+    }
+  });
+</script>
 </div>
 </html>

@@ -2,39 +2,55 @@
 <html lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
+    <script>
+      // Sett tema fra localStorage ved lasting (gjelder hele appen)
+      document.addEventListener("DOMContentLoaded", () => {
+        const skin = localStorage.getItem("skin") || "dark";
+        document.body.dataset.tema = skin === "light" ? "lys" : "mork";
+      });
+    </script>
 </head>
 <body>
 <div th:replace="~{meny :: meny}"></div>
 <main>
-    <h1>DBApp</h1>
-    <h4>En enkel app for å hente data fra databaser med SQL.</h4>
-    <div class="alert alert-primary" style="max-width: 600px">
-        <h4>Teknologier brukt:</h4>
-        <ul>
-            <li>
-                <a href="https://www.oracle.com/java/technologies/java-se-glance.html"
-                   target="_blank">Java SE</a>
-            </li>
-            <li>
-                <a href="https://start.spring.io" target="_blank">Spring Boot</a>
-            </li>
-            <li>
-                <a href="https://getbootstrap.com" target="_blank">Bootstrap</a>
-            </li>
-            <li>
-                <a href="https://codemirror.net/" target="_blank">CodeMirror 6</a>
-            </li>
-            <li>
-                <a href="https://github.com/sql-formatter-org/sql-formatter" target="_blank">sql-formatter</a>
-            </li>
-        </ul>
-        <p>Koden til denne appen kan hentes herfra: <a href="https://github.com/terjebh/dbdemo" target="_blank">https://github.com/terjebh/dbdemo</a>
-        </p>
-        <p><b>Utvikler:</b> Terje Berg-Hansen</p>
-        <p>
-            <b>Epost: </b>
-            <a href="mailto:terje@itfakultetet.no">terje@itfakultetet.no</a>
-        </p>
+    <div class="container-fluid" style="max-width: 900px; margin-top: 1rem;">
+        <h1>DBApp</h1>
+        <h4>En enkel app for å hente data fra databaser med SQL.</h4>
+        <div class="card" style="background: var(--app-flate); border: 1px solid var(--app-kant); margin-top: 1rem;">
+            <div class="card-body">
+                <h4 class="card-title">ℹ️ Om DBApp</h4>
+                <p>DBApp er et SQL-grensesnitt for undervisning: studentene skriver
+                SQL-spørringer mot flere databasesystemer (PostgreSQL, Microsoft SQL,
+                Oracle, MySQL og SQLite) og får resultatet umiddelbart — uten
+                side-reload.</p>
+                <h5>Teknologier brukt:</h5>
+                <ul>
+                    <li>
+                        <a href="https://www.oracle.com/java/technologies/java-se-glance.html"
+                           target="_blank">Java SE</a>
+                    </li>
+                    <li>
+                        <a href="https://start.spring.io" target="_blank">Spring Boot</a>
+                    </li>
+                    <li>
+                        <a href="https://getbootstrap.com" target="_blank">Bootstrap</a>
+                    </li>
+                    <li>
+                        <a href="https://codemirror.net/" target="_blank">CodeMirror 6</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/sql-formatter-org/sql-formatter" target="_blank">sql-formatter</a>
+                    </li>
+                </ul>
+                <p>Koden til denne appen kan hentes herfra: <a href="https://github.com/terjebh/dbdemo" target="_blank">https://github.com/terjebh/dbdemo</a>
+                </p>
+                <p><b>Utvikler:</b> Terje Berg-Hansen</p>
+                <p>
+                    <b>Epost: </b>
+                    <a href="mailto:terje@itfakultetet.no">terje@itfakultetet.no</a>
+                </p>
+            </div>
+        </div>
     </div>
 </main>
 </body>
