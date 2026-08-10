@@ -14,7 +14,8 @@ Støttede databaser:
 Ved første kjøring viser appen en **oppsettsveiviser** på `/setup` der du
 fyller inn:
 
-1. **Admin-bruker** — brukernavn og passord for innlogging til appen
+1. **Admin-bruker** — brukernavn og passord. **Den første brukeren som
+   opprettes her blir administrator.**
 2. **Databasetilkoblinger** — for hver av de fire RDBMS-ene: vert, port,
    database (eller service-navn for Oracle), brukernavn og passord
 
@@ -27,6 +28,17 @@ med `600`-rettigheter). Overstyr plasseringen med miljøvariabelen
 
 Etter oppsettet redirectes alt til innlogging, og `/setup` viser kun
 «allerede konfigurert».
+
+## 👥 Brukere og roller
+
+- **Admin** (første bruker i /setup): alt — inkludert brukeradministrasjon
+  (`/brukere`) og tilkoblingsinnstillinger (`/setup`)
+- **Vanlige brukere** (opprettet av admin på `/brukere`): kan logge inn og
+  skrive SQL, men får IKKE tilgang til bruker-oppretting/sletting eller
+  tilkoblingsinnstillinger
+
+Admin oppretter nye brukere på **/brukere** (menyen «👥 Brukere»). Passord
+lagres alltid som bcrypt-hash.
 
 ## Bygging
 

@@ -133,12 +133,11 @@ function handleOnDocumentLoaded() {
   // Eksponer editoren globalt (debugging + tester)
   window.dbDemoEditor = editor;
 
-  // Fyll inn opprinnelig SQL hvis det finnes (f.eks. etter «Rediger SQL»)
-  const opprinneligQuery = document.getElementById("queryText") ? null : null;
-  if (query.value && !editor.state.doc.toString()) {
-    // query.value settes kun ved submit — start tom
-  }
-
+  // Markør skal alltid starte på første tegn, første linje (posisjon 0)
+  editor.dispatch({
+    selection: { anchor: 0, head: 0 },
+    scrollIntoView: true,
+  });
   editor.focus();
 
   // Bytt tema (mørk/lys)

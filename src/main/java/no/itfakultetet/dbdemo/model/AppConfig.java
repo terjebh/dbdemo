@@ -19,6 +19,23 @@ public class AppConfig {
     /** Nøkkel = rdbms_sti: postgres, microsoft, oracle, mysql. */
     private Map<String, DbConnection> connections = new LinkedHashMap<>();
 
+    /**
+     * Vanlige brukere (ikke admin): brukernavn → BCrypt-hash.
+     * Admin-brukeren ligger i adminUsername/adminPasswordHash.
+     */
+    private Map<String, String> users = new LinkedHashMap<>();
+
+    public Map<String, String> getUsers() {
+        if (users == null) {
+            users = new LinkedHashMap<>();
+        }
+        return users;
+    }
+
+    public void setUsers(Map<String, String> users) {
+        this.users = users;
+    }
+
     public String getAdminUsername() {
         return adminUsername;
     }

@@ -47,8 +47,8 @@ public class SetupController {
     public String setupSkjema(Model model, Authentication authentication) {
         boolean konfigurert = configService.isConfigured();
 
-        if (konfigurert && (authentication == null || !authentication.isAuthenticated())) {
-            // Etter oppsett krever /setup innlogging (kun admin kan endre tilkoblinger)
+        if (konfigurert && !erAdmin(authentication)) {
+            // Etter oppsett krever /setup admin (kun admin kan endre tilkoblinger)
             return "redirect:/login";
         }
 
@@ -81,7 +81,7 @@ public class SetupController {
                         @RequestParam Map<String, String> alleParametre) {
 
         boolean konfigurert = configService.isConfigured();
-        if (konfigurert && (authentication == null || !authentication.isAuthenticated())) {
+        if (konfigurert && !erAdmin(authentication)) {
             return "redirect:/login";
         }
 
@@ -164,6 +164,12 @@ public class SetupController {
             }
         }
         return status;
+    }
+
+    /** Er innlogget bruker admin (ROLE_ADMIN)? */
+    private boolean erAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
     }
 
     private DbConnection byggTilkobling(String rdbms, Map<String, String> p, AppConfig eksisterende) {
