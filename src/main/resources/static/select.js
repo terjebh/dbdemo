@@ -641,6 +641,9 @@ function handleOnDocumentLoaded() {
 
   // Resultat-feltets fontstørrelse: Alt+Shift+PilOpp (større) / PilNed (mindre).
   // (Ctrl+Shift+PgUp/PgDn kræsjet med Firefox sine interne kommandoer)
+  // Viktig: capture=true (tredje arg) slik at denne kjører FØR CodeMirror
+  // fanger Shift-Alt-pilene (som kopierer linjer i editoren) — og vi stopper
+  // spredningen så CodeMirror aldri ser tastetrykket.
   const justerResultatFont = (delta) => {
     const gjeldende = parseFloat(
       getComputedStyle(resultatInnhold).getPropertyValue("--resultat-font") || "0.85"
@@ -652,14 +655,12 @@ function handleOnDocumentLoaded() {
   };
 
   document.addEventListener("keydown", (e) => {
-    if (e.altKey && e.shiftKey && e.key === "ArrowUp") {
+    if (e.altKey && e.shiftKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
       e.preventDefault();
-      justerResultatFont(0.05);
-    } else if (e.altKey && e.shiftKey && e.key === "ArrowDown") {
-      e.preventDefault();
-      justerResultatFont(-0.05);
+      e.stopPropagation(); // CodeMirror skal ikke kopiere linjen
+      justerResultatFont(e.key === "ArrowUp" ? 0.05 : -0.05);
     }
-  });
+  }, true);
 
   const editor = new EditorView({
     state: EditorState.create({

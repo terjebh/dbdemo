@@ -1,7 +1,8 @@
 /* Tema-variabler — styres av [data-tema] på html (satt tidlig i head.html,
-   slik at mørkt tema gjelder fra første bilde uten lys-blits) */
-:root,
-body {
+   slik at mørkt tema gjelder fra første bilde uten lys-blits).
+   VIKTIG: lyse variabler defineres kun på :root — hvis de også settes på
+   body, overskriver de de arvede mørke variablene inntil select.js kjører. */
+:root {
     --app-bg: #f5f7ff;
     --app-flate: #ffffff;
     --app-kant: #d0d4da;
@@ -13,8 +14,7 @@ body {
     --app-hover: #e2e6ea;
 }
 
-:root[data-tema="mork"],
-body[data-tema="mork"] {
+:root[data-tema="mork"] {
     --app-bg: #1a1d23;
     --app-flate: #242830;
     --app-kant: #3a3f4a;
