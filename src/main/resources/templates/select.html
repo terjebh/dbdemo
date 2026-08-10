@@ -39,8 +39,11 @@
         <aside id="trePanel">
             <div id="treHeader" class="tre-header">
                 <span>Databaser</span>
-                <select id="selectDB" class="form-select form-select-sm" title="Velg database">
-                    <option>Velg Database</option>
+                <select id="systemSelect" class="form-select form-select-sm" title="Velg databasesystem">
+                    <option th:each="sys : ${tilgjengeligeSystemer}"
+                            th:value="${sys}"
+                            th:selected="${rdbms_sti == sys}"
+                            th:text="${systemNavn[sys]}"></option>
                 </select>
             </div>
             <div id="tre" class="tre"></div>

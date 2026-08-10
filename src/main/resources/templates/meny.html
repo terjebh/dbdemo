@@ -20,14 +20,8 @@
         <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal">❓ Hjelp</a></li>
       </ul>
 
-      <!-- System-velger: alle systemer med tilkoblingsinfo + SQLite (innloggede) -->
+      <!-- Tema-velger (system-velgeren ligger i venstrespalten på SQL-siden) -->
       <div class="d-flex align-items-center gap-2" sec:authorize="isAuthenticated()">
-        <select id="systemSelect" class="form-select form-select-sm" style="width:auto; color:#fff; background-color:#2657a8; border-color:#4a7ac4;" title="Velg databasesystem">
-          <option th:each="sys : ${tilgjengeligeSystemer}"
-                  th:value="${sys}"
-                  th:selected="${rdbms_sti == sys}"
-                  th:text="${systemNavn[sys]}"></option>
-        </select>
         <select id="skinSelect" class="form-select form-select-sm" style="width:auto; color:#fff; background-color:#2657a8; border-color:#4a7ac4;" title="Tema">
           <option value="dark">🌙 Mørk</option>
           <option value="light">☀️ Lys</option>
@@ -90,7 +84,7 @@
   </div>
 </div>
 
-<!-- Meny-JS: system-bytte + tema på sider uten select.js (select.js overskriver) -->
+<!-- Meny-JS: tema på sider uten select.js (select.js overskriver) -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     // Tema: gjelder hele appen (data-tema på body)
@@ -103,16 +97,6 @@
       };
       settTema();
       skinSelect.addEventListener("change", settTema);
-    }
-    // System-bytte: naviger til valgt system (kun på sider uten select.js —
-    // på SQL-siden håndterer select.js dette)
-    const systemSelect = document.getElementById("systemSelect");
-    if (systemSelect && !document.getElementById("editorContainer")) {
-      systemSelect.addEventListener("change", () => {
-        const valgt = systemSelect.value;
-        if (!valgt) return;
-        window.location.href = valgt === "sqlite" ? "/sqlite" : "/select/" + valgt;
-      });
     }
   });
 </script>

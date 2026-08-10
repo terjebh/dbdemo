@@ -90,9 +90,9 @@ main {
     gap: 0.5rem;
 }
 
-/* Database-velger rett til høyre for «Databaser» i venstrespalten */
-.tre-header #selectDB {
-    width: 10rem;
+/* System-velger rett til høyre for «Databaser» i venstrespalten */
+.tre-header #systemSelect {
+    width: 9.5rem;
     font-size: 0.8rem;
     font-weight: normal;
 }

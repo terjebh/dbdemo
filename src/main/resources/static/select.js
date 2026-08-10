@@ -84,7 +84,6 @@ window.initDbDemoEditor = initDbDemoEditor;
 
 function handleOnDocumentLoaded() {
   const feilMelding = document.getElementById("feilmelding");
-  const selectDB = document.getElementById("selectDB");
   const systemSelect = document.getElementById("systemSelect");
   const query = document.getElementById("query");
   const sql = document.getElementById("sql");
@@ -133,7 +132,7 @@ function handleOnDocumentLoaded() {
     const url = rdbms === "sqlite"
       ? `/rest/kjor/sqlite`
       : `/rest/kjor/${rdbms}`;
-    const body = JSON.stringify({ db: db.value || selectDB.value, query: q });
+    const body = JSON.stringify({ db: db.value, query: q });
 
     resultatStatus.textContent = "Kjører …";
     console.log("[kjørSQL]", url, body.slice(0, 80));
@@ -337,8 +336,7 @@ function handleOnDocumentLoaded() {
 
     dbNode.addEventListener("click", () => {
       // Velg databasen (uten å bygge om hele treet)
-      if (selectDB.value !== dbNavn) {
-        selectDB.value = dbNavn;
+      if (db.value !== dbNavn) {
         db.value = dbNavn;
         oppdaterSchema(dbNavn);
         document.querySelectorAll("#tre .tre-node.tre-valgt")
@@ -504,33 +502,6 @@ function handleOnDocumentLoaded() {
   }
 
   // Bygger database-nedtrekksmenyen (nå i toppmenyen)
-  function byggDBListe() {
-    const url = `/rest/get/dblist/${rdbms}`;
-    const tilJSON = (response) => {
-      if (!response.ok) throw new Error("Kunne ikke hente databaseliste");
-      return response.json();
-    };
-
-    const fyllSelect = (liste) => {
-      if (!Array.isArray(liste)) {
-        visFeilHvisIkkeSatt(String(liste));
-        return;
-      }
-      liste.forEach((item) => {
-        const option = document.createElement("option");
-        option.innerText = item;
-        option.value = item;
-        option.selected = item == db.value;
-        selectDB.appendChild(option);
-      });
-    };
-
-    fetch(url).then(tilJSON).then(fyllSelect).catch((err) => {
-      // Ikke overskriv en eksisterende server-feilmelding (f.eks. tilkoblingsfeil)
-      visFeilHvisIkkeSatt(err.message);
-    });
-  }
-
   // Keymap: ctrl+enter = kjør, shift+enter = formater (høy prioritet,
   // slik at den overstyrer CodeMirrors egne Enter-bindinger)
   const extraKeymap = Prec.high(keymap.of([
@@ -572,7 +543,7 @@ function handleOnDocumentLoaded() {
     });
   };
 
-  // Bytte databasesystem fra toppmenyen
+  // Bytte databasesystem fra venstrespalten
   function byttSystem() {
     const nytt = systemSelect.value;
     if (!nytt || nytt === rdbms) return;
@@ -583,24 +554,14 @@ function handleOnDocumentLoaded() {
     }
   }
 
-  function handleOnSelectDBChange() {
-    skjulFeil();
-    db.value = selectDB.value;
-    oppdaterSchema(selectDB.value);
-    byggTre();
-    editor.focus();
-  }
-
   const handleOnSkinSelectChange = function handleOnSkinChange() {
     localStorage.setItem("skin", skinSelect.value);
     settTema(skinSelect.value);
     editor.focus();
   };
 
-  selectDB.onchange = handleOnSelectDBChange;
   skinSelect.onchange = handleOnSkinSelectChange;
   if (systemSelect) systemSelect.onchange = byttSystem;
-  byggDBListe();
   byggTre();
   // Server-rendret feil (f.eks. «ikke konfigurert») vises i resultatpanelet;
   // tomt felt skjules (whitespace ignoreres)
@@ -615,8 +576,7 @@ function handleOnDocumentLoaded() {
   skinSelect.value = localStorage.getItem("skin") ? localStorage.getItem("skin") : "dark";
   settTema(skinSelect.value);
   if (db.value) {
-    // Forhåndsvelg db fra config i nedtrekksmenyen
-    selectDB.value = db.value;
+    // Forhåndsvelg db fra config (databasen markeres i trestrukturen)
     oppdaterSchema(db.value);
   }
 }
