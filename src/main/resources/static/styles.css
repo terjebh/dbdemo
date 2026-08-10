@@ -70,8 +70,8 @@ main {
 
 #trePanel {
     width: 19rem;
-    min-width: 12rem;
-    max-width: 24rem;
+    min-width: 10rem;
+    max-width: 40rem;
     background: var(--app-sideflate);
     border: 1px solid var(--app-kant);
     border-radius: 5px;
@@ -79,6 +79,8 @@ main {
     max-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
+    /* Bredden styres av dra-splitteren (#treSplitter) */
+    flex-shrink: 0;
 }
 
 .tre-header {
@@ -249,6 +251,22 @@ main {
 }
 
 #editorSplitter:hover {
+    background: var(--app-aktiv);
+}
+
+/* Dra-splitter mellom venstrespalten og høyre kolonne */
+#treSplitter {
+    width: 8px;
+    margin: 0 0.2rem;
+    background: var(--app-kant);
+    border-radius: 3px;
+    cursor: col-resize;
+    flex-shrink: 0;
+    touch-action: none;
+    align-self: stretch;
+}
+
+#treSplitter:hover {
     background: var(--app-aktiv);
 }
 

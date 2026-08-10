@@ -740,6 +740,42 @@ function handleOnDocumentLoaded() {
     });
   }
 
+  // Dra-splitter: justerer BREDDEN på venstrespalten.
+  // Dra høyre → bredere (lange feltnavn får plass), dra venstre → smalere.
+  function settOppTreBreddeSplitter() {
+    const splitter = document.getElementById("treSplitter");
+    const trePanel = document.getElementById("trePanel");
+    if (!splitter || !trePanel) return;
+    let dragging = false;
+
+    splitter.addEventListener("mousedown", (e) => {
+      dragging = true;
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      e.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const layout = trePanel.closest(".select-layout");
+      if (!layout) return;
+      const rect = layout.getBoundingClientRect();
+      // Bredde = avstand fra venstre kant av layout til musen
+      const nyBredde = Math.min(
+        Math.max(e.clientX - rect.left - 10, 160),
+        rect.width - 400
+      );
+      trePanel.style.width = nyBredde + "px";
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return;
+      dragging = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    });
+  }
+
   // Bytte databasesystem fra venstrespalten
   function byttSystem() {
     const nytt = systemSelect.value;
@@ -760,6 +796,7 @@ function handleOnDocumentLoaded() {
   skinSelect.onchange = handleOnSkinSelectChange;
   if (systemSelect) systemSelect.onchange = byttSystem;
   settOppDragSplitter();
+  settOppTreBreddeSplitter();
   byggTre();
   // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
   const lagretEditorFont = localStorage.getItem("editorFont");
