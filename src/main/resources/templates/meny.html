@@ -21,8 +21,9 @@
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/setup" title="Oppdater databasetilkoblinger">⚙️ Tilkoblinger</a></li>
       </ul>
       <span class="navbar-text d-flex">
-        <span class="text-light me-3" th:text="'Logget inn: ' + ${#authentication.name}"></span>
-        <a class="btn btn-outline-danger btn-sm" href="/logout">Logout</a>
+        <span class="text-light me-3" sec:authorize="isAuthenticated()"
+              th:text="'Logget inn: ' + ${#authentication.name}"></span>
+        <a class="btn btn-outline-danger btn-sm" sec:authorize="isAuthenticated()" href="/logout">Logout</a>
       </span>
     </div>
   </div>

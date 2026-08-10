@@ -81,7 +81,7 @@ public class SecurityConfig {
             if (!configService.isConfigured()) {
                 return new AuthorizationDecision(true);
             }
-            return new AuthorizationDecision(authentication.get() != null
+            return new AuthorizationDecision(erInnlogget(authentication.get())
                     && authentication.get().getAuthorities().stream()
                         .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())));
         };
@@ -93,9 +93,19 @@ public class SecurityConfig {
             if (!configService.isConfigured()) {
                 return new AuthorizationDecision(true);
             }
-            return new AuthorizationDecision(authentication.get() != null
-                    && authentication.get().isAuthenticated());
+            return new AuthorizationDecision(erInnlogget(authentication.get()));
         };
+    }
+
+    /**
+     * Ekte innlogging? Merk: AnonymousAuthenticationToken har
+     * isAuthenticated() == true, men er IKKE en reell bruker — den må
+     * behandles som uinnlogget.
+     */
+    private boolean erInnlogget(org.springframework.security.core.Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken);
     }
 
     @Bean
