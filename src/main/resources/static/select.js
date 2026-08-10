@@ -92,6 +92,7 @@ function handleOnDocumentLoaded() {
   const tre = document.getElementById("tre");
   const skinSelect = document.getElementById("skinSelect");
   const editorContainer = document.getElementById("editorContainer");
+  const editorSplitter = document.getElementById("editorSplitter");
   const resultatPanel = document.getElementById("resultatPanel");
   const resultatStatus = document.getElementById("resultatStatus");
   const resultatInnhold = document.getElementById("resultatInnhold");
@@ -543,6 +544,41 @@ function handleOnDocumentLoaded() {
     });
   };
 
+  // Dra-splitter: justerer høyden mellom kode-feltet og resultatpanelet.
+  // Dra oppover → kode mindre, resultat større (og omvendt).
+  function settOppDragSplitter() {
+    if (!editorSplitter) return;
+    let dragging = false;
+
+    editorSplitter.addEventListener("mousedown", (e) => {
+      dragging = true;
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
+      e.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const hoyre = editorContainer.closest(".select-hoyre");
+      if (!hoyre) return;
+      const rect = hoyre.getBoundingClientRect();
+      // Editorhøyde = avstand fra toppen av kolonnen til musen (minus splitter)
+      const nyHoyde = Math.min(
+        Math.max(e.clientY - rect.top - 8, 120),
+        rect.height - 120
+      );
+      editorContainer.style.height = nyHoyde + "px";
+      editor.requestMeasure?.();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return;
+      dragging = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    });
+  }
+
   // Bytte databasesystem fra venstrespalten
   function byttSystem() {
     const nytt = systemSelect.value;
@@ -562,6 +598,7 @@ function handleOnDocumentLoaded() {
 
   skinSelect.onchange = handleOnSkinSelectChange;
   if (systemSelect) systemSelect.onchange = byttSystem;
+  settOppDragSplitter();
   byggTre();
   // Server-rendret feil (f.eks. «ikke konfigurert») vises i resultatpanelet;
   // tomt felt skjules (whitespace ignoreres)

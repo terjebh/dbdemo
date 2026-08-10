@@ -229,7 +229,10 @@ public class Dao {
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
 
-        try (Connection c = connect(conn);
+        // PostgreSQL: databasen ligger i URL-en — koble til den valgte databasen
+        // (ellers hentes tabellene fra config-standarddatabasen, f.eks. hr)
+        DbConnection kobling = "postgres".equals(rdbms) ? kopiMedDatabase(conn, db) : conn;
+        try (Connection c = connect(kobling);
              PreparedStatement ps = c.prepareStatement(sql)) {
             if ("microsoft".equals(rdbms)) {
                 ps.setString(1, db);
@@ -273,7 +276,9 @@ public class Dao {
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
 
-        try (Connection c = connect(conn);
+        // PostgreSQL: databasen ligger i URL-en — koble til den valgte databasen
+        DbConnection kobling = "postgres".equals(rdbms) ? kopiMedDatabase(conn, db) : conn;
+        try (Connection c = connect(kobling);
              PreparedStatement ps = c.prepareStatement(sql)) {
             if ("microsoft".equals(rdbms) || "oracle".equals(rdbms) || "mysql".equals(rdbms)) {
                 ps.setString(1, db);

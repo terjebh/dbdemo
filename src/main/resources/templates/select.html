@@ -40,10 +40,10 @@
             <div id="treHeader" class="tre-header">
                 <span>Databaser</span>
                 <select id="systemSelect" class="form-select form-select-sm" title="Velg databasesystem">
-                    <option th:each="sys : ${tilgjengeligeSystemer}"
-                            th:value="${sys}"
-                            th:selected="${rdbms_sti == sys}"
-                            th:text="${systemNavn[sys]}"></option>
+                    <option th:each="sys : ${systemValg}"
+                            th:value="${sys.verdi}"
+                            th:selected="${rdbms_sti == sys.verdi}"
+                            th:text="${sys.navn}"></option>
                 </select>
             </div>
             <div id="tre" class="tre"></div>
@@ -59,7 +59,10 @@
                 <div id="editorContainer"></div>
             </form>
 
-            <!-- Resultatpanel (pgAdmin4-stil): justerbart med drag-håndtak.
+            <!-- Dra-splitter: juster høyden mellom kode og resultat -->
+            <div id="editorSplitter" title="Dra for å justere høyden"></div>
+
+            <!-- Resultatpanel (pgAdmin4-stil).
                  Feilmeldingen vises her (fyller panelet) når SQL-en feiler,
                  resultat-tabellen ellers. -->
             <div id="resultatPanel">

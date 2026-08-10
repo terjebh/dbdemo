@@ -95,6 +95,9 @@ main {
     width: 9.5rem;
     font-size: 0.8rem;
     font-weight: normal;
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+    border-color: var(--app-kant);
 }
 
 .tre {
@@ -151,21 +154,25 @@ main {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    /* Fast høyde på høyre kolonne — gjør drag-justering forutsigbar */
+    height: calc(100vh - 130px);
+    min-height: 30rem;
 }
 
 #editorContainer {
     width: 100%;
-    min-height: 300px;
+    height: 45vh;
+    min-height: 10rem;
+    max-height: 90vh;
     border: solid 1px var(--app-kant);
     border-radius: 5px;
     overflow: hidden;
     /* Bakgrunn styres av CodeMirror-temaet (oneDark = mørk, default = lys) */
-    /* Høyden er justerbar: dra i nedre kant av feltet */
-    resize: vertical;
+    flex-shrink: 0;
 }
 
 #editorContainer .cm-editor {
-    min-height: 300px;
+    height: 100%;
     font-size: 16px;
 }
 
@@ -197,18 +204,41 @@ main {
     opacity: 0.7;
 }
 
-/* Resultatpanel under editoren — justerbart med drag-håndtak */
+/* Dra-splitter mellom editor og resultatpanel */
+#editorSplitter {
+    height: 8px;
+    margin: 0.2rem 0;
+    background: var(--app-kant);
+    border-radius: 3px;
+    cursor: row-resize;
+    flex-shrink: 0;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#editorSplitter::after {
+    content: "⋯";
+    color: var(--app-muted);
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+#editorSplitter:hover {
+    background: var(--app-aktiv);
+}
+
+/* Resultatpanel under editoren — fyller resten av plassen */
 #resultatPanel {
-    margin-top: 0.4rem;
     border: 1px solid var(--app-kant);
     border-radius: 5px;
     background: var(--app-flate);
     display: flex;
     flex-direction: column;
-    height: 40vh;
-    min-height: 8rem;
-    resize: vertical;
+    min-height: 6rem;
     overflow: hidden;
+    flex: 1;
 }
 
 #resultatStatus {
