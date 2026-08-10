@@ -3,6 +3,7 @@
 <head>
     <div th:replace="~{head :: head}"></div>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/one-dark.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"/>
     <script type="importmap">
     {
       "imports": {
@@ -23,62 +24,46 @@
       }
     }
     </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js" defer></script>
     <script src="/select.js" type="module" defer></script>
 </head>
 <body>
 <div th:replace="~{meny :: meny}"></div>
-<main class="flex">
+<main>
 
-    <div class="select-main-wrapper flex">
-            <div class="select-head flex">
-                <h4 id="DBHead">
-                    <th:block th:text="${rdbms}"/>
-                </h4>
-                <div id="inputHead">
-                    <form id="dbForm" method="get">
-                        <select id="selectDB" class="form-select">
-                            <option>Velg Database</option>
-                        </select>
-                    </form>
-                    <div id="skinSelectDiv">
-                        <select id="skinSelect" class="form-select">
-                            <option value="dark">Mørk (one-dark)</option>
-                            <option value="light">Lys</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+    <div class="select-layout">
 
-        <div class="select-form flex">
+        <!-- Venstrespalte: trestruktur -->
+        <aside id="trePanel">
+            <div id="treHeader" class="tre-header">Databaser</div>
+            <div id="tre" class="tre"></div>
+        </aside>
+
+        <!-- Høyre: editor + resultat -->
+        <div class="select-hoyre">
             <div id="feilmelding" class="alert alert-danger">
-                <th:block th:text="${feil}"/>
+                <th:block th:if="${feil}" th:text="${feil}"/>
                 <th:block th:if="${feil}">
                     <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
                 </th:block>
             </div>
 
-            <div class="form flex">
-                <form id="sql" method="post" action="/select">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                    <input type="hidden" name="db" id="db" th:value="${db}"/>
-                    <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
-                    <input type="hidden" id="query" name="query" th:value="${query}"/>
+            <form id="sql" method="post" action="/select">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="db" id="db" th:value="${db}"/>
+                <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
+                <input type="hidden" id="query" name="query" th:value="${query}"/>
+                <div id="editorContainer"></div>
+            </form>
 
-                    <div id="editorContainer"></div>
-                </form>
-                <div id="tabellListeContainer" >
-                    <div id="tabellListeHeading" class="alert alert-dark">Tabeller og views</div>
-                    <div id="tabellListe" class="flex"></div>
-                </div>
+            <!-- Resultatpanel (pgAdmin4-stil): justerbart med drag-håndtak -->
+            <div id="resultatPanel">
+                <div id="resultatStatus" class="text-muted small">Kjør en spørring med <i>ctrl+enter</i> — resultatet vises her</div>
+                <div id="resultatInnhold" class="table-responsive"></div>
             </div>
-
-            <div id="infotekst" class="flex">
-                <span id="skrivSelect">Formater koden med: <i>shift+enter</i>. Kjør koden med: <i>ctrl+enter</i></span>
-            </div>
-
         </div>
-
-
     </div>
 
 </main>

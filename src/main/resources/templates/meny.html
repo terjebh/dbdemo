@@ -2,7 +2,7 @@
 <html lang="no" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:fragment="meny">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#1a4fa0;">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bank2" viewBox="0 0 16 16">
       <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916l-7.5-5zM12.375 6v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1H.5z"/>
@@ -13,15 +13,31 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="/">Hjem</a></li>
-        <li class="nav-item"><a class="nav-link" href="/select/postgres">PostgreSQL</a></li>
-        <li class="nav-item"><a class="nav-link" href="/select/microsoft">Microsoft SQL</a></li>
-        <li class="nav-item"><a class="nav-link" href="/select/oracle">Oracle SQL</a></li>
-        <li class="nav-item"><a class="nav-link" href="/select/mysql">MySQL</a></li>
         <li class="nav-item"><a class="nav-link" href="/sqlite">🗄️ SQLite</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/brukere" title="Administrer brukere">👥 Brukere</a></li>
         <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/setup" title="Oppdater databasetilkoblinger">⚙️ Tilkoblinger</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal">❓ Hjelp</a></li>
       </ul>
-      <span class="navbar-text d-flex">
+
+      <!-- Kun på SQL-editoren: system-velger, database-velger og tema -->
+      <div class="d-flex align-items-center gap-2" th:if="${selectSide}">
+        <select id="systemSelect" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Velg databasesystem">
+          <option value="postgres" th:selected="${rdbms_sti == 'postgres'}">PostgreSQL</option>
+          <option value="microsoft" th:selected="${rdbms_sti == 'microsoft'}">Microsoft SQL</option>
+          <option value="oracle" th:selected="${rdbms_sti == 'oracle'}">Oracle SQL</option>
+          <option value="mysql" th:selected="${rdbms_sti == 'mysql'}">MySQL</option>
+          <option value="sqlite" th:selected="${rdbms_sti == 'sqlite'}">🗄️ SQLite</option>
+        </select>
+        <select id="selectDB" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Velg database">
+          <option>Velg Database</option>
+        </select>
+        <select id="skinSelect" class="form-select form-select-sm text-bg-dark" style="width:auto" title="Tema">
+          <option value="dark">🌙 Mørk</option>
+          <option value="light">☀️ Lys</option>
+        </select>
+      </div>
+
+      <span class="navbar-text d-flex ms-3">
         <span class="text-light me-3" sec:authorize="isAuthenticated()"
               th:text="'Logget inn: ' + ${#authentication.name}"></span>
         <form method="post" th:action="@{/logout}" class="d-inline" sec:authorize="isAuthenticated()">
@@ -32,5 +48,46 @@
     </div>
   </div>
 </nav>
+
+<!-- Hjelp-modal med kort brukerdokumentasjon -->
+<div class="modal fade" id="hjelpModal" tabindex="-1" aria-labelledby="hjelpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#1a4fa0; color:white;">
+        <h5 class="modal-title" id="hjelpModalLabel">❓ Hjelp — slik bruker du DBApp</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Lukk"></button>
+      </div>
+      <div class="modal-body">
+        <h6>⌨️ Tastatursnarveier i SQL-editoren</h6>
+        <table class="table table-sm">
+          <thead><tr><th>Tast</th><th>Funksjon</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td>Kjør SQL-spørringen (resultatet vises under editoren)</td></tr>
+            <tr><td><kbd>Shift</kbd> + <kbd>Enter</kbd></td><td>Formater SQL-koden (som i VS Code)</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>Aksepter autocomplete-forslag</td></tr>
+            <tr><td><kbd>Enter</kbd></td><td>Alltid linjeskift (ødelegger aldri teksten)</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Space</kbd></td><td>Åpne autocomplete manuelt</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Lukk autocomplete</td></tr>
+            <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Naviger i autocomplete-forslag</td></tr>
+          </tbody>
+        </table>
+        <hr/>
+        <h6>🧭 Venstrespalten — trestruktur</h6>
+        <p>Venstrespalten viser databasesystemet med databaser, skjemaer (for PostgreSQL),
+        tabeller og views. Klikk på en node for å utvide/skjule. Klikk på en database
+        for å velge den i editoren.</p>
+        <h6>🖥️ Toppmenyen</h6>
+        <p>Velg databasesystem, database og tema (mørk/lys) fra toppmenyen.
+        Resultatet av SQL-kjøringer vises i panelet under editoren — ingen side-reload.</p>
+        <h6>🗄️ SQLite</h6>
+        <p>Alle brukere kan opprette egne SQLite-databaser med valgfritt navn under
+        menyvalget «SQLite». Databasene er private og lagres per bruker.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Lukk</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 </html>

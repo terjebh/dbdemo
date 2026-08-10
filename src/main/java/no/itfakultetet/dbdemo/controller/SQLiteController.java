@@ -67,6 +67,7 @@ public class SQLiteController {
         model.addAttribute("rdbms", "SQLite");
         model.addAttribute("rdbms_sti", "sqlite");
         model.addAttribute("db", navn);
+        model.addAttribute("selectSide", true);
         return "select";
     }
 

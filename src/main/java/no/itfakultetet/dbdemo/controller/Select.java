@@ -40,6 +40,7 @@ public class Select {
         model.addAttribute("rdbms_sti", rdbms_sti);
         model.addAttribute("db", db);
         model.addAttribute("skin", skin);
+        model.addAttribute("selectSide", true);
         return "select";
     }
 
