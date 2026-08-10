@@ -7,7 +7,7 @@ import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, dr
 import { EditorState, Compartment, EditorSelection, Prec } from "@codemirror/state";
 import { history, defaultKeymap, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, indentOnInput, foldGutter, foldKeymap } from "@codemirror/language";
-import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
+import { closeBrackets, autocompletion, closeBracketsKeymap, startCompletion, acceptCompletion, closeCompletion, moveCompletionSelection } from "@codemirror/autocomplete";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { sql as sqlLang, PostgreSQL, MySQL, MSSQL, PLSQL, SQLite } from "@codemirror/lang-sql";
 import { oneDark, oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
@@ -27,15 +27,26 @@ const grunnOppsett = [
   indentOnInput(),
   bracketMatching(),
   closeBrackets(),
-  autocompletion(),
+  // Viktig: defaultKeymap: false — ellers fanger autocomplete Enter med
+  // Prec.highest og ERSTATTER teksten når popupen er åpen (f.eks. skriver
+  // man «insert», popupen viser INSERT, Enter → teksten blir ødelagt).
+  // Vi bruker egen keymap: Tab aksepterer forslag, Enter lager linjeskift.
+  autocompletion({ defaultKeymap: false }),
   keymap.of([
     ...closeBracketsKeymap,
     ...defaultKeymap,
     ...searchKeymap,
     ...historyKeymap,
     ...foldKeymap,
-    ...completionKeymap,
-    indentWithTab,
+    // Autocomplete-taster (uten Enter — Enter skal alltid gi linjeskift)
+    { key: "Ctrl-Space", run: startCompletion },
+    { key: "Escape", run: closeCompletion },
+    { key: "ArrowDown", run: moveCompletionSelection(true) },
+    { key: "ArrowUp", run: moveCompletionSelection(false) },
+    { key: "PageDown", run: moveCompletionSelection(true, "page") },
+    { key: "PageUp", run: moveCompletionSelection(false, "page") },
+    { key: "Tab", run: acceptCompletion },
+    indentWithTab, // fallback: Tab indenter når ingen autocomplete er åpen
   ]),
 ];
 
