@@ -437,7 +437,11 @@ function handleOnDocumentLoaded() {
   // Tabell/view-node som kan utvides: klikk viser feltnavn + datatype.
   // Klikk igjen setter inn navnet i editoren? Nei — først klikk utvider,
   // dobbeltklikk setter inn navnet i editoren.
+  // Returnerer en wrapper der tabellnavnet står øverst og kolonnene
+  // kommer UNDER det, med innrykk (søsken, ikke barn av noden).
   function lagTabellNode(navn, ikon) {
+    const wrapper = document.createElement("div");
+
     const div = document.createElement("div");
     div.className = "tre-node tre-tabell";
     const ik = document.createElement("span");
@@ -447,10 +451,12 @@ function handleOnDocumentLoaded() {
     lab.textContent = navn;
     div.appendChild(ik);
     div.appendChild(lab);
+    wrapper.appendChild(div);
 
     const barn = document.createElement("div");
     barn.className = "tre-barn";
     barn.style.display = "none";
+    wrapper.appendChild(barn);
 
     let lastet = false;
     div.addEventListener("click", () => {
@@ -482,12 +488,11 @@ function handleOnDocumentLoaded() {
         ik.textContent = "▸";
       }
     });
-    div.appendChild(barn);
     div.addEventListener("dblclick", (e) => {
       e.stopPropagation();
       settInnIEditor(navn);
     });
-    return div;
+    return wrapper;
   }
 
   // Henter [navn, type]-par for en tabell i den valgte databasen
