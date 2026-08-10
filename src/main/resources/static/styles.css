@@ -196,6 +196,12 @@ main {
 #editorContainer .cm-scroller {
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
     line-height: 1.6;
+    /* Fontstørrelse justeres med Ctrl+Shift+PilOpp/Ned (JS) */
+}
+
+/* Resultat-tabellens fontstørrelse (Ctrl+Shift+PgUp/PgDn) */
+#resultatInnhold table.dataTable {
+    font-size: 0.85rem;
 }
 
 #editorContainer .cm-tooltip {
@@ -269,7 +275,7 @@ main {
 }
 
 #resultatInnhold table.dataTable {
-    font-size: 0.85rem;
+    font-size: var(--resultat-font, 0.85rem);
     width: 100% !important;
     color: var(--app-tekst);
 }

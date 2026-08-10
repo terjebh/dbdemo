@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -18,6 +19,9 @@ import java.util.Map;
  * <p>
  * POST /rest/kjor/{rdbms_sti} med body {"db": "...", "query": "..."}
  * returnerer {"header": [...], "rows": [[...]]} eller en feilmelding.
+ * Tilkoblingsfeil flagges med {"feil": "...", "tilkobling": true} slik at
+ * klienten kun viser «Oppdater tilkoblingsinformasjonen»-lenken for de
+ * feilene som faktisk har med tilkobling å gjøre.
  */
 @RestController
 public class QueryRestController {
@@ -36,6 +40,44 @@ public class QueryRestController {
 
     /** Forespørsel-body: valgt database + SQL. */
     public record KjorRequest(String db, String query) {
+    }
+
+    /** Klassifiserer om en feilmelding har med tilkobling å gjøre. */
+    static boolean erTilkoblingsfeil(String melding) {
+        if (melding == null) return false;
+        String m = melding.toLowerCase(Locale.ROOT);
+        return m.contains("connection")           // generisk
+                || m.contains("could not connect")
+                || m.contains("cannot connect")
+                || m.contains("refused")
+                || m.contains("timed out")
+                || m.contains("timeout")
+                || m.contains("unreachable")
+                || m.contains("no route to host")
+                || m.contains("unknown host")
+                || m.contains("connection reset")
+                || m.contains("broken pipe")
+                || m.contains("no suitable driver")
+                || m.contains("ikke konfigurert")  // vår egen melding i ConnectionHelper
+                || m.contains("login failed")
+                || m.contains("access denied")
+                || m.contains("ora-12541")         // Oracle: ingen lytter
+                || m.contains("ora-12514")         // Oracle: ukjent tjeneste
+                || m.contains("ora-12154")         // Oracle: TNS kunne ikke oversettes
+                || m.contains("ora-01017")         // Oracle: feil brukernavn/passord
+                || m.contains("connection failure")
+                || m.contains("network error")
+                || m.contains("communications link failure")
+                || m.contains("link failure")
+                || m.contains("communicating")
+                || m.contains("fatal error");
+    }
+
+    /** Bygger feil-svar med tilkoblingsflagg. */
+    private ResponseEntity<Map<String, Object>> feilSvar(String melding) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "feil", melding == null ? "Ukjent feil" : melding,
+                "tilkobling", erTilkoblingsfeil(melding)));
     }
 
     @PostMapping("/rest/kjor/{rdbms_sti}")
@@ -58,7 +100,7 @@ public class QueryRestController {
                         "rows", resultat.rows()));
             } catch (SQLException | IllegalArgumentException e) {
                 logger.error("SQLite-feil (db={}): {}", db, e.getMessage());
-                return ResponseEntity.badRequest().body(Map.of("feil", e.getMessage()));
+                return feilSvar(e.getMessage());
             }
         }
 
@@ -71,9 +113,9 @@ public class QueryRestController {
                     "rows", resultat.rows()));
         } catch (SQLException e) {
             logger.error("SQL-feil mot {} (db={}): {}", rdbms_sti, db, e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("feil", e.getMessage()));
+            return feilSvar(e.getMessage());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("feil", e.getMessage()));
+            return feilSvar(e.getMessage());
         }
     }
 }

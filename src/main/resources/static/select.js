@@ -159,7 +159,7 @@ function handleOnDocumentLoaded() {
       .then(({ ok, data }) => {
         console.log("[kjørSQL] data:", JSON.stringify(data).slice(0, 100));
         if (!ok || data.feil) {
-          visFeil(data.feil || "Kunne ikke kjøre spørringen");
+          visFeil(data.feil || "Kunne ikke kjøre spørringen", data.tilkobling === true);
           return;
         }
         skjulFeil();
@@ -167,7 +167,7 @@ function handleOnDocumentLoaded() {
       })
       .catch((err) => {
         console.error("[kjørSQL] feil:", err);
-        visFeil("Nettverksfeil: " + err.message);
+        visFeil("Nettverksfeil: " + err.message, true);
       });
     return true;
   }
@@ -227,18 +227,21 @@ function handleOnDocumentLoaded() {
     resultatInnhold.style.display = "";
   }
 
-  function visFeil(melding) {
+  function visFeil(melding, erTilkoblingsfeil) {
     // Feilmeldingen vises i resultatpanelet (der tabellen ellers ville stått)
     skjulResultat();
     feilMelding.innerHTML = "";
     const span = document.createElement("span");
     settTekst(span, melding);
     feilMelding.appendChild(span);
-    feilMelding.appendChild(document.createElement("br"));
-    const lenke = document.createElement("a");
-    lenke.href = "/setup";
-    settTekst(lenke, "Oppdater tilkoblingsinformasjonen →");
-    feilMelding.appendChild(lenke);
+    // Lenken til tilkoblingsinfo vises KUN for feil som har med tilkobling å gjøre
+    if (erTilkoblingsfeil) {
+      feilMelding.appendChild(document.createElement("br"));
+      const lenke = document.createElement("a");
+      lenke.href = "/setup";
+      settTekst(lenke, "Oppdater tilkoblingsinformasjonen →");
+      feilMelding.appendChild(lenke);
+    }
     feilMelding.style.display = "block";
     resultatInnhold.style.display = "none";
   }
@@ -261,7 +264,7 @@ function handleOnDocumentLoaded() {
   // (server-rendret feil skal ikke overskrives av JS-feil)
   function visFeilHvisIkkeSatt(melding) {
     if (feilMelding.textContent.trim() === "") {
-      visFeil(melding);
+      visFeil(melding, false);
     }
   }
 
@@ -584,10 +587,45 @@ function handleOnDocumentLoaded() {
   // Bygger database-nedtrekksmenyen (nå i toppmenyen)
   // Keymap: ctrl+enter = kjør, shift+enter = formater (høy prioritet,
   // slik at den overstyrer CodeMirrors egne Enter-bindinger)
+  const ekstraFont = (delta) => {
+    const scroller = editorContainer.querySelector(".cm-scroller");
+    if (!scroller) return true;
+    const gjeldende = parseFloat(getComputedStyle(scroller).fontSize) || 16;
+    const ny = Math.min(Math.max(gjeldende + delta, 10), 28);
+    scroller.style.fontSize = ny + "px";
+    editorContainer.style.setProperty("--editor-font", ny + "px");
+    localStorage.setItem("editorFont", String(ny));
+    editor.requestMeasure?.();
+    return true;
+  };
+
   const extraKeymap = Prec.high(keymap.of([
     { key: "Ctrl-Enter", run: kjørSQL },
     { key: "Shift-Enter", run: formaterSQL },
+    { key: "Ctrl-Shift-ArrowUp", run: () => ekstraFont(2) },
+    { key: "Ctrl-Shift-ArrowDown", run: () => ekstraFont(-2) },
   ]));
+
+  // Resultat-feltets fontstørrelse: Ctrl+Shift+PgUp (større) / PgDn (mindre)
+  const justerResultatFont = (delta) => {
+    const gjeldende = parseFloat(
+      getComputedStyle(resultatInnhold).getPropertyValue("--resultat-font") || "0.85"
+    ) || 0.85;
+    const ny = Math.min(Math.max(gjeldende + delta, 0.6), 1.4);
+    resultatInnhold.style.setProperty("--resultat-font", ny + "rem");
+    localStorage.setItem("resultatFont", String(ny));
+    return true;
+  };
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === "PageUp") {
+      e.preventDefault();
+      justerResultatFont(0.05);
+    } else if (e.ctrlKey && e.shiftKey && e.key === "PageDown") {
+      e.preventDefault();
+      justerResultatFont(-0.05);
+    }
+  });
 
   const editor = new EditorView({
     state: EditorState.create({
@@ -679,6 +717,17 @@ function handleOnDocumentLoaded() {
   if (systemSelect) systemSelect.onchange = byttSystem;
   settOppDragSplitter();
   byggTre();
+  // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
+  const lagretEditorFont = localStorage.getItem("editorFont");
+  if (lagretEditorFont) {
+    const scroller = editorContainer.querySelector(".cm-scroller");
+    if (scroller) scroller.style.fontSize = lagretEditorFont + "px";
+    editorContainer.style.setProperty("--editor-font", lagretEditorFont + "px");
+  }
+  const lagretResultatFont = localStorage.getItem("resultatFont");
+  if (lagretResultatFont) {
+    resultatInnhold.style.setProperty("--resultat-font", lagretResultatFont + "rem");
+  }
   // Server-rendret feil (f.eks. «ikke konfigurert») vises i resultatpanelet;
   // tomt felt skjules (whitespace ignoreres)
   if (feilMelding.textContent.trim() !== "") {
