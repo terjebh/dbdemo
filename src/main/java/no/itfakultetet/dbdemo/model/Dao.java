@@ -202,10 +202,36 @@ public class Dao {
                             "performance_schema", "sys").contains(navn)) {
                         continue;
                     }
+                    // PostgreSQL: vis kun databaser brukeren faktisk kan LESE i
+                    // (has_database_privilege gir bare CONNECT-tilgang)
+                    if ("postgres".equals(rdbms) && !harLesetilgang(conn, navn)) {
+                        continue;
+                    }
                     dbList.add(navn);
                 }
                 return dbList.stream().sorted().toList();
             }
+        }
+    }
+
+    /**
+     * Sjekker om brukeren kan lese tabeller/views i en PostgreSQL-database.
+     * Kobler til databasen og spør information_schema — som kun viser
+     * objekter den tilkoblede brukeren har tilgang til.
+     */
+    private boolean harLesetilgang(DbConnection conn, String database) {
+        DbConnection kobling = kopiMedDatabase(conn, database);
+        String sql = "SELECT EXISTS (SELECT 1 FROM information_schema.tables t "
+                + "WHERE t.table_schema NOT IN ('pg_catalog','information_schema') LIMIT 1)";
+        try (Connection c = connect(kobling);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            begrens(ps);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            logger.debug("Ingen lesetilgang til {}: {}", database, e.getMessage());
+            return false;
         }
     }
 
@@ -261,17 +287,22 @@ public class Dao {
      * Lister kolonner per tabell i valgt database/skjema — brukes til
      * intellisense i SQL-editoren. Returnerer Map&lt;tabell, kolonner&gt;.
      */
-    public java.util.Map<String, List<String>> getColumns(DbConnection conn, String db) throws SQLException {
+    /**
+     * Lister kolonner per tabell i valgt database/skjema.
+     * Returnerer Map&lt;tabell, liste av [kolonnenavn, datatype]&gt; —
+     * brukes til intellisense (navn) og tre-utvidelse (navn + type).
+     */
+    public java.util.Map<String, List<List<String>>> getColumns(DbConnection conn, String db) throws SQLException {
         String rdbms = conn.getRdbms();
         String sql = switch (rdbms) {
-            case "postgres" -> "SELECT table_name, column_name FROM information_schema.columns "
+            case "postgres" -> "SELECT table_name, column_name, data_type FROM information_schema.columns "
                     + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
                     + "ORDER BY table_name, ordinal_position";
-            case "microsoft" -> "SELECT TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+            case "microsoft" -> "SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
                     + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_NAME, ORDINAL_POSITION";
-            case "oracle" -> "SELECT table_name, column_name FROM all_tab_columns "
+            case "oracle" -> "SELECT table_name, column_name, data_type FROM all_tab_columns "
                     + "WHERE owner = ? ORDER BY table_name, column_id";
-            case "mysql" -> "SELECT table_name, column_name FROM information_schema.columns "
+            case "mysql" -> "SELECT table_name, column_name, data_type FROM information_schema.columns "
                     + "WHERE table_schema = ? ORDER BY table_name, ordinal_position";
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
@@ -284,12 +315,14 @@ public class Dao {
                 ps.setString(1, db);
             }
             begrens(ps);
-            java.util.Map<String, List<String>> kolonner = new java.util.LinkedHashMap<>();
+            java.util.Map<String, List<List<String>>> kolonner = new java.util.LinkedHashMap<>();
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String tabell = rs.getString(1);
                     String kolonne = rs.getString(2);
-                    kolonner.computeIfAbsent(tabell, k -> new ArrayList<>()).add(kolonne);
+                    String type = rs.getString(3);
+                    kolonner.computeIfAbsent(tabell, k -> new ArrayList<>())
+                            .add(List.of(kolonne, type == null ? "" : type));
                 }
                 return kolonner;
             }

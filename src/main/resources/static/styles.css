@@ -132,6 +132,19 @@ main {
     padding-left: 1.2rem;
 }
 
+/* Feltnavn + datatype under en tabell/view-node */
+.tre-node.tre-kolonne {
+    font-weight: normal;
+    padding-left: 2rem;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    cursor: default;
+}
+
+.tre-node.tre-kolonne:hover {
+    background: transparent;
+}
+
 .tre-node.tre-valgt {
     background: var(--app-aktiv);
     color: var(--app-aktiv-tekst);

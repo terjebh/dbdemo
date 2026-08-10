@@ -48,12 +48,10 @@ const grunnOppsett = [
   // Vi bruker egen keymap: Tab aksepterer forslag, Enter lager linjeskift.
   autocompletion({ defaultKeymap: false }),
   keymap.of([
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...searchKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    // Autocomplete-taster (uten Enter — Enter skal alltid gi linjeskift)
+    // Autocomplete-taster MÅ komme FØR defaultKeymap, ellers vinner
+    // defaultKeymap sine piltaster (cursor-bevegelse) over
+    // moveCompletionSelection, og man kan ikke navigere i forslagene.
+    // Enter er utelatt — den skal alltid gi linjeskift, ikke akseptere.
     { key: "Ctrl-Space", run: startCompletion },
     { key: "Escape", run: closeCompletion },
     { key: "ArrowDown", run: moveCompletionSelection(true) },
@@ -61,6 +59,11 @@ const grunnOppsett = [
     { key: "PageDown", run: moveCompletionSelection(true, "page") },
     { key: "PageUp", run: moveCompletionSelection(false, "page") },
     { key: "Tab", run: acceptCompletion },
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
     indentWithTab, // fallback: Tab indenter når ingen autocomplete er åpen
   ]),
 ];
@@ -416,12 +419,7 @@ function handleOnDocumentLoaded() {
       tBarn.className = "tre-barn";
       container.appendChild(tBarn);
       g.tabeller.forEach((navn) => {
-        tBarn.appendChild(lagNode({
-          tekst: navn,
-          ikon: "📄",
-          tabell: true,
-          onClick: () => settInnIEditor(navn),
-        }));
+        tBarn.appendChild(lagTabellNode(navn, "📄"));
       });
     }
     if (g.views.length > 0) {
@@ -431,14 +429,77 @@ function handleOnDocumentLoaded() {
       vBarn.className = "tre-barn";
       container.appendChild(vBarn);
       g.views.forEach((navn) => {
-        vBarn.appendChild(lagNode({
-          tekst: navn,
-          ikon: "👁️",
-          tabell: true,
-          onClick: () => settInnIEditor(navn),
-        }));
+        vBarn.appendChild(lagTabellNode(navn, "👁️"));
       });
     }
+  }
+
+  // Tabell/view-node som kan utvides: klikk viser feltnavn + datatype.
+  // Klikk igjen setter inn navnet i editoren? Nei — først klikk utvider,
+  // dobbeltklikk setter inn navnet i editoren.
+  function lagTabellNode(navn, ikon) {
+    const div = document.createElement("div");
+    div.className = "tre-node tre-tabell";
+    const ik = document.createElement("span");
+    ik.className = "tre-ikon";
+    ik.textContent = "▸";
+    const lab = document.createElement("span");
+    lab.textContent = navn;
+    div.appendChild(ik);
+    div.appendChild(lab);
+
+    const barn = document.createElement("div");
+    barn.className = "tre-barn";
+    barn.style.display = "none";
+
+    let lastet = false;
+    div.addEventListener("click", () => {
+      if (barn.style.display === "none") {
+        barn.style.display = "";
+        ik.textContent = "▾";
+        if (!lastet) {
+          lastet = true;
+          hentKolonner(navn).then((kolonner) => {
+            barn.innerHTML = "";
+            kolonner.forEach(([felt, type]) => {
+              const feltNode = document.createElement("div");
+              feltNode.className = "tre-node tre-kolonne";
+              const fik = document.createElement("span");
+              fik.className = "tre-ikon";
+              fik.textContent = "•";
+              const flab = document.createElement("span");
+              flab.textContent = felt + "  (" + type + ")";
+              feltNode.appendChild(fik);
+              feltNode.appendChild(flab);
+              barn.appendChild(feltNode);
+            });
+          }).catch(() => {
+            barn.textContent = "Kunne ikke hente kolonner";
+          });
+        }
+      } else {
+        barn.style.display = "none";
+        ik.textContent = "▸";
+      }
+    });
+    div.appendChild(barn);
+    div.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      settInnIEditor(navn);
+    });
+    return div;
+  }
+
+  // Henter [navn, type]-par for en tabell i den valgte databasen
+  function hentKolonner(tabell) {
+    const url = `/rest/get/columns/${rdbms}/${encodeURIComponent(db.value || "")}`;
+    return fetch(url).then((r) => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then((data) => {
+      const k = (data || {})[tabell];
+      return Array.isArray(k) ? k : [];
+    });
   }
 
   // Setter inn tabellnavnet i editoren på markørens posisjon
@@ -497,7 +558,13 @@ function handleOnDocumentLoaded() {
         return response.json();
       })
       .then((data) => {
-        schema = data || {};
+        // data = {tabell: [[navn, type], ...], ...} — intellisense bruker bare navnene
+        schema = {};
+        Object.entries(data || {}).forEach(([tabell, kolonner]) => {
+          schema[tabell] = (Array.isArray(kolonner) ? kolonner : []).map((k) =>
+            Array.isArray(k) ? k[0] : k
+          );
+        });
         editor.dispatch({
           effects: sqlCompartment.reconfigure(
             sqlLang({ dialect, schema, upperCaseKeywords: true })

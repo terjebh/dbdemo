@@ -170,9 +170,10 @@ public class SQLiteService {
         }
     }
 
-    /** Lister kolonner per tabell — brukes til intellisense. */
-    public java.util.Map<String, List<String>> getColumns(String brukernavn, String navn) throws SQLException {
-        java.util.Map<String, List<String>> kolonner = new java.util.LinkedHashMap<>();
+    /** Lister kolonner per tabell — brukes til intellisense og tre-utvidelse.
+     *  Returnerer Map&lt;tabell, liste av [kolonnenavn, datatype]&gt;. */
+    public java.util.Map<String, List<List<String>>> getColumns(String brukernavn, String navn) throws SQLException {
+        java.util.Map<String, List<List<String>>> kolonner = new java.util.LinkedHashMap<>();
         try (Connection c = koble(brukernavn, navn);
              Statement st = c.createStatement();
              ResultSet tabeller = st.executeQuery(
@@ -184,9 +185,9 @@ public class SQLiteService {
             for (String tabell : tabellNavn) {
                 try (PreparedStatement ps = c.prepareStatement("PRAGMA table_info(\"" + tabell + "\")");
                      ResultSet rs = ps.executeQuery()) {
-                    List<String> cols = new ArrayList<>();
+                    List<List<String>> cols = new ArrayList<>();
                     while (rs.next()) {
-                        cols.add(rs.getString(2)); // kolonnenavn
+                        cols.add(List.of(rs.getString(2), rs.getString(3))); // navn, type
                     }
                     kolonner.put(tabell, cols);
                 }

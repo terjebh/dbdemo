@@ -76,7 +76,7 @@ public class TableListRestController {
             if (database == null || database.isBlank() || "Velg Database".equals(database)) {
                 return ResponseEntity.ok(java.util.Map.of());
             }
-            java.util.Map<String, List<String>> kolonner = dao.getColumns(conn, database);
+            java.util.Map<String, List<List<String>>> kolonner = dao.getColumns(conn, database);
             return ResponseEntity.ok(kolonner);
         } catch (SQLException e) {
             logger.error("Kunne ikke hente kolonneliste fra {} ({}): {}", rdbms_sti, database, e.getMessage());
