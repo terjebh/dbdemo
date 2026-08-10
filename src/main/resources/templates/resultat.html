@@ -18,12 +18,12 @@
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" id="rdbms_sti" name="rdbms_sti" th:value="${rdbms_sti}"/>
         <input type="hidden" name="rdbms"  th:value="${rdbms}"/>
-        <input type="hidden" name="db"   th:value="${db}"/>
+        <input type="hidden" name="db" id="db" th:value="${db}"/>
         <input type="hidden" name="query"  th:value="${query}"/>
         </form>
     </h3>
     <h6>
-        <span id="db"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>
+        <span id="dbVisning"><th:block th:text="${db}"/></span> : <span id="sql"><th:block th:text="${query}"/></span>
     </h6>
     <p id="queryMeta" class="text-muted"></p>
     <div id="queryResult"  class="table-responsive"  >

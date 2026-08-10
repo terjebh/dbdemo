@@ -206,6 +206,13 @@ a {
     width: 80%;
     overflow-wrap: anywhere;
     overflow-y: scroll;
+    /* Skjul feltet helt når det ikke er noen feilmelding */
+    display: none;
+}
+
+#feilmelding:not(:empty) {
+    display: block;
+}
 
 }
 

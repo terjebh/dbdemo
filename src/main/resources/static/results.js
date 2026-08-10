@@ -10,5 +10,10 @@ function redigerSQL() {
 function nySQL() {
   // Ny SQL: beholder valgt database (om noen), tomt query-felt
   const db = dbHidden ? dbHidden.value : "";
-  document.location.href = `/select/${rdbms_sti.value}${db ? "?db=" + encodeURIComponent(db) : ""}`;
+  if (rdbms_sti.value === "sqlite") {
+    // SQLite-editoren ligger på /sqlite/{navn}, ikke /select/sqlite
+    document.location.href = db ? `/sqlite/${encodeURIComponent(db)}` : "/sqlite";
+  } else {
+    document.location.href = `/select/${rdbms_sti.value}${db ? "?db=" + encodeURIComponent(db) : ""}`;
+  }
 }
