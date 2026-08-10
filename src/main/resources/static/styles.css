@@ -76,7 +76,7 @@ main {
     border: 1px solid var(--app-kant);
     border-radius: 5px;
     overflow: hidden;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 82px);
     display: flex;
     flex-direction: column;
     /* Bredden styres av dra-splitteren (#treSplitter) */
@@ -173,9 +173,74 @@ main {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    /* Fast høyde på høyre kolonne — gjør drag-justering forutsigbar */
-    height: calc(100vh - 130px);
+    /* Fast høyde på høyre kolonne — gjør drag-justering forutsigbar.
+       Fyller nesten hele skjermhøyden (liten margin nederst). */
+    height: calc(100vh - 92px);
     min-height: 30rem;
+}
+
+/* Fanelinje for flere SQL-faner */
+.fane-liste {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 0.2rem 0.2rem 0;
+    background: var(--app-sideflate);
+    border: 1px solid var(--app-kant);
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.fane {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.28rem 0.6rem;
+    font-size: 0.8rem;
+    background: var(--app-flate);
+    color: var(--app-tekst);
+    border: 1px solid var(--app-kant);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+}
+
+.fane-aktiv {
+    background: var(--app-aktiv);
+    color: var(--app-aktiv-tekst);
+    font-weight: 600;
+}
+
+.fane-lukk {
+    color: var(--app-muted);
+    font-weight: bold;
+    padding: 0 0.15rem;
+    border-radius: 3px;
+}
+
+.fane-lukk:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.12);
+}
+
+.fane-ny {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--app-muted);
+    border-radius: 4px 4px 0 0;
+}
+
+.fane-ny:hover {
+    color: var(--app-tekst);
+    background: var(--app-hover);
 }
 
 #editorContainer {
@@ -184,7 +249,8 @@ main {
     min-height: 10rem;
     max-height: 90vh;
     border: solid 1px var(--app-kant);
-    border-radius: 5px;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
     overflow: hidden;
     /* Bakgrunn styres av CodeMirror-temaet (oneDark = mørk, default = lys) */
     flex-shrink: 0;

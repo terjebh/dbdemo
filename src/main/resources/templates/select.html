@@ -59,6 +59,8 @@
                 <input type="hidden" name="db" id="db" th:value="${db}"/>
                 <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
                 <input type="hidden" id="query" name="query" th:value="${query}"/>
+                <!-- Fanelinje: flere SQL-faner (Ctrl+Shift+N ny, Ctrl+Shift+X lukk) -->
+                <div id="faneListe" class="fane-liste" title="SQL-faner — Ctrl+Shift+N: ny fane, Ctrl+Shift+X: lukk fane"></div>
                 <div id="editorContainer"></div>
             </form>
 

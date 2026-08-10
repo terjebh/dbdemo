@@ -100,6 +100,7 @@ function handleOnDocumentLoaded() {
   const resultatStatus = document.getElementById("resultatStatus");
   const resultatInnhold = document.getElementById("resultatInnhold");
   const csrfToken = document.querySelector('input[name="_csrf"]')?.value || "";
+  const faneListe = document.getElementById("faneListe");
 
   const rdbms = rdbms_sti.value;
   const dialect = DIALECT[rdbms] || PostgreSQL;
@@ -643,6 +644,8 @@ function handleOnDocumentLoaded() {
   const extraKeymap = Prec.high(keymap.of([
     { key: "Ctrl-Enter", run: kjørSQL },
     { key: "Shift-Enter", run: formaterSQL },
+    { key: "Ctrl-Shift-n", run: nyFane },
+    { key: "Ctrl-Shift-x", run: lukkAktivFane },
     { key: "Ctrl-Shift-ArrowUp", run: () => ekstraFont(2) },
     { key: "Ctrl-Shift-ArrowDown", run: () => ekstraFont(-2) },
   ]));
@@ -787,6 +790,118 @@ function handleOnDocumentLoaded() {
     }
   }
 
+  // ===== Faner: flere SQL-faner knyttet til samme database =====
+  // Hver fane har eget innhold (doc), lagret i minnet. Alle faner deler
+  // samme database-valg, tema og resultatpanel.
+  let faneIdTeller = 1;
+  let aktivFaneId = 1;
+  const faneDokumenter = { 1: query.value || "" };
+  const faneNavn = { 1: "Fane 1" };
+
+  // Bytter editorens innhold til en fanes doc (bevarer fane-referanser)
+  function byttFaneDoc(doc) {
+    editor.dispatch({
+      changes: { from: 0, to: editor.state.doc.length, insert: doc },
+      selection: { anchor: 0, head: 0 },
+      scrollIntoView: true,
+    });
+    editor.requestMeasure?.();
+  }
+
+  // Tegner fanelinjen på nytt
+  function renderFaner() {
+    if (!faneListe) return;
+    faneListe.innerHTML = "";
+    Object.keys(faneDokumenter).forEach((idStr) => {
+      const id = Number(idStr);
+      const fane = document.createElement("div");
+      fane.className = "fane" + (id === aktivFaneId ? " fane-aktiv" : "");
+      fane.title = "Klikk for å aktivere";
+      const navn = document.createElement("span");
+      navn.textContent = faneNavn[id] || "Fane " + id;
+      fane.appendChild(navn);
+      const lukk = document.createElement("span");
+      lukk.className = "fane-lukk";
+      lukk.textContent = "×";
+      lukk.title = "Lukk fane (Ctrl+Shift+X)";
+      lukk.addEventListener("click", (e) => {
+        e.stopPropagation();
+        lukkFane(id);
+      });
+      fane.appendChild(lukk);
+      fane.addEventListener("click", () => aktiverFane(id));
+      faneListe.appendChild(fane);
+    });
+    // «+»-knapp for ny fane
+    const ny = document.createElement("div");
+    ny.className = "fane-ny";
+    ny.textContent = "+";
+    ny.title = "Ny fane (Ctrl+Shift+N)";
+    ny.addEventListener("click", nyFane);
+    faneListe.appendChild(ny);
+  }
+
+  // Oppretter en ny fane (tom) og aktiverer den
+  function nyFane() {
+    // Lagre innholdet i den aktive fanen
+    faneDokumenter[aktivFaneId] = editor.state.doc.toString();
+    faneIdTeller++;
+    const id = faneIdTeller;
+    faneDokumenter[id] = "";
+    faneNavn[id] = "Fane " + id;
+    aktivFaneId = id;
+    byttFaneDoc("");
+    renderFaner();
+    editor.focus();
+    return true;
+  }
+
+  // Lukker en fane; hvis det er den aktive, aktiveres nabofanen
+  function lukkFane(id) {
+    const antall = Object.keys(faneDokumenter).length;
+    if (antall <= 1) return true; // behold alltid minst én fane
+    const idListe = Object.keys(faneDokumenter).map(Number);
+    const idx = idListe.indexOf(id);
+    if (idx === -1) return true;
+    delete faneDokumenter[id];
+    delete faneNavn[id];
+    if (id === aktivFaneId) {
+      const nabo = idListe[Math.max(idx - 1, 0)];
+      aktivFaneId = nabo;
+      byttFaneDoc(faneDokumenter[nabo] || "");
+    }
+    renderFaner();
+    editor.focus();
+    return true;
+  }
+
+  // Lukker den aktive fanen (tastatursnarvei)
+  function lukkAktivFane() {
+    return lukkFane(aktivFaneId);
+  }
+
+  // Aktiverer en fane: lagrer gjeldende innhold, bytter til valgt fane
+  function aktiverFane(id) {
+    if (id === aktivFaneId) return;
+    faneDokumenter[aktivFaneId] = editor.state.doc.toString();
+    aktivFaneId = id;
+    byttFaneDoc(faneDokumenter[id] || "");
+    renderFaner();
+    editor.focus();
+  }
+
+  // Eksponer fane-funksjoner for testing
+  window.dbDemoFaner = {
+    nyFane,
+    lukkFane,
+    lukkAktivFane,
+    aktiverFane,
+    renderFaner,
+    getAntall: () => Object.keys(faneDokumenter).length,
+    getAktiv: () => aktivFaneId,
+    getDokumenter: () => ({ ...faneDokumenter }),
+  };
+
   const handleOnSkinSelectChange = function handleOnSkinChange() {
     localStorage.setItem("skin", skinSelect.value);
     settTema(skinSelect.value);
@@ -798,6 +913,7 @@ function handleOnDocumentLoaded() {
   settOppDragSplitter();
   settOppTreBreddeSplitter();
   byggTre();
+  renderFaner(); // tegn den første fanen
   // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
   const lagretEditorFont = localStorage.getItem("editorFont");
   if (lagretEditorFont) {
