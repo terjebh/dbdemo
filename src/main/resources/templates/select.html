@@ -43,13 +43,6 @@
 
         <!-- Høyre: editor + resultat -->
         <div class="select-hoyre">
-            <div id="feilmelding" class="alert alert-danger">
-                <th:block th:if="${feil}" th:text="${feil}"/>
-                <th:block th:if="${feil}">
-                    <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
-                </th:block>
-            </div>
-
             <form id="sql" method="post" action="/select">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="db" id="db" th:value="${db}"/>
@@ -58,9 +51,17 @@
                 <div id="editorContainer"></div>
             </form>
 
-            <!-- Resultatpanel (pgAdmin4-stil): justerbart med drag-håndtak -->
+            <!-- Resultatpanel (pgAdmin4-stil): justerbart med drag-håndtak.
+                 Feilmeldingen vises her (fyller panelet) når SQL-en feiler,
+                 resultat-tabellen ellers. -->
             <div id="resultatPanel">
                 <div id="resultatStatus" class="text-muted small">Kjør en spørring med <i>ctrl+enter</i> — resultatet vises her</div>
+                <div id="feilmelding" class="alert alert-danger">
+                    <th:block th:if="${feil}" th:text="${feil}"/>
+                    <th:block th:if="${feil}">
+                        <br/><a th:href="@{/setup}">Oppdater tilkoblingsinformasjonen →</a>
+                    </th:block>
+                </div>
                 <div id="resultatInnhold" class="table-responsive"></div>
             </div>
         </div>

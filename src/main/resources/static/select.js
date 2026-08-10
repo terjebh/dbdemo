@@ -212,9 +212,13 @@ function handleOnDocumentLoaded() {
       });
     }
     resultatStatus.textContent = rader.length + " rader";
+    // Resultat vises → feilmeldingen skjules
+    feilMelding.style.display = "none";
+    resultatInnhold.style.display = "";
   }
 
   function visFeil(melding) {
+    // Feilmeldingen vises i resultatpanelet (der tabellen ellers ville stått)
     skjulResultat();
     feilMelding.innerHTML = "";
     const span = document.createElement("span");
@@ -226,11 +230,13 @@ function handleOnDocumentLoaded() {
     settTekst(lenke, "Oppdater tilkoblingsinformasjonen →");
     feilMelding.appendChild(lenke);
     feilMelding.style.display = "block";
+    resultatInnhold.style.display = "none";
   }
 
   function skjulFeil() {
     feilMelding.innerHTML = "";
     feilMelding.style.display = "none";
+    resultatInnhold.style.display = "";
   }
 
   function skjulResultat() {
@@ -244,7 +250,7 @@ function handleOnDocumentLoaded() {
   // Viser en feilmelding KUN hvis feltet ikke allerede har innhold
   // (server-rendret feil skal ikke overskrives av JS-feil)
   function visFeilHvisIkkeSatt(melding) {
-    if (feilMelding.textContent.trim() === "" && feilMelding.innerHTML.trim() === "") {
+    if (feilMelding.textContent.trim() === "") {
       visFeil(melding);
     }
   }
@@ -595,7 +601,16 @@ function handleOnDocumentLoaded() {
   if (systemSelect) systemSelect.onchange = byttSystem;
   byggDBListe();
   byggTre();
-  feilMelding.innerHTML ? (feilMelding.style.display = "block") : (feilMelding.style.display = "none");
+  // Server-rendret feil (f.eks. «ikke konfigurert») vises i resultatpanelet;
+  // tomt felt skjules (whitespace ignoreres)
+  if (feilMelding.textContent.trim() !== "") {
+    feilMelding.style.display = "block";
+    resultatInnhold.style.display = "none";
+    resultatStatus.textContent = "Feil";
+  } else {
+    feilMelding.style.display = "none";
+    resultatInnhold.style.display = "";
+  }
   skinSelect.value = localStorage.getItem("skin") ? localStorage.getItem("skin") : "dark";
   settTema(skinSelect.value);
   if (db.value) {

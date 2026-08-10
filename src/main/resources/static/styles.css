@@ -185,18 +185,14 @@ main {
 
 #feilmelding {
     font-weight: bold;
-    margin-top: 10px;
     padding: 10px;
+    margin: 0;
     width: 100%;
     overflow-wrap: anywhere;
-    max-height: 120px;
     overflow-y: auto;
     display: none;
-}
-
-/* Vis kun når feltet faktisk har innhold */
-#feilmelding:not(:empty) {
-    display: block;
+    /* Fyller resultatpanelet når den vises */
+    flex: 1;
 }
 
 #infotekst {
