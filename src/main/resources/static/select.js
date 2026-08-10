@@ -670,6 +670,10 @@ function handleOnDocumentLoaded() {
       e.preventDefault();
       e.stopPropagation(); // CodeMirror skal ikke kopiere linjen
       justerResultatFont(e.key === "ArrowUp" ? 0.05 : -0.05);
+    } else if (e.altKey && e.shiftKey && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+      e.preventDefault();
+      e.stopPropagation(); // CodeMirror skal ikke markere ord
+      e.key === "ArrowRight" ? nesteFane() : forrigeFane();
     }
   }, true);
 
@@ -890,12 +894,32 @@ function handleOnDocumentLoaded() {
     editor.focus();
   }
 
+  // Neste fane (Alt+Shift+PilHøyre) — syklisk
+  function nesteFane() {
+    const idListe = Object.keys(faneDokumenter).map(Number);
+    if (idListe.length <= 1) return true;
+    const idx = idListe.indexOf(aktivFaneId);
+    aktiverFane(idListe[(idx + 1) % idListe.length]);
+    return true;
+  }
+
+  // Forrige fane (Alt+Shift+PilVenstre) — syklisk
+  function forrigeFane() {
+    const idListe = Object.keys(faneDokumenter).map(Number);
+    if (idListe.length <= 1) return true;
+    const idx = idListe.indexOf(aktivFaneId);
+    aktiverFane(idListe[(idx - 1 + idListe.length) % idListe.length]);
+    return true;
+  }
+
   // Eksponer fane-funksjoner for testing
   window.dbDemoFaner = {
     nyFane,
     lukkFane,
     lukkAktivFane,
     aktiverFane,
+    nesteFane,
+    forrigeFane,
     renderFaner,
     getAntall: () => Object.keys(faneDokumenter).length,
     getAktiv: () => aktivFaneId,
