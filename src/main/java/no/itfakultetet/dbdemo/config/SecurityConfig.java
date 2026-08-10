@@ -65,7 +65,7 @@ public class SecurityConfig {
                 } else {
                     auth
                         .requestMatchers("/setup", "/setup/**", "/css/**", "/js/**",
-                                "/favicon.ico", "/error").permitAll()
+                                "/vendor/**", "/favicon.ico", "/error").permitAll()
                         .anyRequest().authenticated();
                 }
             })

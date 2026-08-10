@@ -2,7 +2,28 @@
 <html lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
-    <script src="/select.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/one-dark.min.css"/>
+    <script type="importmap">
+    {
+      "imports": {
+        "@codemirror/view": "/vendor/@codemirror/view/dist/index.js",
+        "@codemirror/state": "/vendor/@codemirror/state/dist/index.js",
+        "@codemirror/language": "/vendor/@codemirror/language/dist/index.js",
+        "@codemirror/commands": "/vendor/@codemirror/commands/dist/index.js",
+        "@codemirror/autocomplete": "/vendor/@codemirror/autocomplete/dist/index.js",
+        "@codemirror/search": "/vendor/@codemirror/search/dist/index.js",
+        "@codemirror/lang-sql": "/vendor/@codemirror/lang-sql/dist/index.js",
+        "@codemirror/theme-one-dark": "/vendor/@codemirror/theme-one-dark/dist/index.js",
+        "@lezer/common": "/vendor/@lezer/common/dist/index.js",
+        "@lezer/highlight": "/vendor/@lezer/highlight/dist/index.js",
+        "@lezer/lr": "/vendor/@lezer/lr/dist/index.js",
+        "crelt": "/vendor/crelt/index.js",
+        "style-mod": "/vendor/style-mod/src/style-mod.js",
+        "w3c-keyname": "/vendor/w3c-keyname/index.js"
+      }
+    }
+    </script>
+    <script src="/select.js" type="module" defer></script>
 </head>
 <body>
 <div th:replace="~{meny :: meny}"></div>
@@ -21,19 +42,8 @@
                     </form>
                     <div id="skinSelectDiv">
                         <select id="skinSelect" class="form-select">
-                            <option>agate</option>
-                            <option>a11y-dark</option>
-                            <option>atom-one-dark</option>
-                            <option>github-dark</option>
-                            <option>monokai</option>
-                            <option>nord</option>
-                            <option>obsidian</option>
-                            <option>tokyo-night-dark</option>
-                            <option>vs2015</option>
-                            <option>default</option>
-                            <option>github</option>
-                            <option>stackoverflow-light</option>
-                            <option>intellij-light</option>
+                            <option value="dark">Mørk (one-dark)</option>
+                            <option value="light">Lys</option>
                         </select>
                     </div>
                 </div>
@@ -45,11 +55,9 @@
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <input type="hidden" name="db" id="db" th:value="${db}"/>
                     <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
-                    <input type="hidden" id="query" name="query"/>
+                    <input type="hidden" id="query" name="query" th:value="${query}"/>
 
-                    <div id="queryText" class="code sql" contenteditable>
-                        <th:block th:text="${query}"/>
-                    </div>
+                    <div id="editorContainer"></div>
                 </form>
                 <div id="tabellListeContainer" >
                     <div id="tabellListeHeading" class="alert alert-dark">Tabeller og views</div>
@@ -74,18 +82,5 @@
     </div>
 
 </main>
-
-<script>
-    var queryText = document.getElementById("queryText");
-    queryText.focus();
-
-    document.querySelectorAll('div.code').forEach(el => {
-        // then highlight each
-        hljs.highlightElement(el);
-    });
-
-    hljs.highlightElement(queryText);
-
-</script>
 </body>
 </html>

@@ -253,4 +253,41 @@ public class Dao {
             }
         }
     }
+
+    /**
+     * Lister kolonner per tabell i valgt database/skjema — brukes til
+     * intellisense i SQL-editoren. Returnerer Map&lt;tabell, kolonner&gt;.
+     */
+    public java.util.Map<String, List<String>> getColumns(DbConnection conn, String db) throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "postgres" -> "SELECT table_name, column_name FROM information_schema.columns "
+                    + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
+                    + "ORDER BY table_name, ordinal_position";
+            case "microsoft" -> "SELECT TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                    + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_NAME, ORDINAL_POSITION";
+            case "oracle" -> "SELECT table_name, column_name FROM all_tab_columns "
+                    + "WHERE owner = ? ORDER BY table_name, column_id";
+            case "mysql" -> "SELECT table_name, column_name FROM information_schema.columns "
+                    + "WHERE table_schema = ? ORDER BY table_name, ordinal_position";
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
+        };
+
+        try (Connection c = connect(conn);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            if ("microsoft".equals(rdbms) || "oracle".equals(rdbms) || "mysql".equals(rdbms)) {
+                ps.setString(1, db);
+            }
+            begrens(ps);
+            java.util.Map<String, List<String>> kolonner = new java.util.LinkedHashMap<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String tabell = rs.getString(1);
+                    String kolonne = rs.getString(2);
+                    kolonner.computeIfAbsent(tabell, k -> new ArrayList<>()).add(kolonne);
+                }
+                return kolonner;
+            }
+        }
+    }
 }

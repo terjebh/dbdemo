@@ -43,4 +43,23 @@ public class TableListRestController {
         }
     }
 
+    /** Kolonner per tabell — brukes til intellisense i SQL-editoren. */
+    @GetMapping(value = "/rest/get/columns/{rdbms_sti}/{db}")
+    public ResponseEntity<?> hentKolonner(@PathVariable("rdbms_sti") String rdbms_sti,
+                                          @PathVariable("db") String database) {
+        try {
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            if (database == null || database.isBlank() || "Velg Database".equals(database)) {
+                return ResponseEntity.ok(java.util.Map.of());
+            }
+            java.util.Map<String, List<String>> kolonner = dao.getColumns(conn, database);
+            return ResponseEntity.ok(kolonner);
+        } catch (SQLException e) {
+            logger.error("Kunne ikke hente kolonneliste fra {} ({}): {}", rdbms_sti, database, e.getMessage());
+            return ResponseEntity.internalServerError().body("Kunne ikke hente kolonneliste: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
