@@ -96,13 +96,16 @@
 <!-- Meny-JS: tema på sider uten select.js (select.js overskriver) -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Tema: gjelder hele appen (data-tema på body)
+    // Tema: gjelder hele appen (data-tema på BÅDE :root og body — CSS-en
+    // lytter på :root[data-tema], satt tidlig i head.html)
     const skinSelect = document.getElementById("skinSelect");
     if (skinSelect) {
       skinSelect.value = localStorage.getItem("skin") || "dark";
       const settTema = () => {
         localStorage.setItem("skin", skinSelect.value);
-        document.body.dataset.tema = skinSelect.value === "light" ? "lys" : "mork";
+        const verdi = skinSelect.value === "light" ? "lys" : "mork";
+        document.documentElement.dataset.tema = verdi;
+        document.body.dataset.tema = verdi;
       };
       settTema();
       skinSelect.addEventListener("change", settTema);

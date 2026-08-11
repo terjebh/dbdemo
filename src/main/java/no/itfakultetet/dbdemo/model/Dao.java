@@ -141,7 +141,7 @@ public class Dao {
                 while (rs.next()) {
                     List<String> rad = new ArrayList<>(kolonner);
                     for (int i = 1; i <= kolonner; i++) {
-                        rad.add(rs.getString(i));
+                        rad.add(formaterVerdi(rs.getObject(i)));
                     }
                     rader.add(rad);
                 }
@@ -161,6 +161,36 @@ public class Dao {
         kopi.setUsername(conn.getUsername());
         kopi.setPassword(conn.getPassword());
         return kopi;
+    }
+
+    /**
+     * Formaterer en JDBC-verdi for visning i resultat-tabellen.
+     * Dato-verdier (java.sql.Date/Timestamp/LocalDate) vises som ren dato når
+     * klokkeslettet er midnatt — Oracle DATE ga f.eks. «2026-08-11 00:00:00».
+     */
+    private String formaterVerdi(Object verdi) {
+        if (verdi == null) return "null";
+        if (verdi instanceof java.sql.Date d) {
+            return d.toLocalDate().toString(); // kun dato
+        }
+        if (verdi instanceof java.time.LocalDate d) {
+            return d.toString();
+        }
+        if (verdi instanceof java.sql.Timestamp ts) {
+            // Hvis klokkeslettet er midnatt → vis kun datoen
+            if (ts.toLocalDateTime().toLocalTime().equals(java.time.LocalTime.MIDNIGHT)
+                    && ts.toLocalDateTime().getNano() == 0) {
+                return ts.toLocalDateTime().toLocalDate().toString();
+            }
+            return ts.toLocalDateTime().toString().replace("T", " ");
+        }
+        if (verdi instanceof java.time.LocalDateTime ldt) {
+            if (ldt.toLocalTime().equals(java.time.LocalTime.MIDNIGHT) && ldt.getNano() == 0) {
+                return ldt.toLocalDate().toString();
+            }
+            return ldt.toString().replace("T", " ");
+        }
+        return String.valueOf(verdi);
     }
 
     /**

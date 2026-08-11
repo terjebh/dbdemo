@@ -12,6 +12,10 @@
     --app-aktiv: #cfe2ff;
     --app-aktiv-tekst: #1a4fa0;
     --app-hover: #e2e6ea;
+    /* Bootstrap-variabler som må følge temaet (text-muted osv. bruker dem) */
+    --bs-secondary-color: #6c757d;
+    --bs-body-color: #212529;
+    --bs-card-bg: #ffffff;
 }
 
 :root[data-tema="mork"] {
@@ -24,6 +28,10 @@
     --app-aktiv: #2b4a7a;
     --app-aktiv-tekst: #a8c8ff;
     --app-hover: #333947;
+    /* Bootstrap-variabler følger mørkt tema */
+    --bs-secondary-color: #9aa3b2;
+    --bs-body-color: #e6e9ef;
+    --bs-card-bg: #242830;
 }
 
 body {
@@ -32,8 +40,79 @@ body {
     color: var(--app-tekst);
 }
 
+/* Lenker: tydelig farge i begge temaer (Bootstrap setter blå som default,
+   som blir mørk og lite lesbar mot mørk bakgrunn) */
+a {
+    color: var(--app-lenke);
+}
+
+a:hover {
+    color: var(--app-lenke-hover);
+}
+
+:root {
+    --app-lenke: #0d6efd;
+    --app-lenke-hover: #0a58ca;
+}
+
+:root[data-tema="mork"] {
+    --app-lenke: #7ab8ff;
+    --app-lenke-hover: #a8d0ff;
+}
+
 main {
     padding: 0.5rem;
+}
+
+/* Skjema-kontroller følger temaet (Bootstrap setter hvit bakgrunn) */
+.form-control,
+.form-select {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+    border-color: var(--app-kant);
+}
+
+.form-control::placeholder {
+    color: var(--app-muted);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+}
+
+.form-label,
+.form-check-label,
+.form-text,
+.text-muted {
+    color: var(--app-muted);
+}
+
+.form-check-input {
+    background-color: var(--app-flate);
+    border-color: var(--app-kant);
+}
+
+/* Alert-bokser følger temaet */
+.alert {
+    color: var(--app-tekst);
+    border-color: var(--app-kant);
+}
+
+.alert-info {
+    background-color: var(--app-sideflate);
+    color: var(--app-tekst);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #f5c6cb;
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+.alert-info a {
+    color: var(--app-lenke);
 }
 
 .flex {
@@ -534,10 +613,6 @@ main {
 
 div.code {
     white-space: pre;
-}
-
-a {
-    color: navy;
 }
 
 @media only screen and (max-width: 1100px) {
