@@ -320,6 +320,72 @@ main {
     background: var(--app-aktiv);
 }
 
+/* Hjelp-modal følger temaet (Bootstrap-modal er hvit som default) */
+.modal-content {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+}
+
+.modal-header {
+    background-color: #1a4fa0;
+    color: white;
+}
+
+.modal-header .modal-title {
+    color: white;
+}
+
+.modal-body {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+}
+
+.modal-body h6 {
+    color: var(--app-tekst);
+    margin-top: 0.75rem;
+}
+
+.modal-body p {
+    color: var(--app-tekst);
+}
+
+.modal-body .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--app-tekst);
+    color: var(--app-tekst);
+}
+
+.modal-body .table th,
+.modal-body .table td {
+    color: var(--app-tekst);
+    border-color: var(--app-kant);
+}
+
+.modal-body .table-striped > tbody > tr:nth-of-type(odd) {
+    --bs-table-striped-bg: var(--app-sideflate);
+    color: var(--app-tekst);
+}
+
+.modal-body kbd {
+    background-color: var(--app-aktiv);
+    color: var(--app-aktiv-tekst);
+}
+
+.modal-footer {
+    background-color: var(--app-flate);
+    border-top: 1px solid var(--app-kant);
+}
+
+.modal-footer .btn-secondary {
+    background-color: var(--app-aktiv);
+    color: var(--app-aktiv-tekst);
+    border-color: var(--app-kant);
+}
+
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
 /* Dra-splitter mellom venstrespalten og høyre kolonne */
 #treSplitter {
     width: 8px;

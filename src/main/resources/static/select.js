@@ -125,6 +125,38 @@ function handleOnDocumentLoaded() {
     return true;
   }
 
+  // Gjenkjenner DDL-setninger (CREATE/DROP/ALTER TABLE/VIEW) og trekker ut
+  // objekttype + navn. Returnerer {type, navn, handling} eller null.
+  function analyserDdl(q) {
+    const uq = " " + q.toUpperCase().replace(/\s+/g, " ").trim();
+    const navnMønster = "([A-Z0-9_.\\\"$\\-]+)";
+    const finn = (regex) => {
+      const m = uq.match(regex);
+      if (!m) return null;
+      // Fjern evt. sitat og skjema-prefiks fra navnet (behold siste del)
+      const navn = (m[1] || "").replace(/"/g, "").split(".").pop();
+      return navn;
+    };
+    let navn = finn(new RegExp("CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?" + navnMønster));
+    if (navn) return { type: "Tabell", navn, handling: "opprettet" };
+    navn = finn(new RegExp("CREATE\\s+(?:OR\\s+REPLACE\\s+)?VIEW\\s+" + navnMønster));
+    if (navn) return { type: "View", navn, handling: "opprettet" };
+    navn = finn(new RegExp("DROP\\s+TABLE\\s+(?:IF\\s+EXISTS\\s+)?" + navnMønster));
+    if (navn) return { type: "Tabell", navn, handling: "slettet" };
+    navn = finn(new RegExp("DROP\\s+VIEW\\s+(?:IF\\s+EXISTS\\s+)?" + navnMønster));
+    if (navn) return { type: "View", navn, handling: "slettet" };
+    navn = finn(new RegExp("ALTER\\s+TABLE\\s+" + navnMønster));
+    if (navn) return { type: "Tabell", navn, handling: "endret" };
+    return null;
+  }
+
+  // Viser «Tabell X opprettet»-meldingen i statusfeltet (DDL ga ingen rader)
+  function visDdlMelding(ddl) {
+    skjulResultat();
+    feilMelding.style.display = "none";
+    resultatStatus.textContent = ddl.type + " " + ddl.navn + " " + ddl.handling;
+  }
+
   // Kjører SQL via REST uten side-reload — resultatet vises i panelet under.
   // Hvis brukeren har MARKERT tekst, kjøres kun den markerte setningen
   // (evt. flere markerte setninger atskilt med semikolon) — ellers hele feltet.
@@ -164,6 +196,14 @@ function handleOnDocumentLoaded() {
           return;
         }
         skjulFeil();
+        // DDL (CREATE/DROP/ALTER TABLE/VIEW): vis «Tabell X opprettet/slettet»
+        // i stedet for «No results» og oppdater trestrukturen automatisk
+        const ddl = analyserDdl(q);
+        if (ddl) {
+          visDdlMelding(ddl);
+          byggTre();
+          return;
+        }
         visResultat(data.header || [], data.rows || []);
       })
       .catch((err) => {
@@ -401,8 +441,11 @@ function handleOnDocumentLoaded() {
 
     grupper.forEach((g, skjema) => {
       const erEneste = grupper.size === 1;
-      if (erEneste) {
-        // Kun ett skjema → vis tabeller/views direkte
+      // PostgreSQL: vis ALLTID skjema-nivået (public, andre skjemaer osv.)
+      // mellom database og tabeller/views — som pgAdmin4
+      const visSkjemaNivaa = rdbms === "postgres" || !erEneste;
+      if (!visSkjemaNivaa) {
+        // Kun ett skjema (f.eks. MySQL/SQLite) → vis tabeller/views direkte
         byggTabellViewGrener(container, g);
       } else {
         const schemaNode = lagNode({
