@@ -719,6 +719,17 @@ main {
     padding: 0.15rem 0.4rem;
 }
 
+/* Tydelige statusmeldinger i resultat-statuslinjen (lagret/åpnet/filfeil) */
+#resultatStatus.status-suksess {
+    color: var(--app-suksess-tekst);
+    font-weight: 600;
+}
+
+#resultatStatus.status-info {
+    color: var(--app-feil-tekst);
+    font-weight: 600;
+}
+
 #resultatInnhold {
     flex: 1;
     overflow: auto;

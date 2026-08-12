@@ -1240,9 +1240,12 @@ function handleOnDocumentLoaded() {
               .then((data) => {
                 if (data && data.innhold != null) {
                   settEditorTekst(data.innhold);
-                  resultatStatus.textContent = "Åpnet " + navn + ".sql";
+                  visStatusMelding("📂 Åpnet " + navn + ".sql", true);
+                } else {
+                  visStatusMelding("⚠️ Kunne ikke åpne " + navn + ".sql", false);
                 }
-              });
+              })
+              .catch(() => visStatusMelding("⚠️ Kunne ikke åpne " + navn + ".sql", false));
           });
           li.appendChild(a);
           sqlFilListe.appendChild(li);
@@ -1251,11 +1254,22 @@ function handleOnDocumentLoaded() {
       .catch(() => {});
   }
 
+  // Viser en tydelig suksess-/infomelding i statuslinjen (grønn, forsvinner selv)
+  function visStatusMelding(tekst, suksess) {
+    resultatStatus.textContent = tekst;
+    resultatStatus.classList.remove("status-suksess", "status-info");
+    resultatStatus.classList.add(suksess ? "status-suksess" : "status-info");
+    clearTimeout(window.__statusTimer);
+    window.__statusTimer = setTimeout(() => {
+      resultatStatus.classList.remove("status-suksess", "status-info");
+    }, 4000);
+  }
+
   if (lagreSqlKnapp) {
     lagreSqlKnapp.addEventListener("click", () => {
       const innhold = hentEditorTekst();
       if (!innhold.trim()) {
-        resultatStatus.textContent = "Ingenting å lagre — skriv SQL først";
+        visStatusMelding("Ingenting å lagre — skriv SQL først", false);
         return;
       }
       const navn = prompt("Lagre SQL-fil som (uten .sql):", "sporring1");
@@ -1269,12 +1283,13 @@ function handleOnDocumentLoaded() {
         .then((r) => r.json())
         .then((data) => {
           if (data.ok) {
-            resultatStatus.textContent = "Lagret " + rent + ".sql";
+            visStatusMelding("✅ Lagret " + rent + ".sql", true);
             lastSqlFilListe();
           } else {
-            resultatStatus.textContent = data.feil || "Kunne ikke lagre";
+            visStatusMelding("⚠️ " + (data.feil || "Kunne ikke lagre"), false);
           }
-        });
+        })
+        .catch(() => visStatusMelding("⚠️ Kunne ikke lagre filen", false));
     });
   }
   if (apneSqlKnapp) {
