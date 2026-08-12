@@ -20,6 +20,49 @@ public class AppConfig {
     private Map<String, DbConnection> connections = new LinkedHashMap<>();
 
     /**
+     * Per-bruker tilkoblinger: brukernavn → (rdbms → DbConnection).
+     * Hver bruker kan ha sine egne database-tilkoblinger. Første-adminens
+     * tilkoblinger ligger i {@link #connections} (bakoverkompatibelt) og
+     * speiles inn her ved lagring.
+     */
+    private Map<String, Map<String, DbConnection>> brukerTilkoblinger = new LinkedHashMap<>();
+
+    public Map<String, Map<String, DbConnection>> getBrukerTilkoblinger() {
+        if (brukerTilkoblinger == null) {
+            brukerTilkoblinger = new LinkedHashMap<>();
+        }
+        return brukerTilkoblinger;
+    }
+
+    public void setBrukerTilkoblinger(Map<String, Map<String, DbConnection>> brukerTilkoblinger) {
+        this.brukerTilkoblinger = brukerTilkoblinger;
+    }
+
+    /** Tilkoblingene til én bruker (tomt kart hvis ingen egne ennå). */
+    public Map<String, DbConnection> brukerTilkoblinger(String brukernavn) {
+        Map<String, DbConnection> map = getBrukerTilkoblinger().get(brukernavn);
+        if (map == null) {
+            map = new LinkedHashMap<>();
+            getBrukerTilkoblinger().put(brukernavn, map);
+        }
+        return map;
+    }
+
+    /**
+     * Henter tilkoblingen for en RDBMS sett fra én brukers ståsted:
+     * brukerens EGNE tilkoblinger først, deretter felles/global (som
+     * tilhører første-admin). Returnerer null hvis ingen av dem har den.
+     */
+    public DbConnection getConnection(String rdbms, String brukernavn) {
+        Map<String, DbConnection> egen = getBrukerTilkoblinger().get(brukernavn);
+        if (egen != null && egen.containsKey(rdbms)) {
+            return egen.get(rdbms);
+        }
+        // Felles tilkoblinger (første-admin / global config) som fallback
+        return connections.get(rdbms);
+    }
+
+    /**
      * Vanlige brukere (ikke admin): brukernavn → BCrypt-hash.
      * Admin-brukeren ligger i adminUsername/adminPasswordHash.
      */

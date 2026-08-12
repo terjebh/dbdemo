@@ -16,9 +16,14 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Fast UID 1001 (appuser) — konsistent med volume-eierskap
+# Terminal-emulatoren trenger bash + script (PTY) + openssh-klienten
+# (slik at brukerne kan koble seg til database-serverenes terminalklienter)
 RUN useradd --create-home --shell /bin/bash -u 1001 appuser \
     && mkdir -p /app/logs /home/appuser/.dbdemo \
-    && chown -R appuser:appuser /app /home/appuser
+    && chown -R appuser:appuser /app /home/appuser \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends bash util-linux openssh-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Kjører som root kun i entrypoint (for chown), dropper deretter til appuser
 USER root

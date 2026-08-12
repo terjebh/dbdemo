@@ -43,7 +43,8 @@ public class TableListRestController {
             }
         }
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             if (database == null || database.isBlank() || "Velg Database".equals(database)) {
                 return ResponseEntity.ok(List.of());
             }
@@ -72,7 +73,8 @@ public class TableListRestController {
             }
         }
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             if (database == null || database.isBlank() || "Velg Database".equals(database)) {
                 return ResponseEntity.ok(java.util.Map.of());
             }

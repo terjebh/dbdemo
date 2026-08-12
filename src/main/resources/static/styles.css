@@ -291,6 +291,17 @@ main {
     margin-bottom: 4px;
     border-radius: 4px;
     font-weight: 600;
+    /* Matcher fane-headingenes høyde: samme padding+font som .fane */
+    padding: 0.28rem 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.fane-kjor-knapp svg {
+    flex-shrink: 0;
 }
 
 .fane-liste {
@@ -599,6 +610,37 @@ main {
     justify-content: center;
     min-height: 100vh;
     background: var(--app-bg);
+}
+
+/* Terminalpanel (xterm.js) */
+#terminalPanel {
+    flex: 1;
+    min-height: 0;
+    background: var(--app-sideflate);
+    border: 1px solid var(--app-kant);
+    border-radius: 5px;
+    padding: 0.4rem;
+    overflow: hidden;
+}
+
+.terminal-verktøylinje {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.4rem;
+}
+
+#terminalContainer {
+    flex: 1;
+    min-height: 0;
+    background: #1a1d23;
+    border-radius: 4px;
+    padding: 0.25rem;
+}
+
+#terminalContainer .xterm {
+    height: 100%;
 }
 
 /* Dra-splitter mellom venstrespalten og høyre kolonne */

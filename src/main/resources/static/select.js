@@ -1013,6 +1013,94 @@ function handleOnDocumentLoaded() {
       editor.focus();
     });
   }
+
+  // ===== Terminal-emulator (xterm.js + WebSocket → bash med PTY) =====
+  let terminalWs = null;
+  let xtermInstans = null;
+  const terminalPanel = document.getElementById("terminalPanel");
+  const terminalKnapp = document.getElementById("terminalKnapp");
+  const terminalLukk = document.getElementById("terminalLukk");
+  const terminalContainer = document.getElementById("terminalContainer");
+  const formElement = document.getElementById("sql");
+
+  function apneTerminal() {
+    if (!terminalPanel || !window.Terminal) return;
+    // Skjul editor-området + resultatet, vis terminalpanelet
+    terminalPanel.style.display = "flex";
+    terminalPanel.style.flexDirection = "column";
+    terminalPanel.style.flex = "1";
+    terminalPanel.style.minHeight = "0";
+    if (formElement) formElement.style.display = "none";
+    if (editorSplitter) editorSplitter.style.display = "none";
+    if (resultatPanel) resultatPanel.style.display = "none";
+    terminalKnapp.disabled = true;
+
+    // xterm.js — mørkt tema som matcher appen
+    xtermInstans = new Terminal({
+      cursorBlink: true,
+      fontSize: 13,
+      fontFamily: 'Menlo, Consolas, "Courier New", monospace',
+      theme: { background: "#1a1d23", foreground: "#e6e9ef" },
+      convertEol: false,
+    });
+    xtermInstans.open(terminalContainer);
+    xtermInstans.focus();
+
+    // WebSocket til serveren (samme origin — krever innlogging)
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    terminalWs = new WebSocket(`${proto}://${location.host}/ws/terminal`);
+    terminalWs.onopen = () => {
+      xtermInstans.writeln("\x1b[32mTerminal klar — lokal shell i containeren.\x1b[0m");
+      xtermInstans.writeln("\x1b[33mKoble til f.eks.: ssh bruker@vert  |  psql -h vert -U bruker\x1b[0m");
+      xtermInstans.writeln("");
+    };
+    terminalWs.onmessage = (ev) => xtermInstans.write(ev.data);
+    terminalWs.onclose = () => {
+      if (xtermInstans) xtermInstans.writeln("\r\n\x1b[31mTerminal-tilkoblingen ble lukket.\x1b[0m");
+    };
+    terminalWs.onerror = () => {
+      if (xtermInstans) xtermInstans.writeln("\r\n\x1b[31mKunne ikke koble til terminal-serveren.\x1b[0m");
+    };
+
+    // Tastatur-input → WebSocket (inkl. escape-sekvenser for piler/tab)
+    xtermInstans.onData((data) => {
+      if (terminalWs && terminalWs.readyState === WebSocket.OPEN) {
+        terminalWs.send(data);
+      }
+    });
+    // Tilpass størrelsen når panelet endres
+    xtermInstans.onResize(({ cols, rows }) => {
+      // script/bash håndterer kolonner automatisk; ingen ekstra melding nødvendig
+    });
+  }
+
+  function lukkTerminal() {
+    if (terminalWs) {
+      terminalWs.close();
+      terminalWs = null;
+    }
+    if (xtermInstans) {
+      xtermInstans.dispose();
+      xtermInstans = null;
+    }
+    if (terminalContainer) terminalContainer.innerHTML = "";
+    if (terminalPanel) terminalPanel.style.display = "none";
+    if (formElement) formElement.style.display = "";
+    if (editorSplitter) editorSplitter.style.display = "";
+    if (resultatPanel) resultatPanel.style.display = "";
+    if (terminalKnapp) terminalKnapp.disabled = false;
+    if (editor) editor.focus();
+  }
+
+  if (terminalKnapp) {
+    terminalKnapp.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      apneTerminal();
+    });
+  }
+  if (terminalLukk) {
+    terminalLukk.addEventListener("click", () => lukkTerminal());
+  }
   // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
   const lagretEditorFont = localStorage.getItem("editorFont");
   if (lagretEditorFont) {

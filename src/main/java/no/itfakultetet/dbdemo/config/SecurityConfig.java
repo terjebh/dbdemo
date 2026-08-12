@@ -113,9 +113,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                // Admin-områder: oppsett/tilkoblinger og brukeradministrasjon
-                .requestMatchers("/setup", "/setup/**", "/brukere", "/brukere/**")
+                // Brukeradministrasjon: kun admin (ROLE_ADMIN)
+                .requestMatchers("/brukere", "/brukere/**")
                     .access(adminEllerFørOppsett())
+                // Tilkoblingsinnstillinger: alle innloggede brukere
+                // (hver bruker har sine egne tilkoblinger)
+                .requestMatchers("/setup", "/setup/**")
+                    .access(innloggetEllerFørOppsett())
                 // Statiske ressurser er åpne
                 .requestMatchers("/css/**", "/js/**", "/vendor/**",
                         "/favicon.ico", "/error").permitAll()

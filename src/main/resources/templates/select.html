@@ -4,6 +4,9 @@
     <div th:replace="~{head :: head}"></div>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/one-dark.min.css"/>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"/>
+    <!-- xterm.js: terminal-emulator (defer — aldri synkront i head) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js" defer></script>
     <script type="importmap">
     {
       "imports": {
@@ -70,6 +73,14 @@
                         </svg>
                         <span class="d-none d-sm-inline" th:text="#{select.kjor}">Kjør</span>
                     </button>
+                    <!-- Terminal-knapp: åpner terminal-emulator med ssh-klient -->
+                    <button type="button" id="terminalKnapp" class="btn btn-outline-light btn-sm fane-kjor-knapp"
+                            th:title="#{select.terminalTittel}" style="border-color:var(--app-kant); color:var(--app-tekst);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:-2px;">
+                            <path d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm7.646 4.646a.5.5 0 0 0-.708-.708L8 7.293 6.062 5.354a.5.5 0 1 0-.708.708L7.293 8l-1.939 1.938a.5.5 0 0 0 .708.708L8 8.707l1.938 1.939a.5.5 0 0 0 .708-.708L8.707 8l1.939-1.938z"/>
+                        </svg>
+                        <span class="d-none d-sm-inline" th:text="#{select.terminal}">Terminal</span>
+                    </button>
                 </div>
                 <div id="editorContainer"></div>
             </form>
@@ -89,6 +100,17 @@
                     </th:block>
                 </div>
                 <div id="resultatInnhold" class="table-responsive"></div>
+            </div>
+
+            <!-- Terminalpanel: vises i stedet for editor+resultat når
+                 Terminal-knappen er aktiv (xterm.js fyller dette). -->
+            <div id="terminalPanel" style="display:none;">
+                <div class="terminal-verktøylinje">
+                    <span class="text-muted small" th:text="#{select.terminalHint}">Lokal shell — koble til med f.eks. ssh bruker@vert</span>
+                    <button type="button" id="terminalLukk" class="btn btn-outline-secondary btn-sm"
+                            th:text="#{select.terminalLukk}">✕ Lukk terminal</button>
+                </div>
+                <div id="terminalContainer" style="height: 100%;"></div>
             </div>
         </div>
     </div>

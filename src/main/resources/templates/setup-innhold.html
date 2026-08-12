@@ -2,10 +2,10 @@
 <html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="innhold">
     <div class="kort-head">
-        <h4 class="mb-0" th:text="${redigeringsmodus} ? #{setup.tittel} : #{setup.velkommen}">🔧 Innstillinger</h4>
+        <h4 class="mb-0" th:text="${!alleredeKonfigurert} ? #{setup.velkommen} : (${erAdminBruker} ? #{setup.tittel} : #{setup.mine})">🔧 Innstillinger</h4>
     </div>
     <div class="kort-body">
-        <p class="text-muted" th:text="${redigeringsmodus} ? #{setup.leder} : #{setup.leder.forstegang}">Oppdater tilkoblingsinformasjonen</p>
+        <p class="text-muted" th:text="${!alleredeKonfigurert} ? #{setup.leder.forstegang} : (${erAdminBruker} ? #{setup.leder} : #{setup.leder.bruker})">Oppdater tilkoblingsinformasjonen</p>
 
         <div th:if="${alleredeKonfigurert && !redigeringsmodus}" class="alert alert-info">
             Appen er allerede konfigurert. Gå til <a th:href="@{/login}">innlogging</a>.
@@ -40,8 +40,8 @@
 
                 <!-- Høyre: valgt system -->
                 <div class="sett-innhold">
-                    <!-- Admin-bruker -->
-                    <div class="db-seksjon synlig" id="seksjon-admin">
+                    <!-- Admin-bruker: kun for første-admin (som eier passordet) -->
+                    <div class="db-seksjon synlig" id="seksjon-admin" th:if="${!alleredeKonfigurert || erAdminBruker}">
                         <h5 th:text="#{setup.admin}">🔐 Admin-bruker</h5>
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
@@ -62,22 +62,22 @@
                     <div class="db-seksjon" id="seksjon-postgres">
                         <h5>
                             <input class="form-check-input" type="checkbox" id="enabled_postgres" name="enabled_postgres"
-                                   th:checked="${config?.connections?.get('postgres')?.enabled}">
+                                   th:checked="${mineTilkoblinger?.get('postgres')?.enabled}">
                             <label class="form-check-label" for="enabled_postgres" th:text="#{setup.postgres}">🐘 PostgreSQL</label>
                         </h5>
                         <div class="row g-3 mt-1 db-felter">
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.vert}">Vert (host)</label>
                                 <input type="text" class="form-control" name="host_postgres"
-                                       th:value="${config?.connections?.get('postgres')?.host}" placeholder="f.eks. db.eksempel.no"></div>
+                                       th:value="${mineTilkoblinger?.get('postgres')?.host}" placeholder="f.eks. db.eksempel.no"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.port}">Port</label>
                                 <input type="number" class="form-control" name="port_postgres"
-                                       th:value="${config?.connections?.get('postgres')?.port}" placeholder="5432"></div>
+                                       th:value="${mineTilkoblinger?.get('postgres')?.port}" placeholder="5432"></div>
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.database}">Database</label>
                                 <input type="text" class="form-control" name="database_postgres"
-                                       th:value="${config?.connections?.get('postgres')?.database}" placeholder="f.eks. hr"></div>
+                                       th:value="${mineTilkoblinger?.get('postgres')?.database}" placeholder="f.eks. hr"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.bruker}">Bruker</label>
                                 <input type="text" class="form-control" name="username_postgres"
-                                       th:value="${config?.connections?.get('postgres')?.username}"></div>
+                                       th:value="${mineTilkoblinger?.get('postgres')?.username}"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.passord}">Passord</label>
                                 <input type="password" class="form-control" name="password_postgres"></div>
                         </div>
@@ -89,22 +89,22 @@
                     <div class="db-seksjon" id="seksjon-mysql">
                         <h5>
                             <input class="form-check-input" type="checkbox" id="enabled_mysql" name="enabled_mysql"
-                                   th:checked="${config?.connections?.get('mysql')?.enabled}">
+                                   th:checked="${mineTilkoblinger?.get('mysql')?.enabled}">
                             <label class="form-check-label" for="enabled_mysql" th:text="#{setup.mysql}">🐬 MySQL / MariaDB</label>
                         </h5>
                         <div class="row g-3 mt-1 db-felter">
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.vert}">Vert (host)</label>
                                 <input type="text" class="form-control" name="host_mysql"
-                                       th:value="${config?.connections?.get('mysql')?.host}" placeholder="f.eks. db.eksempel.no"></div>
+                                       th:value="${mineTilkoblinger?.get('mysql')?.host}" placeholder="f.eks. db.eksempel.no"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.port}">Port</label>
                                 <input type="number" class="form-control" name="port_mysql"
-                                       th:value="${config?.connections?.get('mysql')?.port}" placeholder="3306"></div>
+                                       th:value="${mineTilkoblinger?.get('mysql')?.port}" placeholder="3306"></div>
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.database}">Database</label>
                                 <input type="text" class="form-control" name="database_mysql"
-                                       th:value="${config?.connections?.get('mysql')?.database}" placeholder="f.eks. hr"></div>
+                                       th:value="${mineTilkoblinger?.get('mysql')?.database}" placeholder="f.eks. hr"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.bruker}">Bruker</label>
                                 <input type="text" class="form-control" name="username_mysql"
-                                       th:value="${config?.connections?.get('mysql')?.username}"></div>
+                                       th:value="${mineTilkoblinger?.get('mysql')?.username}"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.passord}">Passord</label>
                                 <input type="password" class="form-control" name="password_mysql"></div>
                         </div>
@@ -116,22 +116,22 @@
                     <div class="db-seksjon" id="seksjon-oracle">
                         <h5>
                             <input class="form-check-input" type="checkbox" id="enabled_oracle" name="enabled_oracle"
-                                   th:checked="${config?.connections?.get('oracle')?.enabled}">
+                                   th:checked="${mineTilkoblinger?.get('oracle')?.enabled}">
                             <label class="form-check-label" for="enabled_oracle" th:text="#{setup.oracle}">🏛️ Oracle</label>
                         </h5>
                         <div class="row g-3 mt-1 db-felter">
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.vert}">Vert (host)</label>
                                 <input type="text" class="form-control" name="host_oracle"
-                                       th:value="${config?.connections?.get('oracle')?.host}" placeholder="f.eks. db.eksempel.no"></div>
+                                       th:value="${mineTilkoblinger?.get('oracle')?.host}" placeholder="f.eks. db.eksempel.no"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.port}">Port</label>
                                 <input type="number" class="form-control" name="port_oracle"
-                                       th:value="${config?.connections?.get('oracle')?.port}" placeholder="1521"></div>
+                                       th:value="${mineTilkoblinger?.get('oracle')?.port}" placeholder="1521"></div>
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.service}">Service / SID</label>
                                 <input type="text" class="form-control" name="database_oracle"
-                                       th:value="${config?.connections?.get('oracle')?.database}" placeholder="f.eks. HR"></div>
+                                       th:value="${mineTilkoblinger?.get('oracle')?.database}" placeholder="f.eks. HR"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.bruker}">Bruker</label>
                                 <input type="text" class="form-control" name="username_oracle"
-                                       th:value="${config?.connections?.get('oracle')?.username}"></div>
+                                       th:value="${mineTilkoblinger?.get('oracle')?.username}"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.passord}">Passord</label>
                                 <input type="password" class="form-control" name="password_oracle"></div>
                         </div>
@@ -143,22 +143,22 @@
                     <div class="db-seksjon" id="seksjon-microsoft">
                         <h5>
                             <input class="form-check-input" type="checkbox" id="enabled_microsoft" name="enabled_microsoft"
-                                   th:checked="${config?.connections?.get('microsoft')?.enabled}">
+                                   th:checked="${mineTilkoblinger?.get('microsoft')?.enabled}">
                             <label class="form-check-label" for="enabled_microsoft" th:text="#{setup.mssql}">🪟 MS SQL Server</label>
                         </h5>
                         <div class="row g-3 mt-1 db-felter">
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.vert}">Vert (host)</label>
                                 <input type="text" class="form-control" name="host_microsoft"
-                                       th:value="${config?.connections?.get('microsoft')?.host}" placeholder="f.eks. db.eksempel.no"></div>
+                                       th:value="${mineTilkoblinger?.get('microsoft')?.host}" placeholder="f.eks. db.eksempel.no"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.port}">Port</label>
                                 <input type="number" class="form-control" name="port_microsoft"
-                                       th:value="${config?.connections?.get('microsoft')?.port}" placeholder="1433"></div>
+                                       th:value="${mineTilkoblinger?.get('microsoft')?.port}" placeholder="1433"></div>
                             <div class="col-md-3"><label class="form-label" th:text="#{setup.database}">Database</label>
                                 <input type="text" class="form-control" name="database_microsoft"
-                                       th:value="${config?.connections?.get('microsoft')?.database}" placeholder="f.eks. hr"></div>
+                                       th:value="${mineTilkoblinger?.get('microsoft')?.database}" placeholder="f.eks. hr"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.bruker}">Bruker</label>
                                 <input type="text" class="form-control" name="username_microsoft"
-                                       th:value="${config?.connections?.get('microsoft')?.username}"></div>
+                                       th:value="${mineTilkoblinger?.get('microsoft')?.username}"></div>
                             <div class="col-md-2"><label class="form-label" th:text="#{setup.passord}">Passord</label>
                                 <input type="password" class="form-control" name="password_microsoft"></div>
                         </div>
@@ -167,7 +167,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg w-100 mt-3"
-                            th:text="${redigeringsmodus} ? #{setup.lagre} : #{setup.lagre.forstegang}"></button>
+                            th:text="${!alleredeKonfigurert} ? #{setup.lagre.forstegang} : #{setup.lagre}"></button>
                 </div>
             </div>
         </form>

@@ -46,66 +46,90 @@ public class SetupController {
     @GetMapping("/setup")
     public String setupSkjema(Model model, Authentication authentication) {
         boolean konfigurert = configService.isConfigured();
+        String bruker = authentication == null ? "anonym" : authentication.getName();
 
-        if (konfigurert && !erAdmin(authentication)) {
-            // Etter oppsett krever /setup admin (kun admin kan endre tilkoblinger)
-            return "redirect:/login";
-        }
-
+        // Før oppsett: ingen innlogging nødvendig (SetupInterceptor styrer).
+        // Etter oppsett: krever innlogging (SecurityConfig) — hver bruker ser
+        // SINE EGNE tilkoblinger.
         AppConfig config = configService.load();
-        if (config.getConnections().isEmpty()) {
-            // Fyll inn standardporter som forslag
-            Map<String, DbConnection> conns = new LinkedHashMap<>();
+        Map<String, DbConnection> mine = config.getBrukerTilkoblinger().get(bruker);
+        if (mine == null || mine.isEmpty()) {
+            // Første gang: start fra tomme skjemaer med standardporter
+            mine = new LinkedHashMap<>();
             for (String rdbms : RDBMSER) {
                 DbConnection c = new DbConnection();
                 c.setRdbms(rdbms);
                 c.setPort(Dao.defaultPort(rdbms));
-                conns.put(rdbms, c);
+                mine.put(rdbms, c);
             }
-            config.setConnections(conns);
+            // Første-admin (global config): fyll inn eksisterende verdier
+            if (bruker.equals(config.getAdminUsername())) {
+                for (String rdbms : RDBMSER) {
+                    DbConnection eksisterende = config.getConnection(rdbms);
+                    if (eksisterende != null) {
+                        mine.put(rdbms, eksisterende);
+                    }
+                }
+            }
         }
 
         model.addAttribute("config", config);
+        model.addAttribute("mineTilkoblinger", mine);
+        model.addAttribute("bruker", bruker);
+        model.addAttribute("erAdminBruker", bruker.equals(config.getAdminUsername()));
         model.addAttribute("alleredeKonfigurert", konfigurert);
         model.addAttribute("redigeringsmodus", konfigurert);
-        model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(config));
+        model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(mine));
         return "setup";
     }
 
-    /** Lagrer konfigurasjonen fra skjemaet. */
+    /** Lagrer konfigurasjonen fra skjemaet — per innlogget bruker. */
     @PostMapping("/setup")
     public String lagre(Model model,
                         Authentication authentication,
-                        @RequestParam("adminUsername") String adminUsername,
+                        @RequestParam(value = "adminUsername", required = false) String adminUsername,
                         @RequestParam(value = "adminPassword", required = false) String adminPassword,
                         @RequestParam Map<String, String> alleParametre) {
 
         boolean konfigurert = configService.isConfigured();
-        if (konfigurert && !erAdmin(authentication)) {
+        String bruker = authentication == null ? "anonym" : authentication.getName();
+        if (konfigurert && !erInnlogget(authentication)) {
             return "redirect:/login";
         }
 
         AppConfig eksisterende = configService.load();
 
+        // Ved first-run er man ikke innlogget ennå — tilkoblingene tilhører
+        // den NYE admin-brukeren fra skjemaet, ikke "anonym".
+        if (!konfigurert) {
+            bruker = adminUsername == null ? "anonym" : adminUsername.trim();
+        }
+
         // Ved redigering: beholder eksisterende passord-hash hvis feltet er tomt
-        String adminPasswordHash;
-        if (adminPassword == null || adminPassword.isBlank()) {
-            if (konfigurert && eksisterende.getAdminPasswordHash() != null
-                    && !eksisterende.getAdminPasswordHash().isBlank()) {
-                adminPasswordHash = eksisterende.getAdminPasswordHash();
-            } else {
+        String adminPasswordHash = eksisterende.getAdminPasswordHash();
+        if (!konfigurert) {
+            if (adminPassword == null || adminPassword.isBlank()) {
                 model.addAttribute("feil", "Du må fylle inn passord for admin-brukeren.");
                 return setupSkjema(model, authentication);
             }
-        } else {
             adminPasswordHash = passwordEncoder.encode(adminPassword);
+            eksisterende.setAdminUsername(adminUsername.trim());
+            eksisterende.setAdminPasswordHash(adminPasswordHash);
+        } else if (adminPassword != null && !adminPassword.isBlank()) {
+            // Innlogget bruker kan bytte passordet sitt (hvis det er admin-brukeren)
+            if (bruker.equals(eksisterende.getAdminUsername())) {
+                eksisterende.setAdminPasswordHash(passwordEncoder.encode(adminPassword));
+            } else {
+                // Vanlige brukere: oppdater passord-hash i users-kartet
+                String hash = eksisterende.getUsers().get(bruker);
+                if (hash != null) {
+                    eksisterende.getUsers().put(bruker, passwordEncoder.encode(adminPassword));
+                }
+            }
         }
 
-        AppConfig config = new AppConfig();
-        config.setAdminUsername(adminUsername.trim());
-        config.setAdminPasswordHash(adminPasswordHash);
-
-        Map<String, DbConnection> conns = new LinkedHashMap<>();
+        // Bygg brukerens tilkoblinger fra skjemaet
+        Map<String, DbConnection> mine = new LinkedHashMap<>();
         for (String rdbms : RDBMSER) {
             DbConnection c = byggTilkobling(rdbms, alleParametre, eksisterende);
             if (c.isValid()) {
@@ -114,26 +138,36 @@ public class SetupController {
                 if (feil != null) {
                     model.addAttribute("feil", "Kunne ikke koble til " + ConnectionHelper.rdbmsNavn(rdbms)
                             + ": " + feil);
-                    model.addAttribute("config", fyllConfigMed(adminUsername, conns));
+                    model.addAttribute("config", eksisterende);
+                    model.addAttribute("mineTilkoblinger", mine);
+                    model.addAttribute("bruker", bruker);
+                    model.addAttribute("erAdminBruker", bruker.equals(eksisterende.getAdminUsername()));
                     model.addAttribute("alleredeKonfigurert", konfigurert);
                     model.addAttribute("redigeringsmodus", konfigurert);
-                    model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(config));
+                    model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(mine));
                     return "setup";
                 }
             }
-            conns.put(rdbms, c);
+            mine.put(rdbms, c);
         }
-        config.setConnections(conns);
+        // Lagre per bruker (første-admin lagres også som global/fallback)
+        eksisterende.getBrukerTilkoblinger().put(bruker, mine);
+        if (bruker.equals(eksisterende.getAdminUsername())) {
+            eksisterende.setConnections(mine);
+        }
 
         try {
-            configService.save(config);
-            logger.info("Konfigurasjon lagret. Aktive databaser: {}",
-                    conns.values().stream().filter(DbConnection::isValid).count());
+            configService.save(eksisterende);
+            logger.info("Konfigurasjon lagret for bruker {}. Aktive databaser: {}",
+                    bruker, mine.values().stream().filter(DbConnection::isValid).count());
             return "redirect:/" + (konfigurert ? "select/postgres" : "login");
         } catch (Exception e) {
             logger.error("Kunne ikke lagre konfigurasjon: {}", e.getMessage());
             model.addAttribute("feil", "Kunne ikke lagre konfigurasjon: " + e.getMessage());
-            model.addAttribute("config", config);
+            model.addAttribute("config", eksisterende);
+            model.addAttribute("mineTilkoblinger", mine);
+            model.addAttribute("bruker", bruker);
+            model.addAttribute("erAdminBruker", bruker.equals(eksisterende.getAdminUsername()));
             model.addAttribute("alleredeKonfigurert", konfigurert);
             model.addAttribute("redigeringsmodus", konfigurert);
             return "setup";
@@ -142,11 +176,13 @@ public class SetupController {
 
     /** REST-endepunkt for «Test tilkobling»-knappen i skjemaet. */
     @PostMapping("/setup/test")
-    public ResponseEntity<?> testTilkobling(@RequestBody DbConnection tilkobling) {
+    public ResponseEntity<?> testTilkobling(@RequestBody DbConnection tilkobling,
+                                            Authentication authentication) {
         // Tomt passordfelt (sikkerhet: lagret passord vises aldri i skjemaet)
-        // → bruk det lagrede passordet fra konfigurasjonen
+        // → bruk det lagrede passordet fra den INNLOGGEDE brukerens config
         if (tilkobling.getPassword() == null || tilkobling.getPassword().isBlank()) {
-            DbConnection lagret = configService.load().getConnection(tilkobling.getRdbms());
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection lagret = configService.load().getConnection(tilkobling.getRdbms(), bruker);
             if (lagret != null && lagret.getPassword() != null && !lagret.getPassword().isBlank()) {
                 tilkobling.setPassword(lagret.getPassword());
             }
@@ -160,10 +196,10 @@ public class SetupController {
     }
 
     /** Tester alle konfigurerte tilkoblinger og returnerer status per RDBMS. */
-    private Map<String, String> testAlleTilkoblinger(AppConfig config) {
+    private Map<String, String> testAlleTilkoblinger(Map<String, DbConnection> mine) {
         Map<String, String> status = new LinkedHashMap<>();
         for (String rdbms : RDBMSER) {
-            DbConnection c = config.getConnection(rdbms);
+            DbConnection c = mine.get(rdbms);
             if (c != null && c.isValid()) {
                 String feil = dao.testConnection(c);
                 status.put(rdbms, feil == null ? "OK" : feil);
@@ -174,10 +210,11 @@ public class SetupController {
         return status;
     }
 
-    /** Er innlogget bruker admin (ROLE_ADMIN)? */
-    private boolean erAdmin(Authentication authentication) {
-        return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+    /** Er en reell innlogget bruker (ikke anonymous)? */
+    private boolean erInnlogget(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken);
     }
 
     private DbConnection byggTilkobling(String rdbms, Map<String, String> p, AppConfig eksisterende) {
@@ -197,13 +234,6 @@ public class SetupController {
         }
         c.setPassword(passord);
         return c;
-    }
-
-    private AppConfig fyllConfigMed(String adminUsername, Map<String, DbConnection> conns) {
-        AppConfig cfg = new AppConfig();
-        cfg.setAdminUsername(adminUsername);
-        cfg.setConnections(conns);
-        return cfg;
     }
 
     private String str(Map<String, String> p, String nøkkel) {

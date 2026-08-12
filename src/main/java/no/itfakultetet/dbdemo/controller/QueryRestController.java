@@ -104,9 +104,10 @@ public class QueryRestController {
             }
         }
 
-        // Vanlige RDBMS-er: lese-tilkobling fra config
+        // Vanlige RDBMS-er: tilkobling fra DEN INNLOGGEDE BRUKERENS config
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             Dao.QueryResult resultat = dao.executeQuery(conn, db, query);
             return ResponseEntity.ok(Map.of(
                     "header", resultat.header(),

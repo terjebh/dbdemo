@@ -79,7 +79,15 @@ public class ConfigService {
         logger.info("Konfigurasjon lagret til {}", configPath);
     }
 
-    /** Henter tilkoblingen for en RDBMS (postgres/microsoft/oracle/mysql), eller null. */
+    /**
+     * Henter tilkoblingen for en RDBMS sett fra én brukers ståsted
+     * (egne tilkoblinger først, deretter felles/global som fallback).
+     */
+    public DbConnection getConnection(String rdbms, String brukernavn) {
+        return load().getConnection(rdbms, brukernavn);
+    }
+
+    /** Henter tilkoblingen for en RDBMS fra felles/global config (første-admin). */
     public DbConnection getConnection(String rdbms) {
         return load().getConnection(rdbms);
     }

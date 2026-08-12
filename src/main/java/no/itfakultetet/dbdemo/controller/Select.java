@@ -4,6 +4,7 @@ import no.itfakultetet.dbdemo.model.Dao;
 import no.itfakultetet.dbdemo.model.DbConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,11 @@ public class Select {
     @GetMapping(value = "/select/{rdbms_sti}")
     public String hentSql(Model model, @PathVariable("rdbms_sti") String rdbms_sti,
                           @RequestParam(value = "db", required = false) String db,
-                          @CookieValue(value = "skin", defaultValue = "agate") String skin) {
+                          @CookieValue(value = "skin", defaultValue = "agate") String skin,
+                          Authentication authentication) {
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             // Forhåndsvelg databasen fra tilkoblingsskjemaet hvis ingen er valgt
             if (db == null || db.isBlank()) {
                 db = conn.getDatabase();
@@ -48,7 +51,8 @@ public class Select {
     public String hentData(Model model,
            @PathVariable("rdbms_sti") String rdbms_sti,
            @RequestParam(value = "db") String db,
-           @RequestParam(value = "query") String query) {
+           @RequestParam(value = "query") String query,
+           Authentication authentication) {
 
         model.addAttribute("rdbms", ConnectionHelper.rdbmsNavn(rdbms_sti));
         model.addAttribute("rdbms_sti", rdbms_sti);
@@ -56,7 +60,8 @@ public class Select {
         model.addAttribute("db", db);
 
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             Dao.QueryResult resultat = dao.executeQuery(conn, db, query);
             model.addAttribute("tableHeader", resultat.header());
             model.addAttribute("tableContent", resultat.rows());

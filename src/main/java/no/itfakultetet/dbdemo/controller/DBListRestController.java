@@ -37,7 +37,8 @@ public class DBListRestController {
             return ResponseEntity.ok(sqliteService.listDatabaser(bruker));
         }
         try {
-            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti);
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
             List<String> dbListe = dao.getDatabases(conn);
             return ResponseEntity.ok(dbListe);
         } catch (SQLException e) {

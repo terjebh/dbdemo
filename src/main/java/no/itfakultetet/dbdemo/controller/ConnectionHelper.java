@@ -17,7 +17,24 @@ public class ConnectionHelper {
         this.configService = configService;
     }
 
-    /** Henter tilkoblingen for en RDBMS-sti; kaster IllegalArgumentException hvis ikke konfigurert. */
+    /**
+     * Henter tilkoblingen for en RDBMS-sti sett fra én brukers ståsted
+     * (egne tilkoblinger først, felles som fallback); kaster
+     * IllegalArgumentException hvis ikke konfigurert.
+     */
+    public DbConnection hentEllerFeil(String rdbmsSti, String brukernavn) {
+        DbConnection conn = configService.getConnection(rdbmsSti, brukernavn);
+        if (conn == null) {
+            throw new IllegalArgumentException("Ukjent databasehåndteringssystem: " + rdbmsSti);
+        }
+        if (!conn.isEnabled() || !conn.isValid()) {
+            throw new IllegalArgumentException("Databasehåndteringssystemet er ikke konfigurert: " + rdbmsSti
+                    + ". Gå til /setup for å fylle inn tilkoblingsinformasjon.");
+        }
+        return conn;
+    }
+
+    /** Henter tilkoblingen fra felles/global config (bakoverkompatibel). */
     public DbConnection hentEllerFeil(String rdbmsSti) {
         DbConnection conn = configService.getConnection(rdbmsSti);
         if (conn == null) {
