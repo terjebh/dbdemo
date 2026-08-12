@@ -1046,6 +1046,18 @@ function handleOnDocumentLoaded() {
     xtermInstans.open(terminalContainer);
     xtermInstans.focus();
 
+    // Ctrl+Shift+PilOpp/Ned = fontstørrelse (samme som i SQL-vinduet)
+    xtermInstans.attachCustomKeyEventHandler((e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        const ny = xtermInstans.options.fontSize + (e.key === "ArrowUp" ? 2 : -2);
+        if (ny >= 8 && ny <= 28) {
+          xtermInstans.options.fontSize = ny;
+        }
+        return false; // ikke send til serveren
+      }
+      return true;
+    });
+
     // WebSocket til serveren (samme origin — krever innlogging)
     const proto = location.protocol === "https:" ? "wss" : "ws";
     terminalWs = new WebSocket(`${proto}://${location.host}/ws/terminal`);
@@ -1053,6 +1065,9 @@ function handleOnDocumentLoaded() {
       xtermInstans.writeln("\x1b[32mTerminal klar — lokal shell i containeren.\x1b[0m");
       xtermInstans.writeln("\x1b[33mKoble til f.eks.: ssh bruker@vert  |  psql -h vert -U bruker\x1b[0m");
       xtermInstans.writeln("");
+      // Send terminalens faktiske størrelse → PTY-en blir like stor som
+      // vinduet (ellers er den bare skrivbar i 80×24)
+      sendTerminalResize();
     };
     terminalWs.onmessage = (ev) => xtermInstans.write(ev.data);
     terminalWs.onclose = () => {
@@ -1068,10 +1083,24 @@ function handleOnDocumentLoaded() {
         terminalWs.send(data);
       }
     });
-    // Tilpass størrelsen når panelet endres
+    // Ved vindustørrelse-endring: oppdater PTY-en så hele vinduet er skrivbart
     xtermInstans.onResize(({ cols, rows }) => {
-      // script/bash håndterer kolonner automatisk; ingen ekstra melding nødvendig
+      if (terminalWs && terminalWs.readyState === WebSocket.OPEN) {
+        terminalWs.send(JSON.stringify({ type: "resize", cols, rows }));
+      }
     });
+  }
+
+  function sendTerminalResize() {
+    if (!xtermInstans || !terminalWs || terminalWs.readyState !== WebSocket.OPEN) return;
+    const dims = xtermInstans._core ? xtermInstans._core._renderService.dimensions : null;
+    if (dims && dims.actualCellWidth > 0 && dims.actualCellHeight > 0) {
+      const w = terminalContainer.clientWidth;
+      const h = terminalContainer.clientHeight;
+      const cols = Math.max(20, Math.floor(w / dims.actualCellWidth));
+      const rows = Math.max(5, Math.floor(h / dims.actualCellHeight));
+      terminalWs.send(JSON.stringify({ type: "resize", cols, rows }));
+    }
   }
 
   function lukkTerminal() {
