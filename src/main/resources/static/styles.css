@@ -100,6 +100,27 @@ main {
     border-color: var(--app-kant);
 }
 
+/* Dropdown-meny (tannhjul) følger temaet */
+.dropdown-menu {
+    background-color: var(--app-flate);
+    color: var(--app-tekst);
+    border-color: var(--app-kant);
+}
+
+.dropdown-menu .dropdown-header {
+    color: var(--app-muted);
+}
+
+.dropdown-menu .dropdown-item {
+    color: var(--app-tekst);
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: var(--app-hover);
+    color: var(--app-tekst);
+}
+
 .alert-info {
     background-color: var(--app-sideflate);
     color: var(--app-tekst);
@@ -463,6 +484,86 @@ main {
 
 .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* ===== Tilkoblingsside: 2 spalter (meny + innhold) ===== */
+.sett-opp-2kol {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.sett-meny {
+    width: 11rem;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sett-meny-knapp {
+    text-align: left;
+    border: 1px solid var(--app-kant);
+    background: var(--app-flate);
+    color: var(--app-tekst);
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+.sett-meny-knapp:hover {
+    background: var(--app-hover);
+}
+
+.sett-meny-knapp.aktiv {
+    background: var(--app-aktiv);
+    color: var(--app-aktiv-tekst);
+    border-color: var(--app-aktiv);
+    font-weight: 600;
+}
+
+.sett-innhold {
+    flex: 1;
+    min-width: 0;
+}
+
+.sett-innhold .db-seksjon {
+    display: none;
+}
+
+.sett-innhold .db-seksjon.synlig {
+    display: block;
+}
+
+/* Mobil: menyen legges horisontalt over innholdet */
+@media only screen and (max-width: 767px) {
+    .sett-opp-2kol {
+        flex-direction: column;
+    }
+    .sett-meny {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .sett-meny-knapp {
+        width: auto;
+        flex: 1 1 auto;
+    }
+}
+
+/* ===== First-run-veiviser: popup (modal) over en tom side ===== */
+.veiviser-modal .modal-content {
+    border-radius: 12px;
+}
+
+.veiviser-bakgrunn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--app-bg);
 }
 
 /* Dra-splitter mellom venstrespalten og høyre kolonne */

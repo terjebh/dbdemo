@@ -168,7 +168,7 @@ function handleOnDocumentLoaded() {
       : editor.state.doc.toString().trim();
 
     if (!q) {
-      visFeil("SQL-spørringen er tom");
+      visFeil(window.dbAppTekster ? window.dbAppTekster().feilTom : "SQL-spørringen er tom");
       return true;
     }
     query.value = q;
@@ -178,7 +178,7 @@ function handleOnDocumentLoaded() {
       : `/rest/kjor/${rdbms}`;
     const body = JSON.stringify({ db: db.value, query: q });
 
-    resultatStatus.textContent = "Kjører …";
+    resultatStatus.textContent = window.dbAppTekster ? window.dbAppTekster().kjorer : "Kjører …";
     console.log("[kjørSQL]", url, body.slice(0, 80));
     fetch(url, {
       method: "POST",
@@ -262,12 +262,15 @@ function handleOnDocumentLoaded() {
         // order: [] = ingen INITIAL sortering, men klikk på kolonneoverskrift
         // sorterer fortsatt (order: false deaktiverer sorteringen helt)
         order: [],
+        // Alle rader som default; velgeren lar deg bytte til 10/25/50
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Alle"]],
-        pageLength: 10,
+        pageLength: -1,
+        // Språk: norsk/engelsk fra i18n.js (flagg-knappen i menyen)
+        language: (window.dbAppTekster ? window.dbAppTekster() : { datatables: {} }).datatables,
       });
       settOppPiltastNavigasjon();
     }
-    resultatStatus.textContent = rader.length + " rader";
+    resultatStatus.textContent = rader.length + " " + (window.dbAppTekster ? window.dbAppTekster().rader : "rader");
     // Resultat vises → feilmeldingen skjules
     feilMelding.style.display = "none";
     resultatInnhold.style.display = "";
@@ -684,6 +687,22 @@ function handleOnDocumentLoaded() {
     return true;
   };
 
+  // Justerer HØYDEN på SQL-feltet (Ctrl+Alt+PilOpp/Ned) — i tillegg til
+  // drag-splitteren. Endringen huskes i localStorage.
+  const justerEditorHoyde = (delta) => {
+    const hoyre = editorContainer.closest(".select-hoyre");
+    if (!hoyre) return true;
+    const rect = hoyre.getBoundingClientRect();
+    const gjeldende = editorContainer.offsetHeight;
+    const ny = Math.min(
+      Math.max(gjeldende + delta, 120),
+      rect.height - 120
+    );
+    editorContainer.style.height = ny + "px";
+    editor.requestMeasure?.();
+    return true;
+  };
+
   const extraKeymap = Prec.high(keymap.of([
     { key: "Ctrl-Enter", run: kjørSQL },
     { key: "Shift-Enter", run: formaterSQL },
@@ -691,6 +710,8 @@ function handleOnDocumentLoaded() {
     { key: "Ctrl-Shift-x", run: lukkAktivFane },
     { key: "Ctrl-Shift-ArrowUp", run: () => ekstraFont(2) },
     { key: "Ctrl-Shift-ArrowDown", run: () => ekstraFont(-2) },
+    { key: "Ctrl-Alt-ArrowUp", run: () => justerEditorHoyde(40) },
+    { key: "Ctrl-Alt-ArrowDown", run: () => justerEditorHoyde(-40) },
   ]));
 
   // Resultat-feltets fontstørrelse: Alt+Shift+PilOpp (større) / PilNed (mindre).
@@ -977,6 +998,7 @@ function handleOnDocumentLoaded() {
 
   skinSelect.onchange = handleOnSkinSelectChange;
   if (systemSelect) systemSelect.onchange = byttSystem;
+  if (window.settOppSprakVelger) settOppSprakVelger();
   settOppDragSplitter();
   settOppTreBreddeSplitter();
   byggTre();

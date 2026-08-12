@@ -3,10 +3,21 @@
 <head>
     <div th:replace="~{head :: head}"></div>
     <style>
-        body { background: #f5f7ff; }
+        body { background: var(--app-bg); }
         .sqlite-kort { max-width: 700px; margin: 2rem auto; }
-        .kort-head { background: #212529; color: #fff; border-radius: 10px 10px 0 0; padding: 1rem 1.5rem; }
-        .kort-body { background: #fff; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 10px 10px; padding: 1.5rem; }
+        .kort-head { background: var(--app-aktiv); color: #fff; border-radius: 10px 10px 0 0; padding: 1rem 1.5rem; }
+        .kort-body { background: var(--app-flate); color: var(--app-tekst); border: 1px solid var(--app-kant); border-top: none; border-radius: 0 0 10px 10px; padding: 1.5rem; }
+        .kort-body h5 { color: var(--app-tekst); }
+        /* Listegruppe følger temaet */
+        .list-group-item {
+            background-color: var(--app-flate);
+            color: var(--app-tekst);
+            border-color: var(--app-kant);
+        }
+        .list-group-item:hover {
+            background-color: var(--app-hover);
+            color: var(--app-tekst);
+        }
     </style>
 </head>
 <body>

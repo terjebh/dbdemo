@@ -4,271 +4,139 @@
     <div th:replace="~{head :: head}"></div>
     <style>
         body { background: var(--app-bg); }
-        .setup-kort { max-width: 900px; margin: 2rem auto; }
+        .setup-kort { max-width: 1000px; margin: 1rem auto; }
         .db-seksjon { border: 1px solid var(--app-kant); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; background: var(--app-flate); }
-        .db-seksjon h5 { display: flex; align-items: center; gap: .5rem; }
+        .db-seksjon h5 { display: flex; align-items: center; gap: .5rem; color: var(--app-tekst); }
         .db-seksjon .form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
         .db-seksjon.deaktivert { opacity: .55; }
         .test-resultat { font-size: .85rem; margin-top: .5rem; }
         .test-resultat.ok { color: #198754; }
         .test-resultat.feil { color: #dc3545; }
         .kort-head { background: var(--app-aktiv); color: #fff; border-radius: 10px 10px 0 0; padding: .9rem 1.25rem; }
+        .kort-head h4 { color: #fff; }
         .kort-body { background: var(--app-flate); color: var(--app-tekst); border: 1px solid var(--app-kant); border-top: none; border-radius: 0 0 10px 10px; padding: 1.5rem; }
+        .kort-body p.text-muted { color: var(--app-muted); }
+        /* Lagre-knappen skal ligge utenfor seksjonene (nederst i høyre kolonne) */
+        .sett-innhold { flex: 1; min-width: 0; }
+        .sett-innhold .db-seksjon { display: none; }
+        .sett-innhold .db-seksjon.synlig { display: block; }
+        /* Popup (first-run): innholdet i en modal */
+        .veiviser-modal .modal-dialog { max-width: 900px; }
+        .veiviser-modal .modal-content { border-radius: 12px; }
+        .veiviser-bakgrunn { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-<main>
+
+<!-- Popup-innhold (first-run): vises i modal når appen ikke er konfigurert -->
+<div th:if="${!alleredeKonfigurert}" class="veiviser-bakgrunn">
     <div class="setup-kort">
-        <div class="kort-head">
-            <h4 class="mb-0" th:text="${redigeringsmodus} ? '🔧 Tilkoblingsinnstillinger' : '👋 Velkommen til DBApp — første gangs oppsett'"></h4>
-        </div>
-        <div class="kort-body">
-            <p class="text-muted" th:text="${redigeringsmodus} ? 'Oppdater tilkoblingsinformasjonen for databasene. Tomme passordfelt betyr at det eksisterende passordet beholdes.' : 'Fyll inn innloggingsinformasjon for admin-brukeren og de databasene du vil knytte appen til. Du kan velge én eller flere — de du ikke fyller ut, er ikke aktive. Informasjonen lagres i en lokal konfigurasjonsfil utenfor repoet.'"></p>
-
-            <div th:if="${alleredeKonfigurert && !redigeringsmodus}" class="alert alert-info">
-                Appen er allerede konfigurert. Gå til <a th:href="@{/login}">innlogging</a>.
-            </div>
-
-            <div th:if="${feil}" class="alert alert-danger" th:text="${feil}"></div>
-
-            <!-- Tilkoblingsstatus -->
-            <div th:if="${tilkoblingsstatus != null && !tilkoblingsstatus.isEmpty()}" class="mb-3">
-                <h6>Tilkoblingsstatus</h6>
-                <ul class="list-unstyled">
-                    <li th:each="entry : ${tilkoblingsstatus}">
-                        <span th:if="${entry.value == 'OK'}" class="text-success">✅</span>
-                        <span th:unless="${entry.value == 'OK'}" class="text-danger">❌</span>
-                        <span th:text="${' ' + entry.key + ': ' + entry.value}"></span>
-                    </li>
-                </ul>
-            </div>
-
-            <form th:if="${!alleredeKonfigurert || redigeringsmodus}" method="post" th:action="@{/setup}">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
-                <!-- Admin-bruker -->
-                <div class="db-seksjon">
-                    <h5>🔐 Admin-bruker</h5>
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-6">
-                            <label class="form-label">Brukernavn</label>
-                            <input type="text" class="form-control" name="adminUsername"
-                                   th:value="${config?.adminUsername}" required autofocus>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="adminPassword"
-                                   th:placeholder="${redigeringsmodus} ? 'Behold eksisterende (tomt = uendret)' : 'Velg et sterkt passord'"
-                                   th:required="${!redigeringsmodus}">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PostgreSQL -->
-                <div class="db-seksjon" id="seksjon-postgres">
-                    <h5>
-                        <input class="form-check-input" type="checkbox" id="enabled_postgres" name="enabled_postgres"
-                               th:checked="${config?.connections?.get('postgres')?.enabled}">
-                        <label class="form-check-label" for="enabled_postgres">🐘 PostgreSQL</label>
-                    </h5>
-                    <div class="row g-3 mt-1 db-felter">
-                        <div class="col-md-3">
-                            <label class="form-label">Vert (host)</label>
-                            <input type="text" class="form-control" name="host_postgres"
-                                   th:value="${config?.connections?.get('postgres')?.host}" placeholder="f.eks. db.eksempel.no">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Port</label>
-                            <input type="number" class="form-control" name="port_postgres"
-                                   th:value="${config?.connections?.get('postgres')?.port}" placeholder="5432">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Database</label>
-                            <input type="text" class="form-control" name="database_postgres"
-                                   th:value="${config?.connections?.get('postgres')?.database}" placeholder="f.eks. hr">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bruker</label>
-                            <input type="text" class="form-control" name="username_postgres"
-                                   th:value="${config?.connections?.get('postgres')?.username}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="password_postgres">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline-success btn-sm mt-2 test-knapp" data-rdbms="postgres">Test tilkobling</button>
-                    <div class="test-resultat" id="resultat-postgres"></div>
-                </div>
-
-                <!-- MySQL/MariaDB -->
-                <div class="db-seksjon" id="seksjon-mysql">
-                    <h5>
-                        <input class="form-check-input" type="checkbox" id="enabled_mysql" name="enabled_mysql"
-                               th:checked="${config?.connections?.get('mysql')?.enabled}">
-                        <label class="form-check-label" for="enabled_mysql">🐬 MySQL / MariaDB</label>
-                    </h5>
-                    <div class="row g-3 mt-1 db-felter">
-                        <div class="col-md-3">
-                            <label class="form-label">Vert (host)</label>
-                            <input type="text" class="form-control" name="host_mysql"
-                                   th:value="${config?.connections?.get('mysql')?.host}" placeholder="f.eks. db.eksempel.no">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Port</label>
-                            <input type="number" class="form-control" name="port_mysql"
-                                   th:value="${config?.connections?.get('mysql')?.port}" placeholder="3306">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Database</label>
-                            <input type="text" class="form-control" name="database_mysql"
-                                   th:value="${config?.connections?.get('mysql')?.database}" placeholder="f.eks. hr">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bruker</label>
-                            <input type="text" class="form-control" name="username_mysql"
-                                   th:value="${config?.connections?.get('mysql')?.username}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="password_mysql">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline-success btn-sm mt-2 test-knapp" data-rdbms="mysql">Test tilkobling</button>
-                    <div class="test-resultat" id="resultat-mysql"></div>
-                </div>
-
-                <!-- Oracle -->
-                <div class="db-seksjon" id="seksjon-oracle">
-                    <h5>
-                        <input class="form-check-input" type="checkbox" id="enabled_oracle" name="enabled_oracle"
-                               th:checked="${config?.connections?.get('oracle')?.enabled}">
-                        <label class="form-check-label" for="enabled_oracle">🏛️ Oracle</label>
-                    </h5>
-                    <div class="row g-3 mt-1 db-felter">
-                        <div class="col-md-3">
-                            <label class="form-label">Vert (host)</label>
-                            <input type="text" class="form-control" name="host_oracle"
-                                   th:value="${config?.connections?.get('oracle')?.host}" placeholder="f.eks. db.eksempel.no">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Port</label>
-                            <input type="number" class="form-control" name="port_oracle"
-                                   th:value="${config?.connections?.get('oracle')?.port}" placeholder="1521">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Service / SID</label>
-                            <input type="text" class="form-control" name="database_oracle"
-                                   th:value="${config?.connections?.get('oracle')?.database}" placeholder="f.eks. HR">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bruker</label>
-                            <input type="text" class="form-control" name="username_oracle"
-                                   th:value="${config?.connections?.get('oracle')?.username}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="password_oracle">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline-success btn-sm mt-2 test-knapp" data-rdbms="oracle">Test tilkobling</button>
-                    <div class="test-resultat" id="resultat-oracle"></div>
-                </div>
-
-                <!-- MS SQL Server -->
-                <div class="db-seksjon" id="seksjon-microsoft">
-                    <h5>
-                        <input class="form-check-input" type="checkbox" id="enabled_microsoft" name="enabled_microsoft"
-                               th:checked="${config?.connections?.get('microsoft')?.enabled}">
-                        <label class="form-check-label" for="enabled_microsoft">🪟 MS SQL Server</label>
-                    </h5>
-                    <div class="row g-3 mt-1 db-felter">
-                        <div class="col-md-3">
-                            <label class="form-label">Vert (host)</label>
-                            <input type="text" class="form-control" name="host_microsoft"
-                                   th:value="${config?.connections?.get('microsoft')?.host}" placeholder="f.eks. db.eksempel.no">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Port</label>
-                            <input type="number" class="form-control" name="port_microsoft"
-                                   th:value="${config?.connections?.get('microsoft')?.port}" placeholder="1433">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Database</label>
-                            <input type="text" class="form-control" name="database_microsoft"
-                                   th:value="${config?.connections?.get('microsoft')?.database}" placeholder="f.eks. hr">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bruker</label>
-                            <input type="text" class="form-control" name="username_microsoft"
-                                   th:value="${config?.connections?.get('microsoft')?.username}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Passord</label>
-                            <input type="password" class="form-control" name="password_microsoft">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-outline-success btn-sm mt-2 test-knapp" data-rdbms="microsoft">Test tilkobling</button>
-                    <div class="test-resultat" id="resultat-microsoft"></div>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-lg w-100"
-                        th:text="${redigeringsmodus} ? '💾 Lagre endringer' : '💾 Lagre og fortsett til innlogging'"></button>
-            </form>
-        </div>
+        <div th:replace="~{setup-innhold :: innhold}"></div>
     </div>
-</main>
+</div>
+
+<!-- Vanlig side (redigeringsmodus): vises når appen er konfigurert -->
+<div th:if="${alleredeKonfigurert}">
+    <div th:replace="~{meny :: meny}"></div>
+    <main>
+        <div class="setup-kort">
+            <div th:replace="~{setup-innhold :: innhold}"></div>
+        </div>
+    </main>
+</div>
+
+
+
+<!-- First-run: åpne skjemaet som popup (modal) -->
+<div th:if="${!alleredeKonfigurert}" class="modal fade veiviser-modal" id="veiviserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" id="veiviserInnhold"></div>
+    </div>
+</div>
 
 <script th:if="${!alleredeKonfigurert}">
-    // Deaktiver/aktiver felter basert på checkbox
-    document.querySelectorAll('.db-seksjon').forEach(seksjon => {
-        const cb = seksjon.querySelector('input[type=checkbox]');
-        const felter = seksjon.querySelector('.db-felter');
-        const oppdater = () => seksjon.classList.toggle('deaktivert', !cb.checked);
-        cb.addEventListener('change', oppdater);
-        oppdater();
+    // Flytt skjemaet inn i modalen og åpne den som popup
+    document.addEventListener("DOMContentLoaded", () => {
+        const kort = document.querySelector(".setup-kort");
+        const innhold = document.getElementById("veiviserInnhold");
+        if (kort && innhold) {
+            innhold.appendChild(kort);
+            const modal = new bootstrap.Modal(document.getElementById("veiviserModal"), { backdrop: "static", keyboard: false });
+            modal.show();
+        }
+        settOppTilkoblingsSide();
     });
+</script>
 
-    // Test tilkobling (AJAX)
-    document.querySelectorAll('.test-knapp').forEach(knapp => {
-        knapp.addEventListener('click', async () => {
-            const rdbms = knapp.dataset.rdbms;
-            const seksjon = document.getElementById('seksjon-' + rdbms);
-            const resultat = document.getElementById('resultat-' + rdbms);
-            const hent = (navn) => seksjon.querySelector('[name="' + navn + '_' + rdbms + '"]').value.trim();
-            const payload = {
-                rdbms: rdbms,
-                host: hent('host'),
-                port: parseInt(hent('port')) || 0,
-                database: hent('database'),
-                username: hent('username'),
-                password: seksjon.querySelector('[name="password_' + rdbms + '"]').value
-            };
-            if (!payload.host || !payload.username || !payload.password) {
-                resultat.className = 'test-resultat feil';
-                resultat.textContent = 'Fyll inn host, bruker og passord først.';
-                return;
-            }
-            resultat.className = 'test-resultat';
-            resultat.textContent = '⏳ Tester tilkobling...';
-            try {
-                const resp = await fetch('/setup/test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value
-                    },
-                    body: JSON.stringify(payload)
-                });
-                const data = await resp.json();
-                resultat.className = 'test-resultat ' + (data.ok ? 'ok' : 'feil');
-                resultat.textContent = (data.ok ? '✅ ' : '❌ ') + data.melding;
-            } catch (e) {
-                resultat.className = 'test-resultat feil';
-                resultat.textContent = '❌ Kunne ikke teste tilkoblingen: ' + e;
-            }
+<script th:if="${alleredeKonfigurert}">
+    document.addEventListener("DOMContentLoaded", settOppTilkoblingsSide);
+</script>
+
+<script>
+    // 2-spaltet oppførsel: venstremeny viser/skjuler seksjoner + test-knapper
+    function settOppTilkoblingsSide() {
+        // Venstremeny: klikk på RDBMS-navn → vis riktig seksjon
+        document.querySelectorAll(".sett-meny-knapp").forEach((knapp) => {
+            knapp.addEventListener("click", () => {
+                document.querySelectorAll(".sett-meny-knapp").forEach((k) => k.classList.remove("aktiv"));
+                knapp.classList.add("aktiv");
+                document.querySelectorAll(".sett-innhold .db-seksjon").forEach((s) => s.classList.remove("synlig"));
+                const seksjon = document.getElementById(knapp.dataset.seksjon);
+                if (seksjon) seksjon.classList.add("synlig");
+            });
         });
-    });
+
+        // Deaktiver/aktiver felter basert på checkbox
+        document.querySelectorAll(".db-seksjon").forEach((seksjon) => {
+            const cb = seksjon.querySelector('input[type=checkbox]');
+            if (!cb) return;
+            const felter = seksjon.querySelector(".db-felter");
+            const oppdater = () => seksjon.classList.toggle("deaktivert", !cb.checked);
+            cb.addEventListener("change", oppdater);
+            oppdater();
+        });
+
+        // Test tilkobling (AJAX)
+        document.querySelectorAll(".test-knapp").forEach((knapp) => {
+            knapp.addEventListener("click", async () => {
+                const rdbms = knapp.dataset.rdbms;
+                const seksjon = document.getElementById("seksjon-" + rdbms);
+                const resultat = document.getElementById("resultat-" + rdbms);
+                const hent = (navn) => seksjon.querySelector('[name="' + navn + '_' + rdbms + '"]').value.trim();
+                const payload = {
+                    rdbms: rdbms,
+                    host: hent("host"),
+                    port: parseInt(hent("port")) || 0,
+                    database: hent("database"),
+                    username: hent("username"),
+                    password: seksjon.querySelector('[name="password_' + rdbms + '"]').value
+                };
+                if (!payload.host || !payload.username || !payload.password) {
+                    resultat.className = "test-resultat feil";
+                    resultat.textContent = "Fyll inn host, bruker og passord først.";
+                    return;
+                }
+                resultat.className = "test-resultat";
+                resultat.textContent = "⏳ Tester tilkobling...";
+                try {
+                    const resp = await fetch("/setup/test", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('input[name="_csrf"]').value
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await resp.json();
+                    resultat.className = "test-resultat " + (data.ok ? "ok" : "feil");
+                    resultat.textContent = (data.ok ? "✅ " : "❌ ") + data.melding;
+                } catch (e) {
+                    resultat.className = "test-resultat feil";
+                    resultat.textContent = "❌ Kunne ikke teste tilkoblingen: " + e;
+                }
+            });
+        });
+    }
 </script>
 </body>
 </html>
