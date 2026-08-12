@@ -42,6 +42,9 @@ public class TerminalWebSocketHandler implements WebSocketHandler {
         // script -qefc gir en pseudo-TTY (nødvendig for ssh/psql-prompt)
         ProcessBuilder pb = new ProcessBuilder("script", "-qefc", "bash", "/dev/null");
         pb.redirectErrorStream(true);
+        // HOME kan være /root i containeren — brukerens hjemmemappe gir
+        // ingen «Permission denied»-klage ved bash-start
+        pb.environment().put("HOME", "/home/appuser");
         Process prosess = pb.start();
         prosesser.put(session.getId(), prosess);
 

@@ -127,8 +127,16 @@ public class Dao {
              Statement st = c.createStatement()) {
             begrens(st);
             long start = System.currentTimeMillis();
-            try (ResultSet rs = st.executeQuery(query)) {
-                long elapsed = System.currentTimeMillis() - start;
+            // execute() håndterer BÅDE SELECT (ResultSet) og DDL/andre
+            // setninger (CREATE/DROP/ALTER VIEW/TABLE gir ingen ResultSet —
+            // executeQuery() ville kastet «No results were returned»).
+            boolean harResultat = st.execute(query);
+            long elapsed = System.currentTimeMillis() - start;
+            if (!harResultat) {
+                logger.info("DDL/oppdatering mot {} tok {} ms (ingen resultatsett)", db, elapsed);
+                return new QueryResult(List.of(), List.of());
+            }
+            try (ResultSet rs = st.getResultSet()) {
                 ResultSetMetaData meta = rs.getMetaData();
                 int kolonner = meta.getColumnCount();
 

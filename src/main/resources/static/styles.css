@@ -12,6 +12,8 @@
     --app-aktiv: #cfe2ff;
     --app-aktiv-tekst: #1a4fa0;
     --app-hover: #e2e6ea;
+    /* Feilmelding (rosa felt): mørk rød tekst i lyst tema */
+    --app-feil-tekst: #842029;
     /* Bootstrap-variabler som må følge temaet (text-muted osv. bruker dem) */
     --bs-secondary-color: #6c757d;
     --bs-body-color: #212529;
@@ -28,6 +30,8 @@
     --app-aktiv: #2b4a7a;
     --app-aktiv-tekst: #a8c8ff;
     --app-hover: #333947;
+    /* Feilmelding (rosa felt): lys rosa tekst i mørkt tema */
+    --app-feil-tekst: #f5c6cb;
     /* Bootstrap-variabler følger mørkt tema */
     --bs-secondary-color: #9aa3b2;
     --bs-body-color: #e6e9ef;
@@ -128,7 +132,7 @@ main {
 
 .alert-danger {
     background-color: rgba(220, 53, 69, 0.15);
-    color: #f5c6cb;
+    color: var(--app-feil-tekst);
     border-color: rgba(220, 53, 69, 0.3);
 }
 
