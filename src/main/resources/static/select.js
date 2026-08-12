@@ -851,11 +851,10 @@ function handleOnDocumentLoaded() {
   function byttSystem() {
     const nytt = systemSelect.value;
     if (!nytt || nytt === rdbms) return;
-    if (nytt === "sqlite") {
-      window.location.href = "/sqlite";
-    } else {
-      window.location.href = `/select/${nytt}`;
-    }
+    // SQLite velges fra nedtrekksmenyen → åpne SQL-editoren med
+    // trestrukturen (databasene vises direkte). Hvis brukeren ikke har
+    // noen SQLite-databaser ennå, redirecter serveren til /sqlite.
+    window.location.href = `/select/${nytt}`;
   }
 
   // ===== Faner: flere SQL-faner knyttet til samme database =====

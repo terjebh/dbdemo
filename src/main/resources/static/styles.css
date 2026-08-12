@@ -14,6 +14,8 @@
     --app-hover: #e2e6ea;
     /* Feilmelding (rosa felt): mørk rød tekst i lyst tema */
     --app-feil-tekst: #842029;
+    /* Suksessmelding (grønt felt): mørk grønn tekst i lyst tema */
+    --app-suksess-tekst: #0f5132;
     /* Bootstrap-variabler som må følge temaet (text-muted osv. bruker dem) */
     --bs-secondary-color: #6c757d;
     --bs-body-color: #212529;
@@ -32,6 +34,8 @@
     --app-hover: #333947;
     /* Feilmelding (rosa felt): lys rosa tekst i mørkt tema */
     --app-feil-tekst: #f5c6cb;
+    /* Suksessmelding (grønt felt): lys grønn tekst i mørkt tema */
+    --app-suksess-tekst: #a3d9b1;
     /* Bootstrap-variabler følger mørkt tema */
     --bs-secondary-color: #9aa3b2;
     --bs-body-color: #e6e9ef;
@@ -134,6 +138,12 @@ main {
     background-color: rgba(220, 53, 69, 0.15);
     color: var(--app-feil-tekst);
     border-color: rgba(220, 53, 69, 0.3);
+}
+
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: var(--app-suksess-tekst);
+    border-color: rgba(25, 135, 84, 0.3);
 }
 
 .alert-info a {
@@ -524,7 +534,7 @@ main {
 }
 
 .sett-meny {
-    width: 11rem;
+    width: 14.5rem;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -541,6 +551,12 @@ main {
     font-size: 0.9rem;
     cursor: pointer;
     width: 100%;
+    /* Navn + status på samme linje (status presset til høyre) */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    white-space: nowrap;
 }
 
 .sett-meny-knapp:hover {
@@ -557,13 +573,13 @@ main {
 /* Status etter RDBMS-navnet i venstremenyen */
 .sett-status {
     display: inline-block;
-    float: right;
     font-size: 0.68rem;
     font-weight: 700;
     border-radius: 4px;
     padding: 0.1rem 0.4rem;
     margin-left: 0.5rem;
     vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .sett-status.ok {
