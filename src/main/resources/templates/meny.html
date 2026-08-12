@@ -12,35 +12,33 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/" sec:authorize="isAuthenticated()" th:text="#{meny.start}">🏠 Start</a></li>
-        <li class="nav-item"><a class="nav-link" href="/sqlite" sec:authorize="isAuthenticated()" th:text="#{meny.sqlite}">🗄️ SQLite</a></li>
-        <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/brukere" th:title="#{meny.brukere.tittel}" th:text="#{meny.brukere}">👥 Brukere</a></li>
+        <li class="nav-item"><a class="nav-link" href="/" sec:authorize="isAuthenticated()"><i class="bi bi-house-door-fill"></i> <span th:text="#{meny.start}">Start</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="/sqlite" sec:authorize="isAuthenticated()"><i class="bi bi-database-fill"></i> <span th:text="#{meny.sqlite}">SQLite</span></a></li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a class="nav-link" href="/brukere" th:title="#{meny.brukere.tittel}"><i class="bi bi-people-fill"></i> <span th:text="#{meny.brukere}">Brukere</span></a></li>
         <!-- ⚙️ Innstillinger (tannhjul): tilkoblinger + plass til flere innstillinger senere -->
         <!-- ALLE innloggede brukere har egne tilkoblinger → tannhjulet vises for alle -->
         <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:title="#{meny.innstillinger}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16" style="vertical-align: -2px;">
-                    <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
-                </svg>
+                <i class="bi bi-gear-fill"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><h6 class="dropdown-header" th:text="#{meny.innstillinger}">Innstillinger</h6></li>
-                <li><a class="dropdown-item" href="/setup" th:text="#{meny.tilkoblinger}">🔌 Tilkoblinger</a></li>
+                <li><a class="dropdown-item" href="/setup"><i class="bi bi-plug-fill"></i> <span th:text="#{meny.tilkoblinger}">Tilkoblinger</span></a></li>
                 <!-- Flere innstillinger kan legges til her senere -->
             </ul>
         </li>
-        <li class="nav-item"><a class="nav-link" href="/om" th:text="#{meny.om}">ℹ️ Om DBApp</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal" th:text="#{meny.hjelp}">❓ Hjelp</a></li>
+        <li class="nav-item"><a class="nav-link" href="/om"><i class="bi bi-info-circle-fill"></i> <span th:text="#{meny.om}">Om DBApp</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal"><i class="bi bi-question-circle-fill"></i> <span th:text="#{meny.hjelp}">Hjelp</span></a></li>
         <!-- 📚 Dokumentasjon: siste versjon av hvert system (åpnes i ny fane) -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="#{meny.dokumentasjon}">📚 Dokumentasjon</a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-book-fill"></i> <span th:text="#{meny.dokumentasjon}">Dokumentasjon</span></a>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><h6 class="dropdown-header" th:text="#{meny.dokumentasjon}">📚 Dokumentasjon</h6></li>
-                <li><a class="dropdown-item" href="https://www.postgresql.org/docs/current/" target="_blank" rel="noopener" th:text="#{meny.dok.postgres}">🐘 PostgreSQL</a></li>
-                <li><a class="dropdown-item" href="https://dev.mysql.com/doc/refman/en/" target="_blank" rel="noopener" th:text="#{meny.dok.mysql}">🐬 MySQL</a></li>
-                <li><a class="dropdown-item" href="https://docs.oracle.com/en/database/oracle/oracle-database/" target="_blank" rel="noopener" th:text="#{meny.dok.oracle}">🏛️ Oracle</a></li>
-                <li><a class="dropdown-item" href="https://learn.microsoft.com/en-us/sql/sql-server/" target="_blank" rel="noopener" th:text="#{meny.dok.mssql}">🪟 MS SQL Server</a></li>
-                <li><a class="dropdown-item" href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener" th:text="#{meny.dok.sqlite}">🗄️ SQLite</a></li>
+                <li><h6 class="dropdown-header" th:text="#{meny.dokumentasjon}">Dokumentasjon</h6></li>
+                <li><a class="dropdown-item" href="https://www.postgresql.org/docs/current/" target="_blank" rel="noopener"><i class="bi bi-database"></i> <span th:text="#{meny.dok.postgres}">PostgreSQL</span></a></li>
+                <li><a class="dropdown-item" href="https://dev.mysql.com/doc/refman/en/" target="_blank" rel="noopener"><i class="bi bi-database"></i> <span th:text="#{meny.dok.mysql}">MySQL</span></a></li>
+                <li><a class="dropdown-item" href="https://docs.oracle.com/en/database/oracle/oracle-database/" target="_blank" rel="noopener"><i class="bi bi-database"></i> <span th:text="#{meny.dok.oracle}">Oracle</span></a></li>
+                <li><a class="dropdown-item" href="https://learn.microsoft.com/en-us/sql/sql-server/" target="_blank" rel="noopener"><i class="bi bi-windows"></i> <span th:text="#{meny.dok.mssql}">MS SQL Server</span></a></li>
+                <li><a class="dropdown-item" href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener"><i class="bi bi-database-fill"></i> <span th:text="#{meny.dok.sqlite}">SQLite</span></a></li>
             </ul>
         </li>
       </ul>
@@ -93,7 +91,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color:#1a4fa0; color:white;">
-        <h5 class="modal-title" id="hjelpModalLabel" th:text="#{hjelp.tittel}">❓ Hjelp — slik bruker du DBApp</h5>
+        <h5 class="modal-title" id="hjelpModalLabel"><i class="bi bi-question-circle-fill"></i> <span th:text="#{hjelp.tittel}">Hjelp — slik bruker du DBApp</span></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" th:aria-label="#{hjelp.lukk}"></button>
       </div>
       <div class="modal-body">
@@ -126,7 +124,7 @@
         <p th:text="#{hjelp.searchpath.tekst}">Kjør «SET search_path TO skjemanavn» én gang — deretter kan du skrive bare tabellnavnet (uten skjema-prefiks) i alle spørringer, helt til du logger ut eller kjører et nytt SET search_path (TO DEFAULT for å tilbakestille).</p>
         <h6 th:text="#{hjelp.toppmeny}">🖥️ Toppmenyen</h6>
         <p th:text="#{hjelp.toppmeny.tekst}">Velg databasesystem og tema (mørk/lys) fra toppmenyen. Resultatet av SQL-kjøringer vises i panelet under editoren — ingen side-reload.</p>
-        <h6 th:text="#{hjelp.sqlite}">🗄️ SQLite</h6>
+        <h6><i class="bi bi-database-fill"></i> <span th:text="#{hjelp.sqlite}">SQLite</span></h6>
         <p th:text="#{hjelp.sqlite.tekst}">Alle brukere kan opprette egne SQLite-databaser med valgfritt navn under menyvalget «SQLite». Databasene er private og lagres per bruker.</p>
         <h6 th:text="#{hjelp.innlogging}">⏱️ Innlogging</h6>
         <p th:text="#{hjelp.innlogging.tekst}">Du forblir innlogget under hele økten (opptil 6 timer) — eller til du logger ut selv.</p>

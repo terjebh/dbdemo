@@ -161,6 +161,23 @@ main {
     font-weight: 500;
 }
 
+/* Bootstrap Icons i toppmenyen: hvit, jevnt justert med teksten */
+.navbar-dark .navbar-nav .nav-link i.bi,
+.navbar-dark .navbar-brand i.bi {
+    font-size: 1.05em;
+    vertical-align: -0.12em;
+    margin-right: 0.25rem;
+}
+
+/* Ikoner i dropdown-menyene (Innstillinger/Dokumentasjon) */
+.dropdown-menu .dropdown-item i.bi {
+    width: 1.2em;
+    margin-right: 0.35rem;
+    text-align: center;
+    vertical-align: -0.1em;
+    color: var(--app-muted);
+}
+
 .navbar-dark .navbar-nav .nav-link:hover {
     color: #d6e4ff;
 }
