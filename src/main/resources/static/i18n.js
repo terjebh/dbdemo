@@ -26,6 +26,8 @@
       kjorer: "Kjører …",
       ingenKolonner: "Spørringen ble utført (ingen rader returnert)",
       ingenFiler: "Ingen lagrede filer",
+      ingenResultat: "Ingen resultat-tabell å lagre",
+      csvLagret: "CSV lastet ned",
       tittel: "Bytt til engelsk",
     },
     en: {
@@ -44,6 +46,8 @@
       kjorer: "Running …",
       ingenKolonner: "Query executed (no rows returned)",
       ingenFiler: "No saved files",
+      ingenResultat: "No result table to save",
+      csvLagret: "CSV downloaded",
       tittel: "Switch to Norwegian",
     },
   };

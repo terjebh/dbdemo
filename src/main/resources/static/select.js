@@ -1281,6 +1281,58 @@ function handleOnDocumentLoaded() {
     apneSqlKnapp.addEventListener("click", lastSqlFilListe);
   }
 
+  // ===== Lagre resultat-tabellen som CSV-fil =====
+  const lagreCsvKnapp = document.getElementById("lagreCsvKnapp");
+
+  // CSV-escaping: sitér verdier med komma, anførselstegn eller linjeskift
+  function csvCelle(verdi) {
+    const s = String(verdi == null ? "" : verdi);
+    if (/[",\n\r]/.test(s)) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  // Eksporterer gjeldende resultat-tabell til en CSV-fil (nedlasting)
+  function eksporterCsv() {
+    const tabell = document.getElementById("resultTable");
+    if (!tabell) {
+      resultatStatus.textContent = window.dbAppTekster ? window.dbAppTekster().ingenResultat : "Ingen resultat-tabell å lagre";
+      return;
+    }
+    const rader = [];
+    // Header: hopp over #-kolonnen (rad-nr-kol)
+    const headerCeller = tabell.querySelectorAll("thead th");
+    rader.push([...headerCeller]
+      .filter((th) => !th.classList.contains("rad-nr-kol"))
+      .map((th) => csvCelle(th.textContent))
+      .join(";"));
+    // Datarader: hopp over første celle (rad-nummer)
+    tabell.querySelectorAll("tbody tr").forEach((tr) => {
+      const celler = [...tr.querySelectorAll("td")]
+        .filter((td) => !td.classList.contains("rad-nr-kol"))
+        .map((td) => csvCelle(td.textContent));
+      rader.push(celler.join(";"));
+    });
+    const csv = "\uFEFF" + rader.join("\r\n"); // BOM for Excel + CRLF
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (rdbms || "resultat") + "-" + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-") + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    resultatStatus.textContent = (window.dbAppTekster ? window.dbAppTekster().csvLagret : "CSV lastet ned") +
+      " (" + (rader.length - 1) + " rader)";
+  }
+
+  if (lagreCsvKnapp) {
+    lagreCsvKnapp.addEventListener("click", eksporterCsv);
+  }
+
   // Ctrl+S = lagre, Ctrl+O = åpne-meny (kun når editoren har fokus)
   editorContainer.addEventListener("keydown", (ev) => {
     if (ev.ctrlKey && ev.key === "s") {

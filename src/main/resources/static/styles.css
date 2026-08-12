@@ -731,6 +731,9 @@ main {
     width: auto !important;
     min-width: 50%;
     color: var(--app-tekst);
+    /* Venstrestilt (DataTables sentrerer ellers smale tabeller) */
+    margin-left: 0;
+    margin-right: auto;
 }
 
 /* Linjenummerering (#-kolonnen): smal, dempet, høyrejustert */
