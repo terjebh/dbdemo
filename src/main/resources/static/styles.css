@@ -280,6 +280,19 @@ main {
 }
 
 /* Fanelinje for flere SQL-faner */
+.fane-linje {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.fane-kjor-knapp {
+    flex-shrink: 0;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
 .fane-liste {
     display: flex;
     align-items: flex-end;

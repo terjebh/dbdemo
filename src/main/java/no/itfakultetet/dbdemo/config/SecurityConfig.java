@@ -63,12 +63,13 @@ public class SecurityConfig {
                         .roles("ADMIN")
                         .build();
             }
-            // Vanlige brukere opprettet av admin
+            // Vanlige brukere opprettet av admin (kan ha rolle ADMIN eller USER)
             String hash = config.getUsers().get(username);
             if (hash != null && !hash.isBlank()) {
+                String rolle = config.rolle(username);
                 return User.withUsername(username)
                         .password(hash)
-                        .roles("USER")
+                        .roles(rolle)
                         .build();
             }
             throw new UsernameNotFoundException("Ukjent bruker: " + username);

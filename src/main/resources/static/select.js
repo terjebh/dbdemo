@@ -1003,6 +1003,16 @@ function handleOnDocumentLoaded() {
   settOppTreBreddeSplitter();
   byggTre();
   renderFaner(); // tegn den første fanen
+
+  // ▶ Kjør-knapp (nettbrett/berøring uten Ctrl-tast) — kjører SQL-en
+  const kjorKnapp = document.getElementById("kjorKnapp");
+  if (kjorKnapp) {
+    kjorKnapp.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      kjørSQL();
+      editor.focus();
+    });
+  }
   // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
   const lagretEditorFont = localStorage.getItem("editorFont");
   if (lagretEditorFont) {

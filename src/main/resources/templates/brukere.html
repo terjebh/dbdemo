@@ -4,10 +4,31 @@
     <div th:replace="~{head :: head}"></div>
     <style>
         body { background: var(--app-bg); }
-        .brukere-kort { max-width: 700px; margin: 2rem auto; }
+        .brukere-kort { max-width: 1000px; margin: 2rem auto; }
         .kort-head { background: var(--app-aktiv); color: #fff; border-radius: 10px 10px 0 0; padding: 1rem 1.5rem; }
         .kort-body { background: var(--app-flate); color: var(--app-tekst); border: 1px solid var(--app-kant); border-top: none; border-radius: 0 0 10px 10px; padding: 1.5rem; }
         .kort-body h5 { color: var(--app-tekst); }
+        /* Tabellen følger temaet (Bootstrap .table-striped er hvit som default) */
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--app-tekst);
+            --bs-table-striped-color: var(--app-tekst);
+            --bs-table-striped-bg: var(--app-sideflate);
+            --bs-table-hover-color: var(--app-tekst);
+            --bs-table-hover-bg: var(--app-hover);
+            --bs-table-border-color: var(--app-kant);
+            color: var(--app-tekst);
+            border-color: var(--app-kant);
+        }
+        .table thead th { color: var(--app-tekst); border-color: var(--app-kant); }
+        .table td { color: var(--app-tekst); border-color: var(--app-kant); vertical-align: middle; }
+        /* Zebra-striping synlig i begge temaer */
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--app-sideflate);
+            color: var(--app-tekst);
+        }
+        .endre-form { display: flex; gap: .35rem; align-items: center; flex-wrap: wrap; }
+        .endre-form .form-control, .endre-form .form-select { width: auto; font-size: .85rem; }
     </style>
 </head>
 <body>
@@ -19,8 +40,8 @@
         </div>
         <div class="kort-body">
             <p class="text-muted">
-                Vanlige brukere kan logge inn og skrive SQL, men får ikke tilgang til
-                tilkoblingsinnstillinger eller brukeradministrasjon.
+                Vanlige brukere kan logge inn og skrive SQL. Brukere med rolle <b>Admin</b> får i tillegg
+                tilgang til tilkoblingsinnstillinger og brukeradministrasjon.
             </p>
 
             <div th:if="${feil}" class="alert alert-danger" th:text="${feil}"></div>
@@ -28,13 +49,19 @@
 
             <!-- Opprett bruker -->
             <h5>Opprett ny bruker</h5>
-            <form method="post" th:action="@{/brukere/opprett}" class="row g-2 mb-4">
+            <form method="post" th:action="@{/brukere/opprett}" class="row g-2 mb-4 align-items-end">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <input type="text" class="form-control" name="brukernavn" placeholder="Brukernavn" required>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <input type="password" class="form-control" name="passord" placeholder="Passord" required>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="rolle">
+                        <option value="USER">Bruker</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">➕ Opprett</button>
@@ -48,18 +75,45 @@
                 <tr>
                     <th>Brukernavn</th>
                     <th>Rolle</th>
+                    <th>Endre passord / rolle</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
+                <!-- Admin-brukeren (fra first-run): kun passordendring -->
                 <tr>
                     <td th:text="${adminBruker}"></td>
                     <td><span class="badge bg-danger">Admin</span></td>
+                    <td>
+                        <form method="post" th:action="@{/brukere/endre}" class="endre-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="brukernavn" th:value="${adminBruker}"/>
+                            <input type="hidden" name="rolle" value="ADMIN"/>
+                            <input type="password" class="form-control" name="passord" placeholder="Nytt passord" style="max-width:150px;">
+                            <button type="submit" class="btn btn-outline-primary btn-sm">💾 Endre passord</button>
+                        </form>
+                    </td>
                     <td></td>
                 </tr>
+                <!-- Vanlige brukere: passord + rolle -->
                 <tr th:each="entry : ${brukere}">
                     <td th:text="${entry.key}"></td>
-                    <td><span class="badge bg-secondary">Bruker</span></td>
+                    <td>
+                        <span th:if="${roller[entry.key] == 'ADMIN'}" class="badge bg-danger">Admin</span>
+                        <span th:unless="${roller[entry.key] == 'ADMIN'}" class="badge bg-secondary">Bruker</span>
+                    </td>
+                    <td>
+                        <form method="post" th:action="@{/brukere/endre}" class="endre-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="brukernavn" th:value="${entry.key}"/>
+                            <input type="password" class="form-control" name="passord" placeholder="Nytt passord (tomt = behold)" style="max-width:170px;">
+                            <select class="form-select" name="rolle">
+                                <option value="USER" th:selected="${roller[entry.key] != 'ADMIN'}">Bruker</option>
+                                <option value="ADMIN" th:selected="${roller[entry.key] == 'ADMIN'}">Admin</option>
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">💾 Lagre</button>
+                        </form>
+                    </td>
                     <td>
                         <form method="post" th:action="@{/brukere/slett}"
                               onsubmit="return confirm('Slett brukeren «' + '${entry.key}' + '»?');">

@@ -60,7 +60,17 @@
                 <input type="hidden" id="rdbms_sti" th:value="${rdbms_sti}"/>
                 <input type="hidden" id="query" name="query" th:value="${query}"/>
                 <!-- Fanelinje: flere SQL-faner (Ctrl+Shift+N ny, Ctrl+Shift+X lukk) -->
-                <div id="faneListe" class="fane-liste" title="SQL-faner — Ctrl+Shift+N: ny fane, Ctrl+Shift+X: lukk fane"></div>
+                <div class="fane-linje">
+                    <div id="faneListe" class="fane-liste" title="SQL-faner — Ctrl+Shift+N: ny fane, Ctrl+Shift+X: lukk fane"></div>
+                    <!-- Kjør-knapp (▶) — for nettbrett/berøringsskjermer uten Ctrl-tast -->
+                    <button type="button" id="kjorKnapp" class="btn btn-success btn-sm fane-kjor-knapp"
+                            title="Kjør SQL (Ctrl+Enter)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:-2px;">
+                            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                        </svg>
+                        <span class="d-none d-sm-inline">Kjør</span>
+                    </button>
+                </div>
                 <div id="editorContainer"></div>
             </form>
 

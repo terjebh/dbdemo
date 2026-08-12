@@ -25,6 +25,13 @@ public class AppConfig {
      */
     private Map<String, String> users = new LinkedHashMap<>();
 
+    /**
+     * Roller for vanlige brukere: brukernavn → "ADMIN" eller "USER".
+     * Brukere som ikke står i kartet er USER (default). Admin-brukeren
+     * (adminUsername) er alltid ADMIN.
+     */
+    private Map<String, String> roller = new LinkedHashMap<>();
+
     public Map<String, String> getUsers() {
         if (users == null) {
             users = new LinkedHashMap<>();
@@ -34,6 +41,26 @@ public class AppConfig {
 
     public void setUsers(Map<String, String> users) {
         this.users = users;
+    }
+
+    public Map<String, String> getRoller() {
+        if (roller == null) {
+            roller = new LinkedHashMap<>();
+        }
+        return roller;
+    }
+
+    public void setRoller(Map<String, String> roller) {
+        this.roller = roller;
+    }
+
+    /** Rollen til en bruker: ADMIN/USER (admin-brukeren er alltid ADMIN). */
+    public String rolle(String brukernavn) {
+        if (brukernavn != null && brukernavn.equalsIgnoreCase(adminUsername)) {
+            return "ADMIN";
+        }
+        String r = roller.get(brukernavn);
+        return "ADMIN".equals(r) ? "ADMIN" : "USER";
     }
 
     public String getAdminUsername() {
