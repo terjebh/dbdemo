@@ -25,6 +25,7 @@
       feilTom: "SQL-spørringen er tom",
       kjorer: "Kjører …",
       ingenKolonner: "Spørringen ble utført (ingen rader returnert)",
+      ingenFiler: "Ingen lagrede filer",
       tittel: "Bytt til engelsk",
     },
     en: {
@@ -42,6 +43,7 @@
       feilTom: "SQL query is empty",
       kjorer: "Running …",
       ingenKolonner: "Query executed (no rows returned)",
+      ingenFiler: "No saved files",
       tittel: "Switch to Norwegian",
     },
   };

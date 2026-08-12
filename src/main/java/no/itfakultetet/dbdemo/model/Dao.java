@@ -41,8 +41,8 @@ public class Dao {
     @Value("${db.readonly:true}")
     private boolean readOnly;
 
-    /** Resultat av en vilkårlig SQL-spørring: kolonneoverskrifter + rader. */
-    public record QueryResult(List<String> header, List<List<String>> rows) {
+    /** Resultat av en vilkårlig SQL-spørring: kolonneoverskrifter + rader + utførelsestid. */
+    public record QueryResult(List<String> header, List<List<String>> rows, long tidMs) {
     }
 
     /** Standardporter per RDBMS (brukes i setup-skjemaet som forslag). */
@@ -134,7 +134,7 @@ public class Dao {
             long elapsed = System.currentTimeMillis() - start;
             if (!harResultat) {
                 logger.info("DDL/oppdatering mot {} tok {} ms (ingen resultatsett)", db, elapsed);
-                return new QueryResult(List.of(), List.of());
+                return new QueryResult(List.of(), List.of(), elapsed);
             }
             try (ResultSet rs = st.getResultSet()) {
                 ResultSetMetaData meta = rs.getMetaData();
@@ -154,7 +154,7 @@ public class Dao {
                     rader.add(rad);
                 }
                 logger.info("Query mot {} tok {} ms, {} rader", db, elapsed, rader.size());
-                return new QueryResult(header, rader);
+                return new QueryResult(header, rader, elapsed);
             }
         }
     }

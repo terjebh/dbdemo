@@ -695,13 +695,28 @@ main {
     flex: 1;
 }
 
-#resultatStatus {
-    padding: 0.35rem 0.6rem;
+/* Verktøylinje over resultat-tabellen: status + lagre/åpne-knapper */
+.resultat-verktøylinje {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.15rem 0.6rem;
     border-bottom: 1px solid var(--app-kant);
     background: var(--app-sideflate);
     flex-shrink: 0;
+}
+
+#resultatStatus {
+    flex: 1;
+    min-width: 0;
+    padding: 0.2rem 0;
     font-size: 0.9rem;
     color: var(--app-muted);
+}
+
+.resultat-knapper .btn {
+    padding: 0.15rem 0.4rem;
 }
 
 #resultatInnhold {
@@ -711,8 +726,27 @@ main {
 
 #resultatInnhold table.dataTable {
     font-size: var(--resultat-font, 0.85rem);
-    width: 100% !important;
+    /* Smale tabeller fyller ikke hele bredden — kolonnene blir så brede
+       som innholdet krever (pgAdmin4-stil) */
+    width: auto !important;
+    min-width: 50%;
     color: var(--app-tekst);
+}
+
+/* Linjenummerering (#-kolonnen): smal, dempet, høyrejustert */
+#resultatInnhold table.dataTable th.rad-nr-kol,
+#resultatInnhold table.dataTable td.rad-nr-kol {
+    width: 2.2rem;
+    max-width: 2.2rem;
+    text-align: right;
+    color: var(--app-muted);
+    background: var(--app-sideflate);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+}
+
+#resultatInnhold table.dataTable td.rad-nr-kol {
+    border-right: 1px solid var(--app-kant);
 }
 
 /* Resultat-tabellen følger temaet (rader og overskrifter) */

@@ -204,7 +204,7 @@ function handleOnDocumentLoaded() {
           byggTre();
           return;
         }
-        visResultat(data.header || [], data.rows || []);
+        visResultat(data.header || [], data.rows || [], data.tidMs);
       })
       .catch((err) => {
         console.error("[kjørSQL] feil:", err);
@@ -215,7 +215,7 @@ function handleOnDocumentLoaded() {
 
   // Viser resultatet i panelet under editoren (pgAdmin4-stil)
   let dataTable = null;
-  function visResultat(header, rader) {
+  function visResultat(header, rader, tidMs) {
     if (dataTable) {
       dataTable.destroy();
       dataTable = null;
@@ -236,6 +236,11 @@ function handleOnDocumentLoaded() {
 
     const thead = document.createElement("thead");
     const trh = document.createElement("tr");
+    // Linjenummerering: fast #-kolonne først (pgAdmin4-stil)
+    const thNr = document.createElement("th");
+    thNr.className = "rad-nr-kol";
+    settTekst(thNr, "#");
+    trh.appendChild(thNr);
     header.forEach((h) => {
       const th = document.createElement("th");
       settTekst(th, h);
@@ -245,8 +250,12 @@ function handleOnDocumentLoaded() {
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
-    rader.forEach((rad) => {
+    rader.forEach((rad, indeks) => {
       const tr = document.createElement("tr");
+      const tdNr = document.createElement("td");
+      tdNr.className = "rad-nr-kol";
+      settTekst(tdNr, String(indeks + 1));
+      tr.appendChild(tdNr);
       header.forEach((_, i) => {
         const td = document.createElement("td");
         settTekst(td, rad[i]);
@@ -267,13 +276,26 @@ function handleOnDocumentLoaded() {
         pageLength: -1,
         // Språk: norsk/engelsk fra i18n.js (flagg-knappen i menyen)
         language: (window.dbAppTekster ? window.dbAppTekster() : { datatables: {} }).datatables,
+        // Smale tabeller fyller ikke hele bredden (pgAdmin4-stil) —
+        // kolonnene blir så brede som innholdet krever
+        autoWidth: true,
       });
       settOppPiltastNavigasjon();
     }
-    resultatStatus.textContent = rader.length + " " + (window.dbAppTekster ? window.dbAppTekster().rader : "rader");
+    // Antall rader + utførelsestid (pgAdmin4-stil: «X rader, Y ms»)
+    const raderTekst = rader.length + " " + (window.dbAppTekster ? window.dbAppTekster().rader : "rader");
+    resultatStatus.textContent = (tidMs != null && tidMs >= 0)
+      ? raderTekst + ", " + formaterTid(tidMs)
+      : raderTekst;
     // Resultat vises → feilmeldingen skjules
     feilMelding.style.display = "none";
     resultatInnhold.style.display = "";
+  }
+
+  // Formaterer utførelsestid: < 1 s → ms, ellers s med én desimal
+  function formaterTid(tidMs) {
+    if (tidMs < 1000) return tidMs + " ms";
+    return (tidMs / 1000).toFixed(1) + " s";
   }
 
   function visFeil(melding, erTilkoblingsfeil) {
@@ -1158,6 +1180,118 @@ function handleOnDocumentLoaded() {
     // Forhåndsvelg db fra config (databasen markeres i trestrukturen)
     oppdaterSchema(db.value);
   }
+
+  // ===== Lagre/åpne SQL-filer (per bruker, egen mappe på serveren) =====
+  const lagreSqlKnapp = document.getElementById("lagreSqlKnapp");
+  const apneSqlKnapp = document.getElementById("apneSqlKnapp");
+  const sqlFilListe = document.getElementById("sqlFilListe");
+
+  // Hent innholdet i editoren som tekst
+  function hentEditorTekst() {
+    return editor.state.doc.toString();
+  }
+
+  // Sett innholdet i editoren (bevarer fane-dokumentet)
+  function settEditorTekst(tekst) {
+    editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: tekst } });
+  }
+
+  // Last inn fil-listen i åpne-menyen
+  function lastSqlFilListe() {
+    fetch("/rest/sqlfil", { headers: { "X-CSRF-TOKEN": csrfToken } })
+      .then((r) => r.json())
+      .then((filer) => {
+        sqlFilListe.innerHTML = "";
+        if (!Array.isArray(filer) || filer.length === 0) {
+          const li = document.createElement("li");
+          li.className = "dropdown-item text-muted disabled";
+          li.textContent = window.dbAppTekster ? window.dbAppTekster().ingenFiler : "Ingen lagrede filer";
+          sqlFilListe.appendChild(li);
+          return;
+        }
+        filer.forEach((navn) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.className = "dropdown-item d-flex justify-content-between align-items-center gap-2";
+          a.href = "#";
+          const span = document.createElement("span");
+          span.textContent = "🗎 " + navn + ".sql";
+          a.appendChild(span);
+          // Slett-knapp per fil
+          const slette = document.createElement("span");
+          slette.className = "badge text-danger";
+          slette.textContent = "🗑";
+          slette.style.cursor = "pointer";
+          slette.title = "Slett fil";
+          slette.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            if (!confirm("Slett «" + navn + ".sql»?")) return;
+            fetch("/rest/sqlfil/" + encodeURIComponent(navn), {
+              method: "DELETE",
+              headers: { "X-CSRF-TOKEN": csrfToken },
+            }).then(() => lastSqlFilListe());
+          });
+          a.appendChild(slette);
+          a.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            fetch("/rest/sqlfil/" + encodeURIComponent(navn), { headers: { "X-CSRF-TOKEN": csrfToken } })
+              .then((r) => r.json())
+              .then((data) => {
+                if (data && data.innhold != null) {
+                  settEditorTekst(data.innhold);
+                  resultatStatus.textContent = "Åpnet " + navn + ".sql";
+                }
+              });
+          });
+          li.appendChild(a);
+          sqlFilListe.appendChild(li);
+        });
+      })
+      .catch(() => {});
+  }
+
+  if (lagreSqlKnapp) {
+    lagreSqlKnapp.addEventListener("click", () => {
+      const innhold = hentEditorTekst();
+      if (!innhold.trim()) {
+        resultatStatus.textContent = "Ingenting å lagre — skriv SQL først";
+        return;
+      }
+      const navn = prompt("Lagre SQL-fil som (uten .sql):", "sporring1");
+      if (!navn) return;
+      const rent = navn.trim().replace(/\.sql$/i, "");
+      fetch("/rest/sqlfil", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken },
+        body: JSON.stringify({ filnavn: rent, innhold }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.ok) {
+            resultatStatus.textContent = "Lagret " + rent + ".sql";
+            lastSqlFilListe();
+          } else {
+            resultatStatus.textContent = data.feil || "Kunne ikke lagre";
+          }
+        });
+    });
+  }
+  if (apneSqlKnapp) {
+    apneSqlKnapp.addEventListener("click", lastSqlFilListe);
+  }
+
+  // Ctrl+S = lagre, Ctrl+O = åpne-meny (kun når editoren har fokus)
+  editorContainer.addEventListener("keydown", (ev) => {
+    if (ev.ctrlKey && ev.key === "s") {
+      ev.preventDefault();
+      lagreSqlKnapp?.click();
+    } else if (ev.ctrlKey && ev.key === "o") {
+      ev.preventDefault();
+      lastSqlFilListe();
+      apneSqlKnapp?.click();
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", handleOnDocumentLoaded);

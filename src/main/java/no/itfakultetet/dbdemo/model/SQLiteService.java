@@ -36,7 +36,7 @@ public class SQLiteService {
     private int maxRows;
 
     /** Resultat av en SQL-spørring: kolonneoverskrifter + rader. */
-    public record QueryResult(List<String> header, List<List<String>> rows) {
+    public record QueryResult(List<String> header, List<List<String>> rows, long tidMs) {
     }
 
     /** Rot-mappe for SQLite-filer: <config-mappe>/sqlite */
@@ -146,7 +146,7 @@ public class SQLiteService {
                 int endret = st.getUpdateCount();
                 long elapsed = System.currentTimeMillis() - start;
                 logger.info("SQLite {}: {} rader endret på {} ms", navn, endret, elapsed);
-                return new QueryResult(List.of("Antall rader"), List.of(List.of(String.valueOf(Math.max(endret, 0)))));
+                return new QueryResult(List.of("Antall rader"), List.of(List.of(String.valueOf(Math.max(endret, 0)))), elapsed);
             }
 
             try (ResultSet rs = st.getResultSet()) {
@@ -166,7 +166,7 @@ public class SQLiteService {
                 }
                 long elapsed = System.currentTimeMillis() - start;
                 logger.info("SQLite {}: {} rader på {} ms", navn, rader.size(), elapsed);
-                return new QueryResult(header, rader);
+                return new QueryResult(header, rader, elapsed);
             }
         }
     }

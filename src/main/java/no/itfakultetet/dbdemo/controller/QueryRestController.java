@@ -97,7 +97,8 @@ public class QueryRestController {
                 SQLiteService.QueryResult resultat = sqliteService.kjørSQL(bruker, db, query);
                 return ResponseEntity.ok(Map.of(
                         "header", resultat.header(),
-                        "rows", resultat.rows()));
+                        "rows", resultat.rows(),
+                        "tidMs", resultat.tidMs()));
             } catch (SQLException | IllegalArgumentException e) {
                 logger.error("SQLite-feil (db={}): {}", db, e.getMessage());
                 return feilSvar(e.getMessage());
@@ -111,7 +112,8 @@ public class QueryRestController {
             Dao.QueryResult resultat = dao.executeQuery(conn, db, query);
             return ResponseEntity.ok(Map.of(
                     "header", resultat.header(),
-                    "rows", resultat.rows()));
+                    "rows", resultat.rows(),
+                    "tidMs", resultat.tidMs()));
         } catch (SQLException e) {
             logger.error("SQL-feil mot {} (db={}): {}", rdbms_sti, db, e.getMessage());
             return feilSvar(e.getMessage());
