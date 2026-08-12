@@ -76,6 +76,18 @@ public class SQLiteController {
         return "select";
     }
 
+    /** Sletter brukerens SQLite-database (POST pga. CSRF; bekreftelse i skjemaet). */
+    @PostMapping("/{navn}/slett")
+    public String slett(Authentication authentication, @PathVariable("navn") String navn) {
+        String bruker = brukernavn(authentication);
+        try {
+            sqliteService.slettDatabase(bruker, navn);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Kunne ikke slette {} for {}: {}", navn, bruker, e.getMessage());
+        }
+        return "redirect:/sqlite";
+    }
+
     /** Laster ned brukerens SQLite-databasefil (kun egne filer — path-traversal-blokkert). */
     @GetMapping("/{navn}/last-ned")
     public ResponseEntity<org.springframework.core.io.Resource> lastNed(

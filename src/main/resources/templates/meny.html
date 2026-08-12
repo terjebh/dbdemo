@@ -31,6 +31,18 @@
         </li>
         <li class="nav-item"><a class="nav-link" href="/om" th:text="#{meny.om}">ℹ️ Om DBApp</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#hjelpModal" th:text="#{meny.hjelp}">❓ Hjelp</a></li>
+        <!-- 📚 Dokumentasjon: siste versjon av hvert system (åpnes i ny fane) -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="#{meny.dokumentasjon}">📚 Dokumentasjon</a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header" th:text="#{meny.dokumentasjon}">📚 Dokumentasjon</h6></li>
+                <li><a class="dropdown-item" href="https://www.postgresql.org/docs/current/" target="_blank" rel="noopener" th:text="#{meny.dok.postgres}">🐘 PostgreSQL</a></li>
+                <li><a class="dropdown-item" href="https://dev.mysql.com/doc/refman/en/" target="_blank" rel="noopener" th:text="#{meny.dok.mysql}">🐬 MySQL</a></li>
+                <li><a class="dropdown-item" href="https://docs.oracle.com/en/database/oracle/oracle-database/" target="_blank" rel="noopener" th:text="#{meny.dok.oracle}">🏛️ Oracle</a></li>
+                <li><a class="dropdown-item" href="https://learn.microsoft.com/en-us/sql/sql-server/" target="_blank" rel="noopener" th:text="#{meny.dok.mssql}">🪟 MS SQL Server</a></li>
+                <li><a class="dropdown-item" href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener" th:text="#{meny.dok.sqlite}">🗄️ SQLite</a></li>
+            </ul>
+        </li>
       </ul>
 
       <!-- Tema-velger (system-velgeren ligger i venstrespalten på SQL-siden) -->

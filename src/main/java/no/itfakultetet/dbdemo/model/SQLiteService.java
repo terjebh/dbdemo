@@ -117,6 +117,21 @@ public class SQLiteService {
         return DriverManager.getConnection("jdbc:sqlite:" + fil);
     }
 
+    /** Sletter brukerens SQLite-database (kun egne filer — path-traversal-blokkert). */
+    public void slettDatabase(String brukernavn, String navn) {
+        Path fil = databaseFil(brukernavn, navn);
+        if (!Files.exists(fil)) {
+            throw new IllegalArgumentException("Databasen finnes ikke: " + navn);
+        }
+        try {
+            Files.delete(fil);
+            logger.info("SQLite-database slettet: {} for {}", navn, brukernavn);
+        } catch (Exception e) {
+            logger.error("Kunne ikke slette SQLite-database {}: {}", navn, e.getMessage());
+            throw new IllegalArgumentException("Kunne ikke slette databasen: " + e.getMessage());
+        }
+    }
+
     /** Kjører en vilkårlig SQL-spørring mot brukerens database. */
     public QueryResult kjørSQL(String brukernavn, String navn, String query) throws SQLException {
         try (Connection c = koble(brukernavn, navn);
