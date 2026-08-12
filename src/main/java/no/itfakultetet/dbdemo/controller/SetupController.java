@@ -149,7 +149,14 @@ public class SetupController {
             configService.save(eksisterende);
             logger.info("Konfigurasjon lagret for bruker {}. Aktive databaser: {}",
                     bruker, mine.values().stream().filter(DbConnection::isValid).count());
-            return "redirect:/" + (konfigurert ? "select/postgres" : "login");
+            // First-run: man er ikke innlogget ennå → til innlogging.
+            // Redigeringsmodus: bli værende på /setup (med suksess-melding)
+            // slik at brukeren kan legge til flere tilkoblinger — «Lukk»-
+            // knappen sender brukeren videre til appen.
+            if (!konfigurert) {
+                return "redirect:/login";
+            }
+            return "redirect:/setup?lagret=1";
         } catch (Exception e) {
             logger.error("Kunne ikke lagre konfigurasjon: {}", e.getMessage());
             model.addAttribute("feil", "Kunne ikke lagre konfigurasjon: " + e.getMessage());

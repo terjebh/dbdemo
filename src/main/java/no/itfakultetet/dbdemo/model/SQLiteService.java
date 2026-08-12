@@ -67,6 +67,11 @@ public class SQLiteService {
         return brukerMappe(brukernavn).resolve(navn + ".db");
     }
 
+    /** Full sti til en databasefil for nedlasting (validerer, ingen .db-suffix i navnet). */
+    public Path databaseFilUtenSuffix(String brukernavn, String navn) {
+        return databaseFil(brukernavn, navn);
+    }
+
     /** Lister brukerens SQLite-databaser (filnavn uten .db, sortert). */
     public List<String> listDatabaser(String brukernavn) {
         validerNavn(brukernavn, "brukernavn");

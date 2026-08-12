@@ -6,8 +6,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -69,6 +74,31 @@ public class SQLiteController {
         model.addAttribute("db", navn);
         model.addAttribute("selectSide", true);
         return "select";
+    }
+
+    /** Laster ned brukerens SQLite-databasefil (kun egne filer — path-traversal-blokkert). */
+    @GetMapping("/{navn}/last-ned")
+    public ResponseEntity<org.springframework.core.io.Resource> lastNed(
+            Authentication authentication, @PathVariable("navn") String navn) {
+        String bruker = brukernavn(authentication);
+        try {
+            Path fil = sqliteService.databaseFilUtenSuffix(bruker, navn);
+            if (!Files.exists(fil)) {
+                return ResponseEntity.notFound().build();
+            }
+            org.springframework.core.io.Resource ressurs =
+                    new org.springframework.core.io.FileSystemResource(fil);
+            String nedlastingsnavn = navn + ".db";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + nedlastingsnavn + "\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(Files.size(fil))
+                    .body(ressurs);
+        } catch (Exception e) {
+            logger.error("Kunne ikke laste ned {} for {}: {}", navn, bruker, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/{navn}")

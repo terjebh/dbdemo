@@ -13,26 +13,28 @@
 
         <div th:if="${feil}" class="alert alert-danger" th:text="${feil}"></div>
 
+        <div th:if="${param.lagret}" class="alert alert-success" th:text="#{setup.lagret}">Tilkoblingene ble lagret.</div>
+
         <form th:if="${!alleredeKonfigurert || redigeringsmodus}" method="post" th:action="@{/setup}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
             <div class="sett-opp-2kol">
                 <!-- Venstremeny: navn på RDBMS-er med status etter navnet -->
                 <div class="sett-meny">
-                    <button type="button" class="sett-meny-knapp aktiv" data-seksjon="seksjon-admin" th:if="${!alleredeKonfigurert || erAdminBruker}">th:text="#{setup.admin}">🔐 Admin-bruker</button>
-                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-postgres">th:text="#{setup.postgres}">🐘 PostgreSQL
+                    <button type="button" class="sett-meny-knapp aktiv" data-seksjon="seksjon-admin" th:if="${!alleredeKonfigurert || erAdminBruker}" ><span th:text="#{setup.admin}">🔐 Admin-bruker</span></button>
+                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-postgres" ><span th:text="#{setup.postgres}">🐘 PostgreSQL</span>
                         <span th:if="${tilkoblingsstatus['postgres'] == 'OK'}" class="sett-status ok">OK</span>
                         <span th:if="${tilkoblingsstatus['postgres'] != null && tilkoblingsstatus['postgres'] != 'OK'}" class="sett-status feil" th:title="${tilkoblingsstatus['postgres']}">✕</span>
                     </button>
-                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-mysql">th:text="#{setup.mysql}">🐬 MySQL / MariaDB
+                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-mysql" ><span th:text="#{setup.mysql}">🐬 MySQL / MariaDB</span>
                         <span th:if="${tilkoblingsstatus['mysql'] == 'OK'}" class="sett-status ok">OK</span>
                         <span th:if="${tilkoblingsstatus['mysql'] != null && tilkoblingsstatus['mysql'] != 'OK'}" class="sett-status feil" th:title="${tilkoblingsstatus['mysql']}">✕</span>
                     </button>
-                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-oracle">th:text="#{setup.oracle}">🏛️ Oracle
+                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-oracle" ><span th:text="#{setup.oracle}">🏛️ Oracle</span>
                         <span th:if="${tilkoblingsstatus['oracle'] == 'OK'}" class="sett-status ok">OK</span>
                         <span th:if="${tilkoblingsstatus['oracle'] != null && tilkoblingsstatus['oracle'] != 'OK'}" class="sett-status feil" th:title="${tilkoblingsstatus['oracle']}">✕</span>
                     </button>
-                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-microsoft">th:text="#{setup.mssql}">🪟 MS SQL Server
+                    <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-microsoft" ><span th:text="#{setup.mssql}">🪟 MS SQL Server</span>
                         <span th:if="${tilkoblingsstatus['microsoft'] == 'OK'}" class="sett-status ok">OK</span>
                         <span th:if="${tilkoblingsstatus['microsoft'] != null && tilkoblingsstatus['microsoft'] != 'OK'}" class="sett-status feil" th:title="${tilkoblingsstatus['microsoft']}">✕</span>
                     </button>
@@ -166,8 +168,13 @@
                         <div class="test-resultat" id="resultat-microsoft"></div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3"
-                            th:text="${!alleredeKonfigurert} ? #{setup.lagre.forstegang} : #{setup.lagre}"></button>
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1"
+                                th:text="${!alleredeKonfigurert} ? #{setup.lagre.forstegang} : #{setup.lagre}"></button>
+                        <!-- Lukk: sender brukeren videre til appen (første tilgjengelige system) -->
+                        <a th:if="${alleredeKonfigurert}" th:href="@{/}" class="btn btn-outline-secondary btn-lg"
+                           th:text="#{setup.lukk}">✕ Lukk</a>
+                    </div>
                 </div>
             </div>
         </form>

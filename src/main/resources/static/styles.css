@@ -292,7 +292,9 @@ main {
 
 .fane-kjor-knapp {
     flex-shrink: 0;
-    margin-bottom: 4px;
+    /* Ingen nedre marg: align-items: flex-end i .fane-liste justerer
+       knappen mot fanenes nederkant — marg gjorde den høyere enn fanene */
+    margin-bottom: 0;
     border-radius: 4px;
     font-weight: 600;
     /* Matcher fane-headingenes høyde: samme padding+font som .fane */

@@ -52,11 +52,17 @@
             <h5 th:text="#{sqlite.mine}">Mine databaser</h5>
             <p th:if="${databaser.isEmpty()}" class="text-muted" th:text="#{sqlite.ingen}">Ingen databaser ennå — opprett din første over her!</p>
             <div class="list-group" th:unless="${databaser.isEmpty()}">
-                <a th:each="db : ${databaser}" th:href="@{/sqlite/{navn}(navn=${db})}"
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span>🗄️ <span th:text="${db}"></span></span>
-                    <span class="badge bg-primary rounded-pill" th:text="#{sqlite.apne}">Åpne →</span>
-                </a>
+                <div th:each="db : ${databaser}" class="list-group-item d-flex justify-content-between align-items-center">
+                    <a th:href="@{/sqlite/{navn}(navn=${db})}" class="text-decoration-none d-flex align-items-center gap-2">
+                        <span>🗄️ <span th:text="${db}"></span></span>
+                    </a>
+                    <span class="d-flex align-items-center gap-2">
+                        <a th:href="@{/sqlite/{navn}/last-ned(navn=${db})}" class="btn btn-sm btn-outline-secondary"
+                           th:title="#{sqlite.lastNed.tittel}" th:text="#{sqlite.lastNed}">⬇️ Last ned</a>
+                        <a th:href="@{/sqlite/{navn}(navn=${db})}" class="badge bg-primary rounded-pill text-decoration-none"
+                           th:text="#{sqlite.apne}">Åpne →</a>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
