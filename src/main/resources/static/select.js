@@ -695,8 +695,10 @@ function handleOnDocumentLoaded() {
     const rect = hoyre.getBoundingClientRect();
     const gjeldende = editorContainer.offsetHeight;
     const ny = Math.min(
-      Math.max(gjeldende + delta, 120),
-      rect.height - 120
+      // Minimum = én linje kode (~40px), slik at resultat-tabellen kan få
+      // nesten all høyden
+      Math.max(gjeldende + delta, 40),
+      rect.height - 40
     );
     editorContainer.style.height = ny + "px";
     editor.requestMeasure?.();

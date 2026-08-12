@@ -60,8 +60,8 @@
                         <a th:href="@{/sqlite/{navn}/last-ned(navn=${db})}" class="btn btn-sm btn-outline-secondary"
                            th:title="#{sqlite.lastNed.tittel}" th:text="#{sqlite.lastNed}">⬇️ Last ned</a>
                         <form th:action="@{/sqlite/{navn}/slett(navn=${db})}" method="post" class="m-0"
-                              onsubmit="return confirm('⚠️ Slett databasen «' + this.dataset.navn + '»? Dette kan ikke angres!')"
-                              data-navn="${db}">
+                              th:data-navn="${db}"
+                              onsubmit="return confirm('⚠️ Slett databasen «' + this.dataset.navn + '»? Dette kan ikke angres!')">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <button type="submit" class="btn btn-sm btn-outline-danger"
                                     th:title="#{sqlite.slett.tittel}" th:text="#{sqlite.slett}">🗑️ Slett</button>

@@ -67,6 +67,27 @@
   </div>
 </nav>
 
+<script>
+  // Snarvei: «h» åpner/lukker hjelp-vinduet (kun når man IKKE skriver i et felt)
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "h" && e.key !== "H") return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Ikke når man skriver i input/textarea eller i CodeMirror-editoren
+    const aktiv = document.activeElement;
+    if (aktiv && (aktiv.tagName === "INPUT" || aktiv.tagName === "TEXTAREA"
+        || aktiv.tagName === "SELECT" || aktiv.classList.contains("cm-content")
+        || aktiv.closest(".cm-editor"))) return;
+    const modal = document.getElementById("hjelpModal");
+    if (!modal) return;
+    const bsModal = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
+    if (modal.classList.contains("show")) {
+      bsModal.hide();
+    } else {
+      bsModal.show();
+    }
+  });
+</script>
+
 <!-- Hjelp-modal med kort brukerdokumentasjon -->
 <div class="modal fade" id="hjelpModal" tabindex="-1" aria-labelledby="hjelpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
