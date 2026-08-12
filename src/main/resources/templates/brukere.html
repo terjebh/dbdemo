@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
     <style>
@@ -36,11 +36,11 @@
 <main>
     <div class="brukere-kort">
         <div class="kort-head">
-            <h4 class="mb-0">👥 Brukeradministrasjon</h4>
+            <h4 class="mb-0" th:text="#{brukere.tittel}">👥 Brukeradministrasjon</h4>
         </div>
         <div class="kort-body">
-            <p class="text-muted">
-                Vanlige brukere kan logge inn og skrive SQL. Brukere med rolle <b>Admin</b> får i tillegg
+            <p class="text-muted" th:text="#{brukere.leder}">
+                Vanlige brukere kan logge inn og skrive SQL. Brukere med rolle Admin får i tillegg
                 tilgang til tilkoblingsinnstillinger og brukeradministrasjon.
             </p>
 
@@ -48,34 +48,34 @@
             <div th:if="${ok}" class="alert alert-success" th:text="${ok}"></div>
 
             <!-- Opprett bruker -->
-            <h5>Opprett ny bruker</h5>
+            <h5 th:text="#{brukere.opprett}">Opprett ny bruker</h5>
             <form method="post" th:action="@{/brukere/opprett}" class="row g-2 mb-4 align-items-end">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="col-md-4">
-                    <input type="text" class="form-control" name="brukernavn" placeholder="Brukernavn" required>
+                    <input type="text" class="form-control" name="brukernavn" th:placeholder="#{brukere.brukernavn}" required>
                 </div>
                 <div class="col-md-4">
-                    <input type="password" class="form-control" name="passord" placeholder="Passord" required>
+                    <input type="password" class="form-control" name="passord" th:placeholder="#{brukere.passord}" required>
                 </div>
                 <div class="col-md-2">
                     <select class="form-select" name="rolle">
-                        <option value="USER">Bruker</option>
-                        <option value="ADMIN">Admin</option>
+                        <option value="USER" th:text="#{brukere.rolle.bruker}">Bruker</option>
+                        <option value="ADMIN" th:text="#{brukere.rolle.admin}">Admin</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">➕ Opprett</button>
+                    <button type="submit" class="btn btn-primary w-100" th:text="#{brukere.opprettKnapp}">➕ Opprett</button>
                 </div>
             </form>
 
             <!-- Eksisterende brukere -->
-            <h5>Brukere</h5>
+            <h5 th:text="#{brukere.liste}">Brukere</h5>
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Brukernavn</th>
-                    <th>Rolle</th>
-                    <th>Endre passord / rolle</th>
+                    <th th:text="#{brukere.brukernavn}">Brukernavn</th>
+                    <th th:text="#{brukere.rolle}">Rolle</th>
+                    <th th:text="#{brukere.endre}">Endre passord / rolle</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -83,14 +83,14 @@
                 <!-- Admin-brukeren (fra first-run): kun passordendring -->
                 <tr>
                     <td th:text="${adminBruker}"></td>
-                    <td><span class="badge bg-danger">Admin</span></td>
+                    <td><span class="badge bg-danger" th:text="#{brukere.rolle.admin}">Admin</span></td>
                     <td>
                         <form method="post" th:action="@{/brukere/endre}" class="endre-form">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <input type="hidden" name="brukernavn" th:value="${adminBruker}"/>
                             <input type="hidden" name="rolle" value="ADMIN"/>
-                            <input type="password" class="form-control" name="passord" placeholder="Nytt passord" style="max-width:150px;">
-                            <button type="submit" class="btn btn-outline-primary btn-sm">💾 Endre passord</button>
+                            <input type="password" class="form-control" name="passord" th:placeholder="#{brukere.nyttPassord}" style="max-width:150px;">
+                            <button type="submit" class="btn btn-outline-primary btn-sm" th:text="#{brukere.endrePassord}">💾 Endre passord</button>
                         </form>
                     </td>
                     <td></td>
@@ -99,19 +99,19 @@
                 <tr th:each="entry : ${brukere}">
                     <td th:text="${entry.key}"></td>
                     <td>
-                        <span th:if="${roller[entry.key] == 'ADMIN'}" class="badge bg-danger">Admin</span>
-                        <span th:unless="${roller[entry.key] == 'ADMIN'}" class="badge bg-secondary">Bruker</span>
+                        <span th:if="${roller[entry.key] == 'ADMIN'}" class="badge bg-danger" th:text="#{brukere.rolle.admin}">Admin</span>
+                        <span th:unless="${roller[entry.key] == 'ADMIN'}" class="badge bg-secondary" th:text="#{brukere.rolle.bruker}">Bruker</span>
                     </td>
                     <td>
                         <form method="post" th:action="@{/brukere/endre}" class="endre-form">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <input type="hidden" name="brukernavn" th:value="${entry.key}"/>
-                            <input type="password" class="form-control" name="passord" placeholder="Nytt passord (tomt = behold)" style="max-width:170px;">
+                            <input type="password" class="form-control" name="passord" th:placeholder="#{brukere.nyttPassord.tomt}" style="max-width:170px;">
                             <select class="form-select" name="rolle">
-                                <option value="USER" th:selected="${roller[entry.key] != 'ADMIN'}">Bruker</option>
-                                <option value="ADMIN" th:selected="${roller[entry.key] == 'ADMIN'}">Admin</option>
+                                <option value="USER" th:selected="${roller[entry.key] != 'ADMIN'}" th:text="#{brukere.rolle.bruker}">Bruker</option>
+                                <option value="ADMIN" th:selected="${roller[entry.key] == 'ADMIN'}" th:text="#{brukere.rolle.admin}">Admin</option>
                             </select>
-                            <button type="submit" class="btn btn-outline-primary btn-sm">💾 Lagre</button>
+                            <button type="submit" class="btn btn-outline-primary btn-sm" th:text="#{brukere.lagre}">💾 Lagre</button>
                         </form>
                     </td>
                     <td>
@@ -119,13 +119,13 @@
                               onsubmit="return confirm('Slett brukeren «' + '${entry.key}' + '»?');">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <input type="hidden" name="brukernavn" th:value="${entry.key}"/>
-                            <button type="submit" class="btn btn-outline-danger btn-sm">🗑 Slett</button>
+                            <button type="submit" class="btn btn-outline-danger btn-sm" th:text="#{brukere.slett}">🗑 Slett</button>
                         </form>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <p th:if="${brukere.isEmpty()}" class="text-muted">Ingen vanlige brukere ennå.</p>
+            <p th:if="${brukere.isEmpty()}" class="text-muted" th:text="#{brukere.ingen}">Ingen vanlige brukere ennå.</p>
         </div>
     </div>
 </main>

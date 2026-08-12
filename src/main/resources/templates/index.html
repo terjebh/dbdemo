@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
     <script>
@@ -15,15 +15,15 @@
 <main>
     <div class="container-fluid" style="max-width: 900px; margin-top: 1rem;">
         <h1>DBApp</h1>
-        <h4>En enkel app for å hente data fra databaser med SQL.</h4>
+        <h4 th:text="#{om.leder}">En enkel app for å hente data fra databaser med SQL.</h4>
         <div class="card" style="background: var(--app-flate); border: 1px solid var(--app-kant); margin-top: 1rem;">
             <div class="card-body">
-                <h4 class="card-title">ℹ️ Om DBApp</h4>
-                <p>DBApp er et SQL-grensesnitt for undervisning: studentene skriver
-                SQL-spørringer mot flere databasesystemer (PostgreSQL, Microsoft SQL,
-                Oracle, MySQL og SQLite) og får resultatet umiddelbart — uten
-                side-reload.</p>
-                <h5>Teknologier brukt:</h5>
+                <h4 class="card-title" th:text="#{om.tittel}">ℹ️ Om DBApp</h4>
+                <h5 th:text="#{om.hva}">Hva er DBApp?</h5>
+                <p th:text="#{om.hva.tekst}">DBApp er et SQL-grensesnitt for undervisning: studentene skriver SQL-spørringer mot flere databasesystemer (PostgreSQL, Microsoft SQL, Oracle, MySQL og SQLite) og får resultatet umiddelbart — uten side-reload.</p>
+                <h5 th:text="#{om.funksjoner}">Funksjoner</h5>
+                <p th:text="#{om.funksjoner.tekst}">SQL-faner, mørkt/lyst tema, norsk/engelsk språk, autocomplete med Tab, tastatursnarveier og per-bruker SQLite-databaser.</p>
+                <h5 th:text="#{om.teknologi}">Teknologier brukt:</h5>
                 <ul>
                     <li>
                         <a href="https://www.oracle.com/java/technologies/java-se-glance.html"
@@ -42,9 +42,8 @@
                         <a href="https://github.com/sql-formatter-org/sql-formatter" target="_blank">sql-formatter</a>
                     </li>
                 </ul>
-                <p>Koden til denne appen kan hentes herfra: <a href="https://github.com/terjebh/dbdemo" target="_blank">https://github.com/terjebh/dbdemo</a>
-                </p>
-                <p><b>Utvikler:</b> Terje Berg-Hansen</p>
+                <p th:text="#{om.kode.tekst}">Koden til denne appen kan hentes herfra: <a href="https://github.com/terjebh/dbdemo" target="_blank">https://github.com/terjebh/dbdemo</a></p>
+                <p><b>Utvikler / Developer:</b> Terje Berg-Hansen</p>
                 <p>
                     <b>Epost: </b>
                     <a href="mailto:terje@itfakultetet.no">terje@itfakultetet.no</a>

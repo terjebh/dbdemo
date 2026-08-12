@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.1.2/dist/one-dark.min.css"/>
@@ -38,8 +38,8 @@
         <!-- Venstrespalte: trestruktur -->
         <aside id="trePanel">
             <div id="treHeader" class="tre-header">
-                <span>Databaser</span>
-                <select id="systemSelect" class="form-select form-select-sm" title="Velg databasesystem">
+                <span th:text="#{select.databaser}">Databaser</span>
+                <select id="systemSelect" class="form-select form-select-sm" th:title="#{select.velgSystem}">
                     <option th:each="sys : ${systemValg}"
                             th:value="${sys.verdi}"
                             th:selected="${rdbms_sti == sys.verdi}"
@@ -64,11 +64,11 @@
                     <div id="faneListe" class="fane-liste" title="SQL-faner — Ctrl+Shift+N: ny fane, Ctrl+Shift+X: lukk fane"></div>
                     <!-- Kjør-knapp (▶) — for nettbrett/berøringsskjermer uten Ctrl-tast -->
                     <button type="button" id="kjorKnapp" class="btn btn-success btn-sm fane-kjor-knapp"
-                            title="Kjør SQL (Ctrl+Enter)">
+                            th:title="#{select.kjorTittel}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:-2px;">
                             <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
                         </svg>
-                        <span class="d-none d-sm-inline">Kjør</span>
+                        <span class="d-none d-sm-inline" th:text="#{select.kjor}">Kjør</span>
                     </button>
                 </div>
                 <div id="editorContainer"></div>
@@ -81,7 +81,7 @@
                  Feilmeldingen vises her (fyller panelet) når SQL-en feiler,
                  resultat-tabellen ellers. -->
             <div id="resultatPanel">
-                <div id="resultatStatus" class="text-muted small">Kjør en spørring med <i>ctrl+enter</i> — resultatet vises her</div>
+                <div id="resultatStatus" class="text-muted small" th:text="#{select.kjorHint}">Kjør en spørring med <i>ctrl+enter</i> — resultatet vises her</div>
                 <div id="feilmelding" class="alert alert-danger">
                     <th:block th:if="${feil}" th:text="${feil}"/>
                     <th:block th:if="${feil}">

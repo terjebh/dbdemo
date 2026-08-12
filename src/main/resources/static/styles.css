@@ -537,6 +537,28 @@ main {
     font-weight: 600;
 }
 
+/* Status etter RDBMS-navnet i venstremenyen */
+.sett-status {
+    display: inline-block;
+    float: right;
+    font-size: 0.68rem;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.sett-status.ok {
+    background-color: #198754;
+    color: #fff;
+}
+
+.sett-status.feil {
+    background-color: #dc3545;
+    color: #fff;
+}
+
 .sett-innhold {
     flex: 1;
     min-width: 0;

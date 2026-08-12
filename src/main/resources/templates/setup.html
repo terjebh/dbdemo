@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
     <style>
@@ -69,7 +69,10 @@
 </script>
 
 <script th:if="${alleredeKonfigurert}">
-    document.addEventListener("DOMContentLoaded", settOppTilkoblingsSide);
+    // Merk: MÅ wrappes i arrow-funksjon — å sende settOppTilkoblingsSide
+    // direkte evaluerer referansen her, men funksjonen deklareres i et
+    // senere script-element (hoisting virker kun innenfor samme script).
+    document.addEventListener("DOMContentLoaded", () => settOppTilkoblingsSide());
 </script>
 
 <script>
@@ -111,13 +114,14 @@
                     username: hent("username"),
                     password: seksjon.querySelector('[name="password_' + rdbms + '"]').value
                 };
-                if (!payload.host || !payload.username || !payload.password) {
+                if (!payload.host || !payload.username) {
                     resultat.className = "test-resultat feil";
-                    resultat.textContent = "Fyll inn host, bruker og passord først.";
+                    resultat.textContent = knapp.dataset.mangler || "Fyll inn host og bruker først.";
                     return;
                 }
+                // Tomt passord er OK i redigeringsmodus: serveren bruker det lagrede
                 resultat.className = "test-resultat";
-                resultat.textContent = "⏳ Tester tilkobling...";
+                resultat.textContent = knapp.dataset.pagar || "⏳ Tester tilkobling...";
                 try {
                     const resp = await fetch("/setup/test", {
                         method: "POST",

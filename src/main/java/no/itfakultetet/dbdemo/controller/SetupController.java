@@ -143,6 +143,14 @@ public class SetupController {
     /** REST-endepunkt for «Test tilkobling»-knappen i skjemaet. */
     @PostMapping("/setup/test")
     public ResponseEntity<?> testTilkobling(@RequestBody DbConnection tilkobling) {
+        // Tomt passordfelt (sikkerhet: lagret passord vises aldri i skjemaet)
+        // → bruk det lagrede passordet fra konfigurasjonen
+        if (tilkobling.getPassword() == null || tilkobling.getPassword().isBlank()) {
+            DbConnection lagret = configService.load().getConnection(tilkobling.getRdbms());
+            if (lagret != null && lagret.getPassword() != null && !lagret.getPassword().isBlank()) {
+                tilkobling.setPassword(lagret.getPassword());
+            }
+        }
         String feil = dao.testConnection(tilkobling);
         if (feil == null) {
             return ResponseEntity.ok(Map.of("ok", true,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" lang="no" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:replace="~{head :: head}"></div>
     <style>
@@ -13,26 +13,26 @@
 <main>
     <div class="login-kort">
         <div class="kort-head">
-            <h4 class="mb-0">🏦 DBApp — innlogging</h4>
+            <h4 class="mb-0" th:text="#{login.tittel}">🏦 DBApp — innlogging</h4>
         </div>
         <div class="kort-body">
-            <div th:if="${param.error}" class="alert alert-danger">
+            <div th:if="${param.error}" class="alert alert-danger" th:text="#{login.feil}">
                 Feil brukernavn eller passord.
             </div>
-            <div th:if="${param.logout}" class="alert alert-success">
+            <div th:if="${param.logout}" class="alert alert-success" th:text="#{login.utlogget}">
                 Du er nå logget ut.
             </div>
             <form method="post" th:action="@{/login}">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="mb-3">
-                    <label class="form-label" for="username">Brukernavn</label>
+                    <label class="form-label" for="username" th:text="#{login.brukernavn}">Brukernavn</label>
                     <input type="text" class="form-control" id="username" name="username" required autofocus>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="password">Passord</label>
+                    <label class="form-label" for="password" th:text="#{login.passord}">Passord</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Logg inn</button>
+                <button type="submit" class="btn btn-primary w-100" th:text="#{login.knapp}">Logg inn</button>
             </form>
         </div>
     </div>

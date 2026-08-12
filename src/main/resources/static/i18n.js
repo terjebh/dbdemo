@@ -1,8 +1,13 @@
-// ===== Enkel i18n for DBApp (start): Norsk / Engelsk =====
-// Språket lagres i localStorage («no» default). Velges med flagg-knappen
-// i toppmenyen. DataTables-språk + viktige UI-tekster følger valget.
+// ===== i18n for DBApp: Norsk / Engelsk =====
+// Språket styres AV SERVEREN via CookieLocaleResolver (cookie «lang»).
+// Flagg-knappen setter cookien og reloader — da rendrer Thymeleaf alle
+// tekster på nytt (meny, hjelp, om, brukere, sqlite, setup).
+// Denne filen håndterer kun: flagg-knappens utseende + DataTables-språk
+// + et par dynamiske statusmeldinger i select.js.
 (function () {
-  window.dbAppLang = localStorage.getItem("lang") || "no";
+  // Les locale fra serveren (satt i <html lang="...">) eller cookie
+  window.dbAppLang =
+    document.documentElement.lang === "en" ? "en" : "no";
 
   const TEKSTER = {
     no: {
@@ -20,6 +25,7 @@
       feilTom: "SQL-spørringen er tom",
       kjorer: "Kjører …",
       ingenKolonner: "Spørringen ble utført (ingen rader returnert)",
+      tittel: "Bytt til engelsk",
     },
     en: {
       datatables: {
@@ -36,10 +42,17 @@
       feilTom: "SQL query is empty",
       kjorer: "Running …",
       ingenKolonner: "Query executed (no rows returned)",
+      tittel: "Switch to Norwegian",
     },
   };
 
   window.dbAppTekster = () => TEKSTER[window.dbAppLang] || TEKSTER.no;
+
+  // Setter en cookie (ingen path-restriksjon — hele appen)
+  function settCookie(navn, verdi) {
+    document.cookie = navn + "=" + encodeURIComponent(verdi) +
+      "; path=/; max-age=" + (60 * 60 * 24 * 365) + "; SameSite=Lax";
+  }
 
   // Sett flagg-knappen + bytt språk (idempotent — kalles fra både meny-JS
   // og select.js, men listeners skal bare settes ÉN gang)
@@ -50,23 +63,14 @@
     knapp.dataset.sprakSatt = "ja";
     const oppdaterIkon = () => {
       knapp.textContent = window.dbAppLang === "no" ? "🇳🇴" : "🇬🇧";
-      knapp.title = window.dbAppLang === "no" ? "Switch to English" : "Bytt til norsk";
+      knapp.title = window.dbAppTekster().tittel;
     };
     knapp.addEventListener("click", () => {
-      window.dbAppLang = window.dbAppLang === "no" ? "en" : "no";
-      localStorage.setItem("lang", window.dbAppLang);
-      oppdaterIkon();
-      // DataTables finnes allerede → oppdater språket
-      if (window.DataTable) {
-        document.querySelectorAll(".dataTable").forEach((t) => {
-          const dt = window.DataTable.get(t);
-          if (dt) dt.language(window.dbAppTekster().datatables);
-        });
-      }
-      // Last innholdet på nytt så alle tekster bytter
-      if (window.location.pathname.includes("/select/") || window.location.pathname.includes("/sqlite/")) {
-        window.location.reload();
-      }
+      // Bytt språk: sett cookie «lang» og last siden på nytt — serveren
+      // rendrer alle tekster i valgt språk (Spring MessageSource).
+      const nytt = window.dbAppLang === "no" ? "en" : "no";
+      settCookie("lang", nytt);
+      window.location.reload();
     });
     oppdaterIkon();
   };
