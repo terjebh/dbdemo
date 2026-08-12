@@ -205,7 +205,15 @@ function handleOnDocumentLoaded() {
           return;
         }
         skjulFeil();
-        // DDL (CREATE/DROP/ALTER TABLE/VIEW): vis «Tabell X opprettet/slettet»
+        // psql-oppførsel: «SET search_path TO skjema» → vis meldingen
+        if (data.melding) {
+          skjulResultat();
+          feilMelding.style.display = "none";
+          resultatStatus.textContent = data.melding;
+          byggTre();
+          return;
+        }
+        // DDL (CREATE/DROP/ALTER TABLE/VIEW/SCHEMA): vis «Tabell X opprettet/slettet»
         // i stedet for «No results» og oppdater trestrukturen automatisk
         const ddl = analyserDdl(q);
         if (ddl) {

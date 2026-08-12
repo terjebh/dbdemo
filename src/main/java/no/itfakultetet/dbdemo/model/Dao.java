@@ -117,6 +117,14 @@ public class Dao {
      * header + rader. Read-only, timeout og maxRows beskytter serveren.
      */
     public QueryResult executeQuery(DbConnection conn, String db, String query) throws SQLException {
+        return executeQuery(conn, db, query, null);
+    }
+
+    /**
+     * Kjører en vilkårlig SQL-spørring med valgfri search_path (psql-oppførsel:
+     * «SET search_path TO skjema» gjelder for alle påfølgende spørringer).
+     */
+    public QueryResult executeQuery(DbConnection conn, String db, String query, String searchPath) throws SQLException {
         // For Oracle betyr "database" egentlig skjema; URL-en bruker service-navnet.
         // For de andre brukes db direkte i URL-en, så vi lager en kopi med riktig database.
         DbConnection kobling = conn;
@@ -126,6 +134,17 @@ public class Dao {
         try (Connection c = connect(kobling);
              Statement st = c.createStatement()) {
             begrens(st);
+            // psql-oppførsel: sett search_path på tilkoblingen FØR spørringen.
+            // PostgreSQL støtter ikke parameterbinding i SET — men verdien er
+            // allerede strengt validert (kun bokstaver/tall/_.-"$) i
+            // QueryRestController.fangOppSearchPath, så interpolering er trygt.
+            if (searchPath != null && !searchPath.isBlank()
+                    && "postgres".equals(conn.getRdbms())) {
+                String gyldig = searchPath.replaceAll("[^A-Za-z0-9_.\\\"\\-$]", "");
+                if (gyldig.equals(searchPath)) {
+                    st.execute("SET search_path TO " + searchPath);
+                }
+            }
             long start = System.currentTimeMillis();
             // execute() håndterer BÅDE SELECT (ResultSet) og DDL/andre
             // setninger (CREATE/DROP/ALTER VIEW/TABLE gir ingen ResultSet —

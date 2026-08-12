@@ -83,12 +83,26 @@ public class QueryRestController {
     @PostMapping("/rest/kjor/{rdbms_sti}")
     public ResponseEntity<?> kjor(@PathVariable("rdbms_sti") String rdbms_sti,
                                   @RequestBody KjorRequest request,
-                                  Authentication authentication) {
+                                  Authentication authentication,
+                                  jakarta.servlet.http.HttpSession session) {
         if (request == null || request.query() == null || request.query().isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("feil", "SQL-spørringen er tom"));
         }
         String db = request.db() == null ? "" : request.db();
         String query = request.query().trim();
+
+        // psql-oppførsel: «SET search_path TO skjema» lagres i brukerens sesjon
+        // og gjelder for alle påfølgende spørringer (til logout / ny SET).
+        String searchPath = fangOppSearchPath(query);
+        if (searchPath != null) {
+            session.setAttribute("searchPath", searchPath);
+            return ResponseEntity.ok(Map.of(
+                    "header", List.of(),
+                    "rows", List.of(),
+                    "tidMs", 0L,
+                    "melding", "Search_path satt til " + searchPath));
+        }
+        String sattSearchPath = (String) session.getAttribute("searchPath");
 
         // SQLite: kjør mot brukerens egen databasefil
         if ("sqlite".equals(rdbms_sti)) {
@@ -109,7 +123,7 @@ public class QueryRestController {
         try {
             String bruker = authentication == null ? "anonym" : authentication.getName();
             DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
-            Dao.QueryResult resultat = dao.executeQuery(conn, db, query);
+            Dao.QueryResult resultat = dao.executeQuery(conn, db, query, sattSearchPath);
             return ResponseEntity.ok(Map.of(
                     "header", resultat.header(),
                     "rows", resultat.rows(),
@@ -120,5 +134,28 @@ public class QueryRestController {
         } catch (IllegalArgumentException e) {
             return feilSvar(e.getMessage());
         }
+    }
+
+    /**
+     * Gjenkjenner «SET search_path TO skjema» (psql-syntaks). Returnerer
+     * skjemanavnet, eller null hvis spørringen ikke er en slik setning.
+     * Støtter både «TO» og «=», og «DEFAULT» (tilbakestiller).
+     */
+    static String fangOppSearchPath(String query) {
+        if (query == null) return null;
+        // Enkelt-setning: settning må starte med SET search_path
+        String uq = query.trim().toUpperCase(Locale.ROOT);
+        if (!uq.startsWith("SET ") || !uq.contains("SEARCH_PATH")) return null;
+        // Kun rene SET-setninger — ikke midt i annen SQL
+        if (query.contains(";") && !query.trim().endsWith(";")) return null;
+        var m = java.util.regex.Pattern.compile(
+                "^SET\\s+SEARCH_PATH\\s+(?:TO|=)\\s*([A-Za-z0-9_\\\"\\.\\-$]+)\\s*;?$",
+                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(query.trim());
+        if (!m.matches()) return null;
+        String verdi = m.group(1).trim();
+        if (verdi.equalsIgnoreCase("DEFAULT")) {
+            return ""; // tom = tilbakestill
+        }
+        return verdi.replace("\"", "");
     }
 }
