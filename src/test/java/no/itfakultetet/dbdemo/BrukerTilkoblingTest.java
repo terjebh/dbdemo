@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Tester per-bruker tilkoblinger (egne først, global som fallback). */
+/** Tester per-bruker tilkoblinger (kun egne — ingen global fallback). */
 class BrukerTilkoblingTest {
 
     private DbConnection conn(String rdbms, String host) {
@@ -22,40 +22,42 @@ class BrukerTilkoblingTest {
     }
 
     @Test
-    void egneTilkoblingerVinnerOverGlobal() {
+    void egneTilkoblingerBrukesKunForEieren() {
         AppConfig config = new AppConfig();
         config.setAdminUsername("kurs");
-        config.putConnection("postgres", conn("postgres", "felles.no"));
         config.getBrukerTilkoblinger().put("student1",
                 java.util.Map.of("postgres", conn("postgres", "student-eget.no")));
 
+        // student1 ser sin egen
         assertEquals("student-eget.no", config.getConnection("postgres", "student1").getHost());
-        assertEquals("felles.no", config.getConnection("postgres", "kurs").getHost());
+        // kurs har IKKE student1s tilkobling — ingen global fallback
+        assertNull(config.getConnection("postgres", "kurs"));
     }
 
     @Test
-    void globalErFallbackForAlle() {
+    void adminBrukerHarKunEgneTilkoblinger() {
         AppConfig config = new AppConfig();
         config.setAdminUsername("kurs");
-        config.putConnection("postgres", conn("postgres", "felles.no"));
+        config.getBrukerTilkoblinger().put("kurs",
+                java.util.Map.of("postgres", conn("postgres", "admin-eget.no")));
+        config.getBrukerTilkoblinger().put("student1",
+                java.util.Map.of("mysql", conn("mysql", "student-eget.no")));
 
-        // Bruker uten egne tilkoblinger arver felles/global
-        assertEquals("felles.no", config.getConnection("postgres", "student1").getHost());
-        // Uten global → null
+        // Admin-brukerens tilkoblinger gjelder kun for admin-brukeren
+        assertEquals("admin-eget.no", config.getConnection("postgres", "kurs").getHost());
+        assertNull(config.getConnection("postgres", "student1"));
+        assertNull(config.getConnection("mysql", "kurs"));
+    }
+
+    @Test
+    void brukerUtenEgneHarIngenTilkoblinger() {
+        AppConfig config = new AppConfig();
+        config.setAdminUsername("kurs");
+        config.getBrukerTilkoblinger().put("kurs",
+                java.util.Map.of("postgres", conn("postgres", "admin-eget.no")));
+
+        // Ny bruker uten egne tilkoblinger arver INGENTING (heller ikke admin-ens)
+        assertNull(config.getConnection("postgres", "student1"));
         assertNull(config.getConnection("mysql", "student1"));
-    }
-
-    @Test
-    void lagringPerBrukerPaavirkerIkkeAndre() {
-        AppConfig config = new AppConfig();
-        config.setAdminUsername("kurs");
-        config.putConnection("postgres", conn("postgres", "felles.no"));
-
-        config.getBrukerTilkoblinger().put("student1",
-                java.util.Map.of("postgres", conn("postgres", "student-eget.no")));
-
-        // kurs' globale tilkobling er urørt av student1s egne
-        assertEquals("felles.no", config.getConnection("postgres", "kurs").getHost());
-        assertEquals("student-eget.no", config.getConnection("postgres", "student1").getHost());
     }
 }

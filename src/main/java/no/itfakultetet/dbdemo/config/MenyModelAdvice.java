@@ -1,6 +1,8 @@
 package no.itfakultetet.dbdemo.config;
 
 import no.itfakultetet.dbdemo.model.AppConfig;
+import no.itfakultetet.dbdemo.model.DbConnection;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,17 +31,19 @@ public class MenyModelAdvice {
     }
 
     @ModelAttribute("tilgjengeligeSystemer")
-    public List<String> tilgjengeligeSystemer() {
+    public List<String> tilgjengeligeSystemer(Authentication authentication) {
         AppConfig config = configService.load();
-        return no.itfakultetet.dbdemo.controller.HomeController.tilgjengeligeSystemer(config);
+        String bruker = authentication == null ? "anonym" : authentication.getName();
+        Map<String, DbConnection> egne = config.getBrukerTilkoblinger().get(bruker);
+        return no.itfakultetet.dbdemo.controller.HomeController.tilgjengeligeSystemer(egne);
     }
 
     /** Liste av {verdi, navn}-par for system-velgeren i venstrespalten. */
     @ModelAttribute("systemValg")
-    public List<Map<String, String>> systemValg() {
+    public List<Map<String, String>> systemValg(Authentication authentication) {
         Map<String, String> navn = systemNavn();
         List<Map<String, String>> valg = new ArrayList<>();
-        for (String verdi : tilgjengeligeSystemer()) {
+        for (String verdi : tilgjengeligeSystemer(authentication)) {
             Map<String, String> par = new LinkedHashMap<>();
             par.put("verdi", verdi);
             par.put("navn", navn.getOrDefault(verdi, verdi));

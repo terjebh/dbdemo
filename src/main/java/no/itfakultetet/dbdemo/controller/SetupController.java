@@ -62,15 +62,6 @@ public class SetupController {
                 c.setPort(Dao.defaultPort(rdbms));
                 mine.put(rdbms, c);
             }
-            // Første-admin (global config): fyll inn eksisterende verdier
-            if (bruker.equals(config.getAdminUsername())) {
-                for (String rdbms : RDBMSER) {
-                    DbConnection eksisterende = config.getConnection(rdbms);
-                    if (eksisterende != null) {
-                        mine.put(rdbms, eksisterende);
-                    }
-                }
-            }
         }
 
         model.addAttribute("config", config);
@@ -131,7 +122,7 @@ public class SetupController {
         // Bygg brukerens tilkoblinger fra skjemaet
         Map<String, DbConnection> mine = new LinkedHashMap<>();
         for (String rdbms : RDBMSER) {
-            DbConnection c = byggTilkobling(rdbms, alleParametre, eksisterende);
+            DbConnection c = byggTilkobling(rdbms, alleParametre, eksisterende, bruker);
             if (c.isValid()) {
                 // Test tilkoblingen før vi lagrer
                 String feil = dao.testConnection(c);
@@ -150,11 +141,9 @@ public class SetupController {
             }
             mine.put(rdbms, c);
         }
-        // Lagre per bruker (første-admin lagres også som global/fallback)
+        // Lagre per bruker — hver bruker har sine egne tilkoblinger,
+        // og admin-brukerens tilkoblinger gjelder kun for den admin-brukeren.
         eksisterende.getBrukerTilkoblinger().put(bruker, mine);
-        if (bruker.equals(eksisterende.getAdminUsername())) {
-            eksisterende.setConnections(mine);
-        }
 
         try {
             configService.save(eksisterende);
@@ -217,7 +206,7 @@ public class SetupController {
                 && !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken);
     }
 
-    private DbConnection byggTilkobling(String rdbms, Map<String, String> p, AppConfig eksisterende) {
+    private DbConnection byggTilkobling(String rdbms, Map<String, String> p, AppConfig eksisterende, String bruker) {
         DbConnection c = new DbConnection();
         c.setRdbms(rdbms);
         c.setEnabled(bool(p, "enabled_" + rdbms));
@@ -227,7 +216,8 @@ public class SetupController {
         c.setUsername(str(p, "username_" + rdbms));
         String passord = str(p, "password_" + rdbms);
         if (passord.isEmpty() && eksisterende != null) {
-            DbConnection gammel = eksisterende.getConnection(rdbms);
+            // Behold gammelt passord fra DENNE brukerens egne tilkoblinger
+            DbConnection gammel = eksisterende.getConnection(rdbms, bruker);
             if (gammel != null) {
                 passord = gammel.getPassword(); // behold gammelt passord
             }

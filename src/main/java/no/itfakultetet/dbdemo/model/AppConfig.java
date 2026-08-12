@@ -49,17 +49,17 @@ public class AppConfig {
     }
 
     /**
-     * Henter tilkoblingen for en RDBMS sett fra én brukers ståsted:
-     * brukerens EGNE tilkoblinger først, deretter felles/global (som
-     * tilhører første-admin). Returnerer null hvis ingen av dem har den.
+     * Henter tilkoblingen for én bruker (kun brukerens EGNE tilkoblinger).
+     * Returnerer null hvis brukeren ikke har konfigurert denne RDBMS-en.
+     * Merk: det finnes ingen global/ felles fallback — hver bruker (også
+     * admin-brukere) har sine egne tilkoblinger som kun gjelder for dem.
      */
     public DbConnection getConnection(String rdbms, String brukernavn) {
-        Map<String, DbConnection> egen = getBrukerTilkoblinger().get(brukernavn);
-        if (egen != null && egen.containsKey(rdbms)) {
-            return egen.get(rdbms);
+        Map<String, DbConnection> egne = getBrukerTilkoblinger().get(brukernavn);
+        if (egne != null) {
+            return egne.get(rdbms);
         }
-        // Felles tilkoblinger (første-admin / global config) som fallback
-        return connections.get(rdbms);
+        return null;
     }
 
     /**

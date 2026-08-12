@@ -19,7 +19,7 @@
             <div class="sett-opp-2kol">
                 <!-- Venstremeny: navn på RDBMS-er med status etter navnet -->
                 <div class="sett-meny">
-                    <button type="button" class="sett-meny-knapp aktiv" data-seksjon="seksjon-admin">th:text="#{setup.admin}">🔐 Admin-bruker</button>
+                    <button type="button" class="sett-meny-knapp aktiv" data-seksjon="seksjon-admin" th:if="${!alleredeKonfigurert || erAdminBruker}">th:text="#{setup.admin}">🔐 Admin-bruker</button>
                     <button type="button" class="sett-meny-knapp" data-seksjon="seksjon-postgres">th:text="#{setup.postgres}">🐘 PostgreSQL
                         <span th:if="${tilkoblingsstatus['postgres'] == 'OK'}" class="sett-status ok">OK</span>
                         <span th:if="${tilkoblingsstatus['postgres'] != null && tilkoblingsstatus['postgres'] != 'OK'}" class="sett-status feil" th:title="${tilkoblingsstatus['postgres']}">✕</span>

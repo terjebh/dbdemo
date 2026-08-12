@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,13 +60,29 @@ public class ConfigService {
         }
     }
 
-    /** Laster konfigurasjonen; returnerer tom config hvis filen ikke finnes. */
+    /**
+     * Laster konfigurasjonen; returnerer tom config hvis filen ikke finnes.
+     * Migrerer gamle configs: global «connections» → brukerens egne.
+     */
     public AppConfig load() {
         if (!Files.exists(configPath)) {
             return new AppConfig();
         }
         try {
-            return objectMapper.readValue(configPath.toFile(), AppConfig.class);
+            AppConfig cfg = objectMapper.readValue(configPath.toFile(), AppConfig.class);
+            // Migrering: før per-bruker-tilkoblinger lå alt i «connections»
+            // (global). Nå skal alt være per bruker — overfør global til
+            // første-admin hvis brukeren ikke allerede har egne.
+            if (cfg.getAdminUsername() != null && !cfg.getAdminUsername().isBlank()
+                    && cfg.getConnections() != null && !cfg.getConnections().isEmpty()) {
+                String admin = cfg.getAdminUsername().trim();
+                Map<String, DbConnection> egne = cfg.getBrukerTilkoblinger().get(admin);
+                if (egne == null || egne.isEmpty()) {
+                    cfg.getBrukerTilkoblinger().put(admin, new LinkedHashMap<>(cfg.getConnections()));
+                    logger.info("Migrerte globale tilkoblinger til bruker {}", admin);
+                }
+            }
+            return cfg;
         } catch (IOException e) {
             logger.error("Kunne ikke lese {}: {}", configPath, e.getMessage());
             return new AppConfig();
