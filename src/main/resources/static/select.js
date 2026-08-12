@@ -129,22 +129,31 @@ function handleOnDocumentLoaded() {
   // objekttype + navn. Returnerer {type, navn, handling} eller null.
   function analyserDdl(q) {
     const uq = " " + q.toUpperCase().replace(/\s+/g, " ").trim();
-    const navnMønster = "([A-Z0-9_.\\\"$\\-]+)";
+    // Tillater mellomrom i navn (f.eks. "mitt skjema") — første ord er nok
+    // for vanlige navn, men ordene bindes sammen
+    const navnMønster = "([A-Z0-9_.\\\"\\$\\-]+(?:\\s+[A-Z0-9_.\\\"\\$\\-]+)*)";
     const finn = (regex) => {
       const m = uq.match(regex);
       if (!m) return null;
       // Fjern evt. sitat og skjema-prefiks fra navnet (behold siste del)
-      const navn = (m[1] || "").replace(/"/g, "").split(".").pop();
-      return navn;
+      let navn = (m[1] || "").replace(/"/g, "").split(".").pop();
+      // Kutt ved kjente nøkkelord (ALTER TABLE … ADD COLUMN, DROP SCHEMA …
+      // CASCADE, CREATE VIEW … AS …) slik at navnet blir rent
+      navn = navn.replace(/\s+(?:AS|CASCADE|RESTRICT|ADD|COLUMN|SET|DROP|ON|TO|USING|FROM|WITH|ALTER|CREATE|RENAME|TABLESPACE).*$/i, "");
+      return navn.trim();
     };
     let navn = finn(new RegExp("CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?" + navnMønster));
     if (navn) return { type: "Tabell", navn, handling: "opprettet" };
     navn = finn(new RegExp("CREATE\\s+(?:OR\\s+REPLACE\\s+)?VIEW\\s+" + navnMønster));
     if (navn) return { type: "View", navn, handling: "opprettet" };
+    navn = finn(new RegExp("CREATE\\s+SCHEMA\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?" + navnMønster));
+    if (navn) return { type: "Schema", navn, handling: "opprettet" };
     navn = finn(new RegExp("DROP\\s+TABLE\\s+(?:IF\\s+EXISTS\\s+)?" + navnMønster));
     if (navn) return { type: "Tabell", navn, handling: "slettet" };
     navn = finn(new RegExp("DROP\\s+VIEW\\s+(?:IF\\s+EXISTS\\s+)?" + navnMønster));
     if (navn) return { type: "View", navn, handling: "slettet" };
+    navn = finn(new RegExp("DROP\\s+SCHEMA\\s+(?:IF\\s+EXISTS\\s+)?" + navnMønster));
+    if (navn) return { type: "Schema", navn, handling: "slettet" };
     navn = finn(new RegExp("ALTER\\s+TABLE\\s+" + navnMønster));
     if (navn) return { type: "Tabell", navn, handling: "endret" };
     return null;
@@ -460,6 +469,9 @@ function handleOnDocumentLoaded() {
       const type = (rad[2] || "").toLowerCase();
       if (!grupper.has(skjema)) grupper.set(skjema, { tabeller: [], views: [] });
       const g = grupper.get(skjema);
+      // Tomme skjema-rader (CREATE SCHEMA uten tabeller ennå): beholder
+      // skjema-noden, men legger ikke til noen tom tabell
+      if (!navn) return;
       if (type.includes("view")) g.views.push(navn);
       else g.tabeller.push(navn);
     });

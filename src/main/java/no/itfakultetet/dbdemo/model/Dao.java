@@ -282,7 +282,11 @@ public class Dao {
         String sql = switch (rdbms) {
             case "postgres" -> "SELECT table_schema, table_name, table_type FROM information_schema.tables "
                     + "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
-                    + "ORDER BY table_schema, table_type, table_name";
+                    + "UNION ALL "
+                    + // Tomme skjemaer (uten tabeller) vises også i treet
+                    "SELECT schema_name, NULL, 'SCHEMA' FROM information_schema.schemata "
+                    + "WHERE schema_name NOT IN ('pg_catalog','information_schema') "
+                    + "ORDER BY 1, 3, 2";
             case "microsoft" -> "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
                     + "WHERE TABLE_CATALOG = ? ORDER BY TABLE_TYPE";
             case "oracle" -> "SELECT owner, table_name, 'TABLE' FROM all_tables WHERE owner = ? "
