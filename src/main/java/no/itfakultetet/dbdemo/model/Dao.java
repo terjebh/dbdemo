@@ -316,9 +316,13 @@ public class Dao {
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
 
-        // PostgreSQL: databasen ligger i URL-en — koble til den valgte databasen
-        // (ellers hentes tabellene fra config-standarddatabasen, f.eks. hr)
-        DbConnection kobling = "postgres".equals(rdbms) ? kopiMedDatabase(conn, db) : conn;
+        // PostgreSQL/MSSQL: databasen ligger i URL-en — koble til den valgte
+        // databasen (ellers hentes tabellene fra config-standarddatabasen,
+        // f.eks. hr, og TABLE_CATALOG-filtreringen gir ingen rader for
+        // databaser brukeren kun har lesetilgang til). MySQL/Oracle trenger
+        // det ikke — information_schema/all_tables er server-globale.
+        DbConnection kobling = ("postgres".equals(rdbms) || "microsoft".equals(rdbms))
+                ? kopiMedDatabase(conn, db) : conn;
         try (Connection c = connect(kobling);
              PreparedStatement ps = c.prepareStatement(sql)) {
             if ("microsoft".equals(rdbms)) {
@@ -368,8 +372,11 @@ public class Dao {
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
         };
 
-        // PostgreSQL: databasen ligger i URL-en — koble til den valgte databasen
-        DbConnection kobling = "postgres".equals(rdbms) ? kopiMedDatabase(conn, db) : conn;
+        // PostgreSQL/MSSQL: databasen ligger i URL-en — koble til den valgte
+        // databasen (ellers viser INFORMATION_SCHEMA.COLUMNS kun kolonnene i
+        // config-standarddatabasen). MySQL/Oracle er server-globale.
+        DbConnection kobling = ("postgres".equals(rdbms) || "microsoft".equals(rdbms))
+                ? kopiMedDatabase(conn, db) : conn;
         try (Connection c = connect(kobling);
              PreparedStatement ps = c.prepareStatement(sql)) {
             if ("microsoft".equals(rdbms) || "oracle".equals(rdbms) || "mysql".equals(rdbms)) {
