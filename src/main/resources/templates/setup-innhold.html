@@ -15,6 +15,10 @@
 
         <div th:if="${param.lagret}" class="alert alert-success" th:text="#{setup.lagret}">Tilkoblingene ble lagret.</div>
 
+        <div th:if="${param.advarsel}" class="alert alert-warning">
+            <th:block th:text="#{setup.advarsel(${param.advarsel[0]})}">Disse tilkoblingene feilet og ble deaktivert:</th:block>
+        </div>
+
         <form th:if="${!alleredeKonfigurert || redigeringsmodus}" method="post" th:action="@{/setup}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 

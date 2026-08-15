@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,22 +122,22 @@ public class SetupController {
 
         // Bygg brukerens tilkoblinger fra skjemaet
         Map<String, DbConnection> mine = new LinkedHashMap<>();
+        List<String> feilende = new ArrayList<>();
+        String forsteFeil = null;
         for (String rdbms : RDBMSER) {
             DbConnection c = byggTilkobling(rdbms, alleParametre, eksisterende, bruker);
             if (c.isValid()) {
                 // Test tilkoblingen før vi lagrer
                 String feil = dao.testConnection(c);
                 if (feil != null) {
-                    model.addAttribute("feil", "Kunne ikke koble til " + ConnectionHelper.rdbmsNavn(rdbms)
-                            + ": " + feil);
-                    model.addAttribute("config", eksisterende);
-                    model.addAttribute("mineTilkoblinger", mine);
-                    model.addAttribute("bruker", bruker);
-                    model.addAttribute("erAdminBruker", bruker.equals(eksisterende.getAdminUsername()));
-                    model.addAttribute("alleredeKonfigurert", konfigurert);
-                    model.addAttribute("redigeringsmodus", konfigurert);
-                    model.addAttribute("tilkoblingsstatus", testAlleTilkoblinger(mine));
-                    return "setup";
+                    // En feilende tilkobling blokkerer IKKE de andre — den
+                    // deaktiveres og vises som advarsel, slik at brukeren kan
+                    // komme videre med de tilkoblingene som faktisk virker.
+                    c.setEnabled(false);
+                    feilende.add(ConnectionHelper.rdbmsNavn(rdbms));
+                    if (forsteFeil == null) {
+                        forsteFeil = feil;
+                    }
                 }
             }
             mine.put(rdbms, c);
@@ -147,14 +148,22 @@ public class SetupController {
 
         try {
             configService.save(eksisterende);
-            logger.info("Konfigurasjon lagret for bruker {}. Aktive databaser: {}",
-                    bruker, mine.values().stream().filter(DbConnection::isValid).count());
+            logger.info("Konfigurasjon lagret for bruker {}. Aktive databaser: {}{}",
+                    bruker, mine.values().stream().filter(DbConnection::isValid).count(),
+                    feilende.isEmpty() ? "" : ". Feilende (deaktivert): " + feilende);
             // First-run: man er ikke innlogget ennå → til innlogging.
             // Redigeringsmodus: bli værende på /setup (med suksess-melding)
             // slik at brukeren kan legge til flere tilkoblinger — «Lukk»-
             // knappen sender brukeren videre til appen.
             if (!konfigurert) {
                 return "redirect:/login";
+            }
+            if (!feilende.isEmpty()) {
+                // En eller flere tilkoblinger feilet — vis advarsel, men de
+                // andre er lagret, så brukeren kommer videre.
+                return "redirect:/setup?lagret=1&advarsel="
+                        + java.net.URLEncoder.encode(String.join(", ", feilende),
+                        java.nio.charset.StandardCharsets.UTF_8);
             }
             return "redirect:/setup?lagret=1";
         } catch (Exception e) {
