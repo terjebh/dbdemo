@@ -900,6 +900,12 @@ function handleOnDocumentLoaded() {
   function byttSystem() {
     const nytt = systemSelect.value;
     if (!nytt || nytt === rdbms) return;
+    // Terminal-fanen har ikke noe databasesystem — avvis bytte og sett
+    // nedtrekksmenyen tilbake til forrige verdi
+    if (faneTyper[aktivFaneId] === "terminal") {
+      systemSelect.value = rdbms;
+      return;
+    }
     // Lagre innholdet i den aktive fanen før vi bytter system
     faneDokumenter[aktivFaneId] = editor.state.doc.toString();
     rdbms = nytt;
@@ -935,6 +941,9 @@ function handleOnDocumentLoaded() {
   const faneNavn = { 1: "Fane 1" };
   const faneRdbms = { 1: rdbms };
   const faneDb = { 1: db.value || "" };
+  // Fanetype: "sql" (SQL-editor) eller "terminal" (xterm). Terminal-fanen
+  // har ingen SQL-doc — den viser terminalpanelet i stedet for editoren.
+  const faneTyper = { 1: "sql" };
 
   // Bytter editorens innhold til en fanes doc (bevarer fane-referanser)
   function byttFaneDoc(doc) {
@@ -956,10 +965,19 @@ function handleOnDocumentLoaded() {
       fane.className = "fane" + (id === aktivFaneId ? " fane-aktiv" : "");
       fane.title = "Klikk for å aktivere";
       const navn = document.createElement("span");
-      // Vis systemet i fanenavnet, f.eks. «Fane 2 · PostgreSQL» — slik at
-      // man ser hvilken RDBMS hver fane er knyttet til
-      const sysNavn = SYSTEMNAVN[faneRdbms[id]] || "";
-      navn.textContent = (faneNavn[id] || "Fane " + id) + (sysNavn ? " · " + sysNavn : "");
+      if (faneTyper[id] === "terminal") {
+        // Terminal-fane: eget ikon + navn
+        const ik = document.createElement("i");
+        ik.className = "bi bi-terminal-fill";
+        ik.style.marginRight = "4px";
+        fane.appendChild(ik);
+        navn.textContent = faneNavn[id] || "Terminal";
+      } else {
+        // SQL-fane: vis systemet i fanenavnet, f.eks. «Fane 2 · PostgreSQL» —
+        // slik at man ser hvilken RDBMS hver fane er knyttet til
+        const sysNavn = SYSTEMNAVN[faneRdbms[id]] || "";
+        navn.textContent = (faneNavn[id] || "Fane " + id) + (sysNavn ? " · " + sysNavn : "");
+      }
       fane.appendChild(navn);
       const lukk = document.createElement("span");
       lukk.className = "fane-lukk";
@@ -992,6 +1010,7 @@ function handleOnDocumentLoaded() {
     faneNavn[id] = "Fane " + id;
     faneRdbms[id] = rdbms; // ny fane starter i samme system som den aktive
     faneDb[id] = "";
+    faneTyper[id] = "sql";
     aktivFaneId = id;
     db.value = "";
     byttFaneDoc("");
@@ -1007,15 +1026,27 @@ function handleOnDocumentLoaded() {
     const idListe = Object.keys(faneDokumenter).map(Number);
     const idx = idListe.indexOf(id);
     if (idx === -1) return true;
+    const erTerminal = faneTyper[id] === "terminal";
     delete faneDokumenter[id];
     delete faneNavn[id];
     delete faneRdbms[id];
     delete faneDb[id];
+    delete faneTyper[id];
+    if (erTerminal) {
+      // Terminal-fanen lukkes → rydd xterm + WebSocket
+      lukkTerminal();
+      terminalFaneId = null;
+    }
     if (id === aktivFaneId) {
       const nabo = idListe[Math.max(idx - 1, 0)];
       aktivFaneId = nabo;
-      byttFaneDoc(faneDokumenter[nabo] || "");
-      gjenopprettFaneKontekst(nabo);
+      if (faneTyper[nabo] === "terminal") {
+        visTerminalModus();
+      } else {
+        byttFaneDoc(faneDokumenter[nabo] || "");
+        gjenopprettFaneKontekst(nabo);
+        visEditorModus();
+      }
     }
     renderFaner();
     editor.focus();
@@ -1027,8 +1058,13 @@ function handleOnDocumentLoaded() {
     return lukkFane(aktivFaneId);
   }
 
-  // Gjenoppretter system + database for en fane (kalles ved fanebytte)
+  // Gjenoppretter system + database for en fane (kalles ved fanebytte).
+  // For terminal-fanen: vis terminalpanelet (systemet er irrelevant der).
   function gjenopprettFaneKontekst(id) {
+    if (faneTyper[id] === "terminal") {
+      visTerminalModus();
+      return;
+    }
     const fanensSystem = faneRdbms[id] || rdbms;
     if (fanensSystem !== rdbms) {
       rdbms = fanensSystem;
@@ -1040,14 +1076,21 @@ function handleOnDocumentLoaded() {
     const fanensDb = faneDb[id] || "";
     db.value = fanensDb;
     byggTre();
+    visEditorModus();
   }
 
   // Aktiverer en fane: lagrer gjeldende innhold, bytter til valgt fane
-  // — og gjenoppretter fanens system + database
+  // — og gjenoppretter fanens system + database (eller terminalmodus)
   function aktiverFane(id) {
     if (id === aktivFaneId) return;
     faneDokumenter[aktivFaneId] = editor.state.doc.toString();
     aktivFaneId = id;
+    if (faneTyper[id] === "terminal") {
+      // Terminal-fane: ingen SQL-doc å bytte, bare vis terminalen
+      visTerminalModus();
+      renderFaner();
+      return;
+    }
     byttFaneDoc(faneDokumenter[id] || "");
     gjenopprettFaneKontekst(id);
     renderFaner();
@@ -1081,12 +1124,16 @@ function handleOnDocumentLoaded() {
     nesteFane,
     forrigeFane,
     renderFaner,
+    apneTerminal,
+    lukkTerminal,
     getAntall: () => Object.keys(faneDokumenter).length,
     getAktiv: () => aktivFaneId,
     getDokumenter: () => ({ ...faneDokumenter }),
     getRdbms: () => ({ ...faneRdbms }),
     getDb: () => ({ ...faneDb }),
+    getTyper: () => ({ ...faneTyper }),
     getAktivRdbms: () => rdbms,
+    getTerminalFaneId: () => terminalFaneId,
   };
 
   const handleOnSkinSelectChange = function handleOnSkinChange() {
@@ -1114,17 +1161,22 @@ function handleOnDocumentLoaded() {
   }
 
   // ===== Terminal-emulator (xterm.js + WebSocket → bash med PTY) =====
+  // Terminalen lever i EN EGEN FANE (faneTyper[id] === "terminal") — den
+  // forstyrrer ikke SQL-fanene; man kan bytte mellom dem fritt. Terminalen
+  // lukkes først når terminal-fanen lukkes (eller siden lastes på nytt).
   let terminalWs = null;
   let xtermInstans = null;
+  let terminalFaneId = null; // fanen som inneholder terminalen (null = ingen)
   const terminalPanel = document.getElementById("terminalPanel");
   const terminalKnapp = document.getElementById("terminalKnapp");
   const terminalLukk = document.getElementById("terminalLukk");
   const terminalContainer = document.getElementById("terminalContainer");
   const formElement = document.getElementById("sql");
 
-  function apneTerminal() {
-    if (!terminalPanel || !window.Terminal) return;
-    // Skjul editor-området + resultatet, vis terminalpanelet
+  // Viser terminalpanelet (skjuler editor + resultat) — kalles når
+  // terminal-fanen aktiveres
+  function visTerminalModus() {
+    if (!terminalPanel) return;
     terminalPanel.style.display = "flex";
     terminalPanel.style.flexDirection = "column";
     terminalPanel.style.flex = "1";
@@ -1132,7 +1184,25 @@ function handleOnDocumentLoaded() {
     if (formElement) formElement.style.display = "none";
     if (editorSplitter) editorSplitter.style.display = "none";
     if (resultatPanel) resultatPanel.style.display = "none";
-    terminalKnapp.disabled = true;
+    if (xtermInstans) xtermInstans.focus();
+    // Etter at panelet er synlig igjen, oppdater PTY-størrelsen (xterm har
+    // null-dimensjoner mens panelet var skjult)
+    setTimeout(sendTerminalResize, 50);
+  }
+
+  // Viser editor + resultat (skjuler terminalen) — kalles når en SQL-fane
+  // aktiveres. Terminalen (xterm + WS) lever videre i bakgrunnen.
+  function visEditorModus() {
+    if (terminalPanel) terminalPanel.style.display = "none";
+    if (formElement) formElement.style.display = "";
+    if (editorSplitter) editorSplitter.style.display = "";
+    if (resultatPanel) resultatPanel.style.display = "";
+    if (editor) editor.focus();
+  }
+
+  // Oppretter xterm.js + WebSocket — kun første gang terminalen åpnes
+  function opprettTerminal() {
+    if (!terminalPanel || !window.Terminal || xtermInstans) return;
 
     // xterm.js — mørkt tema som matcher appen
     xtermInstans = new Terminal({
@@ -1202,6 +1272,8 @@ function handleOnDocumentLoaded() {
     }
   }
 
+  // Lukker terminalen helt (kalles når terminal-fanen lukkes) — xterm +
+  // WebSocket ryddes; neste åpning starter en fersk terminal
   function lukkTerminal() {
     if (terminalWs) {
       terminalWs.close();
@@ -1212,12 +1284,32 @@ function handleOnDocumentLoaded() {
       xtermInstans = null;
     }
     if (terminalContainer) terminalContainer.innerHTML = "";
-    if (terminalPanel) terminalPanel.style.display = "none";
-    if (formElement) formElement.style.display = "";
-    if (editorSplitter) editorSplitter.style.display = "";
-    if (resultatPanel) resultatPanel.style.display = "";
-    if (terminalKnapp) terminalKnapp.disabled = false;
-    if (editor) editor.focus();
+    terminalFaneId = null;
+    visEditorModus();
+  }
+
+  // Åpner terminalen i EN NY FANE — eksisterende SQL-faner forstyrres ikke.
+  // Hvis terminal-fanen allerede finnes, aktiveres den i stedet.
+  function apneTerminal() {
+    if (!terminalPanel || !window.Terminal) return;
+    if (terminalFaneId != null && faneDokumenter[terminalFaneId] !== undefined) {
+      aktiverFane(terminalFaneId);
+      return;
+    }
+    // Lagre innholdet i den aktive fanen
+    faneDokumenter[aktivFaneId] = editor.state.doc.toString();
+    faneIdTeller++;
+    const id = faneIdTeller;
+    faneDokumenter[id] = "";
+    faneNavn[id] = "Terminal";
+    faneRdbms[id] = rdbms; // arver aktivt system (kun for visning)
+    faneDb[id] = "";
+    faneTyper[id] = "terminal";
+    terminalFaneId = id;
+    aktivFaneId = id;
+    opprettTerminal();
+    renderFaner();
+    visTerminalModus();
   }
 
   if (terminalKnapp) {
@@ -1227,7 +1319,11 @@ function handleOnDocumentLoaded() {
     });
   }
   if (terminalLukk) {
-    terminalLukk.addEventListener("click", () => lukkTerminal());
+    terminalLukk.addEventListener("click", () => {
+      // «✕ Lukk terminal» lukker terminal-fanen (og dermed terminalen)
+      if (terminalFaneId != null) lukkFane(terminalFaneId);
+      else lukkTerminal();
+    });
   }
   // Last lagrede fontstørrelser (Ctrl+Shift+PilOpp/Ned og PgUp/PgDn)
   const lagretEditorFont = localStorage.getItem("editorFont");
