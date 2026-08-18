@@ -102,8 +102,10 @@ function handleOnDocumentLoaded() {
   const csrfToken = document.querySelector('input[name="_csrf"]')?.value || "";
   const faneListe = document.getElementById("faneListe");
 
-  const rdbms = rdbms_sti.value;
-  const dialect = DIALECT[rdbms] || PostgreSQL;
+  // Aktivt databasesystem — MUTERBAR: byttes per fane (nedtrekksmenyen
+  // gjelder kun den aktive fanen; de andre fanene beholder sitt system).
+  let rdbms = rdbms_sti.value;
+  let dialect = DIALECT[rdbms] || PostgreSQL;
 
   // Kompartment for språk/autocomplete — kan rekonfigureres når DB endres
   const sqlCompartment = new Compartment();
@@ -440,6 +442,7 @@ function handleOnDocumentLoaded() {
       // Velg databasen (uten å bygge om hele treet)
       if (db.value !== dbNavn) {
         db.value = dbNavn;
+        faneDb[aktivFaneId] = dbNavn; // husk valgt database for denne fanen
         oppdaterSchema(dbNavn);
         document.querySelectorAll("#tre .tre-node.tre-valgt")
           .forEach((n) => n.classList.remove("tre-valgt"));
@@ -891,23 +894,47 @@ function handleOnDocumentLoaded() {
     });
   }
 
-  // Bytte databasesystem fra venstrespalten
+  // Bytte databasesystem fra venstrespalten — gjelder KUN den aktive fanen.
+  // Ingen side-last: de andre fanene beholder sitt system, sin database og
+  // sine SQL-setninger uberørt.
   function byttSystem() {
     const nytt = systemSelect.value;
     if (!nytt || nytt === rdbms) return;
-    // SQLite velges fra nedtrekksmenyen → åpne SQL-editoren med
-    // trestrukturen (databasene vises direkte). Hvis brukeren ikke har
-    // noen SQLite-databaser ennå, redirecter serveren til /sqlite.
-    window.location.href = `/select/${nytt}`;
+    // Lagre innholdet i den aktive fanen før vi bytter system
+    faneDokumenter[aktivFaneId] = editor.state.doc.toString();
+    rdbms = nytt;
+    dialect = DIALECT[rdbms] || PostgreSQL;
+    faneRdbms[aktivFaneId] = rdbms;
+    faneDb[aktivFaneId] = "";
+    db.value = "";
+    schema = {};
+    oppdaterEditorSprak();
+    byggTre();
+    renderFaner();
+    editor.focus();
   }
 
-  // ===== Faner: flere SQL-faner knyttet til samme database =====
-  // Hver fane har eget innhold (doc), lagret i minnet. Alle faner deler
-  // samme database-valg, tema og resultatpanel.
+  // Rekonfigurerer CodeMirror-språket til det aktive systemet (dialekt +
+  // autocomplete-schema). Kall etter system- eller schema-endring.
+  function oppdaterEditorSprak() {
+    editor.dispatch({
+      effects: sqlCompartment.reconfigure(
+        sqlLang({ dialect, schema, upperCaseKeywords: true })
+      ),
+    });
+  }
+
+  // ===== Faner: flere SQL-faner — hver med EGEN database + databasesystem =====
+  // Hver fane har eget innhold (doc), eget system (faneRdbms) og egen valgt
+  // database (faneDb), lagret i minnet. Å bytte system i nedtrekksmenyen
+  // påvirker kun den aktive fanen; de andre beholder sin tilkobling til sin
+  // RDBMS helt til fanen lukkes.
   let faneIdTeller = 1;
   let aktivFaneId = 1;
   const faneDokumenter = { 1: query.value || "" };
   const faneNavn = { 1: "Fane 1" };
+  const faneRdbms = { 1: rdbms };
+  const faneDb = { 1: db.value || "" };
 
   // Bytter editorens innhold til en fanes doc (bevarer fane-referanser)
   function byttFaneDoc(doc) {
@@ -929,7 +956,10 @@ function handleOnDocumentLoaded() {
       fane.className = "fane" + (id === aktivFaneId ? " fane-aktiv" : "");
       fane.title = "Klikk for å aktivere";
       const navn = document.createElement("span");
-      navn.textContent = faneNavn[id] || "Fane " + id;
+      // Vis systemet i fanenavnet, f.eks. «Fane 2 · PostgreSQL» — slik at
+      // man ser hvilken RDBMS hver fane er knyttet til
+      const sysNavn = SYSTEMNAVN[faneRdbms[id]] || "";
+      navn.textContent = (faneNavn[id] || "Fane " + id) + (sysNavn ? " · " + sysNavn : "");
       fane.appendChild(navn);
       const lukk = document.createElement("span");
       lukk.className = "fane-lukk";
@@ -952,7 +982,7 @@ function handleOnDocumentLoaded() {
     faneListe.appendChild(ny);
   }
 
-  // Oppretter en ny fane (tom) og aktiverer den
+  // Oppretter en ny fane (tom) og aktiverer den — arver aktiv fanes system
   function nyFane() {
     // Lagre innholdet i den aktive fanen
     faneDokumenter[aktivFaneId] = editor.state.doc.toString();
@@ -960,7 +990,10 @@ function handleOnDocumentLoaded() {
     const id = faneIdTeller;
     faneDokumenter[id] = "";
     faneNavn[id] = "Fane " + id;
+    faneRdbms[id] = rdbms; // ny fane starter i samme system som den aktive
+    faneDb[id] = "";
     aktivFaneId = id;
+    db.value = "";
     byttFaneDoc("");
     renderFaner();
     editor.focus();
@@ -976,10 +1009,13 @@ function handleOnDocumentLoaded() {
     if (idx === -1) return true;
     delete faneDokumenter[id];
     delete faneNavn[id];
+    delete faneRdbms[id];
+    delete faneDb[id];
     if (id === aktivFaneId) {
       const nabo = idListe[Math.max(idx - 1, 0)];
       aktivFaneId = nabo;
       byttFaneDoc(faneDokumenter[nabo] || "");
+      gjenopprettFaneKontekst(nabo);
     }
     renderFaner();
     editor.focus();
@@ -991,12 +1027,29 @@ function handleOnDocumentLoaded() {
     return lukkFane(aktivFaneId);
   }
 
+  // Gjenoppretter system + database for en fane (kalles ved fanebytte)
+  function gjenopprettFaneKontekst(id) {
+    const fanensSystem = faneRdbms[id] || rdbms;
+    if (fanensSystem !== rdbms) {
+      rdbms = fanensSystem;
+      dialect = DIALECT[rdbms] || PostgreSQL;
+      if (systemSelect) systemSelect.value = rdbms;
+      schema = {};
+      oppdaterEditorSprak();
+    }
+    const fanensDb = faneDb[id] || "";
+    db.value = fanensDb;
+    byggTre();
+  }
+
   // Aktiverer en fane: lagrer gjeldende innhold, bytter til valgt fane
+  // — og gjenoppretter fanens system + database
   function aktiverFane(id) {
     if (id === aktivFaneId) return;
     faneDokumenter[aktivFaneId] = editor.state.doc.toString();
     aktivFaneId = id;
     byttFaneDoc(faneDokumenter[id] || "");
+    gjenopprettFaneKontekst(id);
     renderFaner();
     editor.focus();
   }
@@ -1031,6 +1084,9 @@ function handleOnDocumentLoaded() {
     getAntall: () => Object.keys(faneDokumenter).length,
     getAktiv: () => aktivFaneId,
     getDokumenter: () => ({ ...faneDokumenter }),
+    getRdbms: () => ({ ...faneRdbms }),
+    getDb: () => ({ ...faneDb }),
+    getAktivRdbms: () => rdbms,
   };
 
   const handleOnSkinSelectChange = function handleOnSkinChange() {
