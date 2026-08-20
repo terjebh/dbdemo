@@ -97,6 +97,19 @@
             const oppdater = () => seksjon.classList.toggle("deaktivert", !cb.checked);
             cb.addEventListener("change", oppdater);
             oppdater();
+            // Fyller brukeren inn data i en deaktivert seksjon, aktiveres den
+            // automatisk — ellers «lagres» den stille som deaktivert og det
+            // ser ut som ingenting skjer.
+            if (felter) {
+                felter.querySelectorAll("input").forEach((f) => {
+                    f.addEventListener("input", () => {
+                        if (!cb.checked && f.value.trim() !== "") {
+                            cb.checked = true;
+                            oppdater();
+                        }
+                    });
+                });
+            }
         });
 
         // Test tilkobling (AJAX)
@@ -134,6 +147,16 @@
                     const data = await resp.json();
                     resultat.className = "test-resultat " + (data.ok ? "ok" : "feil");
                     resultat.textContent = (data.ok ? "✅ " : "❌ ") + data.melding;
+                    if (data.ok) {
+                        // Tilkoblingen fungerer → aktiver den automatisk, så
+                        // lagring faktisk legger den til (ellers lagres den
+                        // som deaktivert og «ingenting skjer»).
+                        const cb = seksjon.querySelector('input[type=checkbox]');
+                        if (cb && !cb.checked) {
+                            cb.checked = true;
+                            seksjon.classList.remove("deaktivert");
+                        }
+                    }
                 } catch (e) {
                     resultat.className = "test-resultat feil";
                     resultat.textContent = "❌ Kunne ikke teste tilkoblingen: " + e;
