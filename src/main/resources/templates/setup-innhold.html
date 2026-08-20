@@ -17,6 +17,9 @@
 
         <div th:if="${param.advarsel}" class="alert alert-warning">
             <th:block th:text="#{setup.advarsel(${param.advarsel[0]})}">Disse tilkoblingene feilet og ble deaktivert:</th:block>
+            <div th:if="${param.feil}" class="small text-muted mt-1">
+                <th:block th:text="${param.feil[0]}">Årsak</th:block>
+            </div>
         </div>
 
         <form th:if="${!alleredeKonfigurert || redigeringsmodus}" method="post" th:action="@{/setup}">

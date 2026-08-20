@@ -159,11 +159,14 @@ public class SetupController {
                 return "redirect:/login";
             }
             if (!feilende.isEmpty()) {
-                // En eller flere tilkoblinger feilet — vis advarsel, men de
-                // andre er lagret, så brukeren kommer videre.
+                // En eller flere tilkoblinger feilet — vis advarsel (med årsak),
+                // men de andre er lagret, så brukeren kommer videre.
                 return "redirect:/setup?lagret=1&advarsel="
                         + java.net.URLEncoder.encode(String.join(", ", feilende),
-                        java.nio.charset.StandardCharsets.UTF_8);
+                        java.nio.charset.StandardCharsets.UTF_8)
+                        + (forsteFeil != null ? "&feil="
+                        + java.net.URLEncoder.encode(forsteFeil,
+                        java.nio.charset.StandardCharsets.UTF_8) : "");
             }
             return "redirect:/setup?lagret=1";
         } catch (Exception e) {
