@@ -117,14 +117,18 @@ public class Dao {
      * header + rader. Read-only, timeout og maxRows beskytter serveren.
      */
     public QueryResult executeQuery(DbConnection conn, String db, String query) throws SQLException {
-        return executeQuery(conn, db, query, null);
+        return executeQuery(conn, db, query, null, null);
     }
 
     /**
      * Kjører en vilkårlig SQL-spørring med valgfri search_path (psql-oppførsel:
-     * «SET search_path TO skjema» gjelder for alle påfølgende spørringer).
+     * «SET search_path TO skjema» gjelder for alle påfølgende spørringer) og
+     * valgfrie session-kommandoer (SET/ALTER SESSION) som må gjelde for denne
+     * spørringen (de kjøres på tilkoblingen rett før spørringen, siden hver
+     * spørring får en fersk tilkobling).
      */
-    public QueryResult executeQuery(DbConnection conn, String db, String query, String searchPath) throws SQLException {
+    public QueryResult executeQuery(DbConnection conn, String db, String query, String searchPath,
+                                    List<String> sessionKommandorer) throws SQLException {
         // For Oracle betyr "database" egentlig skjema; URL-en bruker service-navnet.
         // For de andre brukes db direkte i URL-en, så vi lager en kopi med riktig database.
         DbConnection kobling = conn;
@@ -143,6 +147,13 @@ public class Dao {
                 String gyldig = searchPath.replaceAll("[^A-Za-z0-9_.\\\"\\-$]", "");
                 if (gyldig.equals(searchPath)) {
                     st.execute("SET search_path TO " + searchPath);
+                }
+            }
+            // Replay lagrede session-kommandoer (SET lc_time_names, ALTER SESSION NLS…)
+            // slik at de gjelder selv om hver spørring får en fersk tilkobling.
+            if (sessionKommandorer != null) {
+                for (String kommando : sessionKommandorer) {
+                    st.execute(kommando);
                 }
             }
             long start = System.currentTimeMillis();

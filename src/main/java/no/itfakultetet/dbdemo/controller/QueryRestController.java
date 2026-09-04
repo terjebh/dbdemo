@@ -123,7 +123,28 @@ public class QueryRestController {
         try {
             String bruker = authentication == null ? "anonym" : authentication.getName();
             DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
-            Dao.QueryResult resultat = dao.executeQuery(conn, db, query, sattSearchPath);
+
+            // psql-oppførsel: andre session-kommandoer (SET lc_time_names,
+            // SET TIME ZONE, ALTER SESSION SET NLS_…, SET LANGUAGE …) lagres
+            // per RDBMS i brukerens sesjon og replayes på hver nye tilkobling,
+            // siden hver spørring får en fersk tilkobling.
+            String sessionKommando = fangOppSessionKommando(query, rdbms_sti);
+            if (sessionKommando != null) {
+                // Valider kommandoen mot databasen FØR vi lagrer den — replayes
+                // den senere med feil, blokkerer den alle spørringer.
+                dao.executeQuery(conn, db, sessionKommando, sattSearchPath, hentSessionKommandorer(session, rdbms_sti));
+                List<String> lagrede = hentSessionKommandorer(session, rdbms_sti);
+                lagrede.removeIf(k -> k.equalsIgnoreCase(sessionKommando));
+                lagrede.add(sessionKommando);
+                return ResponseEntity.ok(Map.of(
+                        "header", List.of(),
+                        "rows", List.of(),
+                        "tidMs", 0L,
+                        "melding", "Session-kommandoen ble lagret og gjelder for videre spørringer"));
+            }
+
+            Dao.QueryResult resultat = dao.executeQuery(conn, db, query, sattSearchPath,
+                    hentSessionKommandorer(session, rdbms_sti));
             return ResponseEntity.ok(Map.of(
                     "header", resultat.header(),
                     "rows", resultat.rows(),
@@ -134,6 +155,55 @@ public class QueryRestController {
         } catch (IllegalArgumentException e) {
             return feilSvar(e.getMessage());
         }
+    }
+
+    /** Session-attributtnøkkel: lagrede session-kommandoer per RDBMS. */
+    private static final String SESSION_KOMMANDOER = "sessionKommandorer:";
+
+    /** Henter (og oppretter ved behov) listen over lagrede session-kommandoer for én RDBMS. */
+    @SuppressWarnings("unchecked")
+    private static List<String> hentSessionKommandorer(jakarta.servlet.http.HttpSession session, String rdbms) {
+        String nokkel = SESSION_KOMMANDOER + rdbms;
+        List<String> liste = (List<String>) session.getAttribute(nokkel);
+        if (liste == null) {
+            liste = new java.util.ArrayList<>();
+            session.setAttribute(nokkel, liste);
+        }
+        return liste;
+    }
+
+    /**
+     * Gjenkjenner rene session-kommandoer (SET / ALTER SESSION SET) som skal
+     * gjelde for alle påfølgende spørringer — tilsvarende search_path-logikken,
+     * men for alle RDBMS-ene. Returnerer kommandoen (uten avsluttende semikolon)
+     * eller null hvis spørringen ikke er en slik kommando.
+     * Ekskluderer kommandoer som ikke gir mening å replaye: transaksjonsstyring
+     * (autocommit/transaction), rollebytte, @-variabler og Oracle CONTAINER.
+     */
+    static String fangOppSessionKommando(String query, String rdbms) {
+        if (query == null || "sqlite".equals(rdbms)) return null;
+        String q = query.trim();
+        // Kun ÉN ren setning — ingen semikolon midt i (batch kjøres som vanlig)
+        String enkelt = q.endsWith(";") ? q.substring(0, q.length() - 1).trim() : q;
+        if (enkelt.contains(";")) return null;
+        String uq = enkelt.toUpperCase(Locale.ROOT);
+
+        boolean erSet = uq.equals("SET") || uq.startsWith("SET ");
+        boolean erAlterSession = "oracle".equals(rdbms) && uq.startsWith("ALTER SESSION SET ");
+        if (!erSet && !erAlterSession) return null;
+
+        // Ekskluder kommandoer som ikke er trygge/nyttige å replaye
+        if (uq.contains("AUTOCOMMIT")) return null;
+        if (uq.contains("SESSION AUTHORIZATION")) return null;
+        if (uq.startsWith("SET ROLE")) return null;
+        if (uq.startsWith("SET @")) return null;                    // MySQL-bruker-variabler
+        if (uq.contains("ALTER SESSION SET CONTAINER")) return null; // Oracle: bytter PDB
+        // MSSQL: SET TRANSACTION ISOLATION LEVEL er en gyldig session-innstilling
+        if ("microsoft".equals(rdbms) && uq.startsWith("SET TRANSACTION ISOLATION")) return enkelt;
+        // MySQL/PG: SET TRANSACTION / SET SESSION TRANSACTION er transaksjonsstyring
+        if (uq.startsWith("SET SESSION TRANSACTION")) return null;
+        if (uq.startsWith("SET TRANSACTION")) return null;
+        return enkelt;
     }
 
     /**
