@@ -29,6 +29,7 @@
       ingenResultat: "Ingen resultat-tabell å lagre",
       csvLagret: "CSV lastet ned",
       tittel: "Bytt til engelsk",
+      txApen: "⚡ Transaksjon åpen — endringer er ikke lagret ennå",
     },
     en: {
       datatables: {
@@ -49,6 +50,7 @@
       ingenResultat: "No result table to save",
       csvLagret: "CSV downloaded",
       tittel: "Switch to Norwegian",
+      txApen: "⚡ Transaction open — changes are not saved yet",
     },
   };
 

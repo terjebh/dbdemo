@@ -187,7 +187,8 @@ function handleOnDocumentLoaded() {
     const url = rdbms === "sqlite"
       ? `/rest/kjor/sqlite`
       : `/rest/kjor/${rdbms}`;
-    const body = JSON.stringify({ db: db.value, query: q });
+    // faneId sendes med slik at transaksjoner holdes per fane
+    const body = JSON.stringify({ db: db.value, query: q, fane: aktivFaneId });
 
     resultatStatus.textContent = window.dbAppTekster ? window.dbAppTekster().kjorer : "Kjører …";
     console.log("[kjørSQL]", url, body.slice(0, 80));
@@ -207,6 +208,8 @@ function handleOnDocumentLoaded() {
           return;
         }
         skjulFeil();
+        // Transaksjonsstatus oppdateres (per fane) — vis Commit/Rollback-knapper
+        oppdaterTransaksjonsStatus(data.transaksjon === true);
         // psql-oppførsel: «SET search_path TO skjema» → vis meldingen
         if (data.melding) {
           skjulResultat();
@@ -1159,6 +1162,82 @@ function handleOnDocumentLoaded() {
       editor.focus();
     });
   }
+
+  // ===== Transaksjonsknapper (COMMIT / ROLLBACK) + status =====
+  // Åpen transaksjon per fane: faneTxAapen[id] = true. Serveren melder
+  // transaksjonsstatus i hvert svar (data.transaksjon === true/false).
+  const faneTxAapen = {}; // faneId → true hvis transaksjon er åpen
+  const commitKnapp = document.getElementById("commitKnapp");
+  const rollbackKnapp = document.getElementById("rollbackKnapp");
+  const transaksjonInfo = document.getElementById("transaksjonInfo");
+  const txTekster = window.dbAppTekster ? window.dbAppTekster() : null;
+
+  // Kjører en transaksjonskommando (COMMIT/ROLLBACK) via REST
+  function kjørTxKommando(kommando) {
+    if (rdbms === "sqlite") return;
+    const url = `/rest/kjor/${rdbms}`;
+    const body = JSON.stringify({ db: db.value, query: kommando, fane: aktivFaneId });
+    resultatStatus.textContent = kommando + " …";
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken },
+      body,
+    })
+      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || data.feil) {
+          visFeil(data.feil || "Kunne ikke utføre " + kommando, data.tilkobling === true);
+          return;
+        }
+        skjulFeil();
+        skjulResultat();
+        feilMelding.style.display = "none";
+        resultatStatus.textContent = data.melding || kommando + " utført";
+        oppdaterTransaksjonsStatus(data.transaksjon === true);
+        byggTre(); // endringer kan ha påvirket treet (etter COMMIT)
+      })
+      .catch((err) => visFeil("Nettverksfeil: " + err.message, true));
+  }
+
+  if (commitKnapp) {
+    commitKnapp.addEventListener("click", () => {
+      kjørTxKommando("COMMIT");
+      editor.focus();
+    });
+  }
+  if (rollbackKnapp) {
+    rollbackKnapp.addEventListener("click", () => {
+      kjørTxKommando("ROLLBACK");
+      editor.focus();
+    });
+  }
+
+  // Viser/skjuler Commit/Rollback-knappene + «Transaksjon åpen»-merket
+  function oppdaterTransaksjonsStatus(aapen) {
+    faneTxAapen[aktivFaneId] = aapen === true;
+    const vis = faneTxAapen[aktivFaneId] && rdbms !== "sqlite";
+    if (commitKnapp) commitKnapp.style.display = vis ? "" : "none";
+    if (rollbackKnapp) rollbackKnapp.style.display = vis ? "" : "none";
+    if (transaksjonInfo) {
+      transaksjonInfo.style.display = vis ? "" : "none";
+      if (vis && txTekster && txTekster.txApen) {
+        transaksjonInfo.textContent = txTekster.txApen;
+      }
+    }
+    // Fane-etiketten får også et lite tx-merke
+    const faneEl = faneListe?.querySelector(".fane-aktiv");
+    if (faneEl) {
+      faneEl.classList.toggle("fane-tx", vis);
+    }
+  }
+  window.oppdaterTransaksjonsStatus = oppdaterTransaksjonsStatus;
+
+  // Fane-bytte: oppdater tx-knappene etter hvilken fane som er aktiv
+  const origRenderFaner = renderFaner;
+  renderFaner = function () {
+    origRenderFaner();
+    oppdaterTransaksjonsStatus(faneTxAapen[aktivFaneId] === true);
+  };
 
   // ===== Terminal-emulator (xterm.js + WebSocket → bash med PTY) =====
   // Terminalen lever i EN EGEN FANE (faneTyper[id] === "terminal") — den

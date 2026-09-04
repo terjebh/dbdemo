@@ -375,6 +375,19 @@ main {
     font-weight: 600;
 }
 
+/* Fane med åpen transaksjon: gul/advarsel-stripe for å gjøre det tydelig at
+   endringer ikke er lagret ennå (COMMIT/ROLLBACK-knappene er synlige). */
+.fane-tx {
+    box-shadow: inset 0 -3px 0 #f0ad4e;
+}
+
+.fane-tx-info {
+    background: #f0ad4e;
+    color: #1a1a1a;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
 .fane-lukk {
     color: var(--app-muted);
     font-weight: bold;

@@ -61,6 +61,17 @@ public class Dao {
      * Passord sendes via Properties — aldri i URL-en.
      */
     private Connection connect(DbConnection conn) throws SQLException {
+        return connect(conn, !readOnly);
+    }
+
+    /**
+     * Åpner en tilkobling. {@code skrivbar=true} hopper over setReadOnly —
+     * brukes for transaksjonstilkoblinger (INSERT/UPDATE/DELETE + ROLLBACK
+     * må kunne kjøre). Utenfor transaksjoner er appen read-only som før;
+     * delte databaser (hr/brreg) er uansett beskyttet av DB-rettighetene
+     * (kurs-brukerne har kun SELECT der), ikke av appens readOnly-flagg.
+     */
+    public Connection connect(DbConnection conn, boolean skrivbar) throws SQLException {
         if (conn == null || !conn.isValid()) {
             throw new SQLException("Tilkoblingen er ikke konfigurert (RDBMS/host/bruker/passord mangler)");
         }
@@ -70,7 +81,7 @@ public class Dao {
         props.setProperty("password", conn.getPassword());
 
         Connection c = DriverManager.getConnection(url, props);
-        if (readOnly) {
+        if (!skrivbar && readOnly) {
             try {
                 c.setReadOnly(true);
             } catch (SQLException e) {
@@ -187,6 +198,50 @@ public class Dao {
                 return new QueryResult(header, rader, elapsed);
             }
         }
+    }
+
+    /**
+     * Kjører en spørring på en ALLEREDE ÅPEN tilkobling (transaksjonsmodus).
+     * Lukker IKKE tilkoblingen — den eies av transaksjonen og lukkes ved
+     * COMMIT/ROLLBACK eller session-timeout. Brukeren kan ha kjørt
+     * BEGIN/START TRANSACTION; spørringen kjører innenfor den transaksjonen.
+     */
+    public QueryResult executeQueryPåTilkobling(Connection c, String db, String query) throws SQLException {
+        try (Statement st = c.createStatement()) {
+            begrens(st);
+            long start = System.currentTimeMillis();
+            boolean harResultat = st.execute(query);
+            long elapsed = System.currentTimeMillis() - start;
+            if (!harResultat) {
+                logger.info("Transaksjons-spørring mot {} tok {} ms (ingen resultatsett)", db, elapsed);
+                return new QueryResult(List.of(), List.of(), elapsed);
+            }
+            try (ResultSet rs = st.getResultSet()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int kolonner = meta.getColumnCount();
+
+                List<String> header = new ArrayList<>(kolonner);
+                for (int i = 1; i <= kolonner; i++) {
+                    header.add(meta.getColumnLabel(i));
+                }
+
+                List<List<String>> rader = new ArrayList<>();
+                while (rs.next()) {
+                    List<String> rad = new ArrayList<>(kolonner);
+                    for (int i = 1; i <= kolonner; i++) {
+                        rad.add(formaterVerdi(rs.getObject(i)));
+                    }
+                    rader.add(rad);
+                }
+                logger.info("Transaksjons-spørring mot {} tok {} ms, {} rader", db, elapsed, rader.size());
+                return new QueryResult(header, rader, elapsed);
+            }
+        }
+    }
+
+    /** Offentlig kopi med annen database (brukes av transaksjonsstøtten). */
+    public DbConnection kopiMedDatabasePublikk(DbConnection conn, String db) {
+        return kopiMedDatabase(conn, db);
     }
 
     private DbConnection kopiMedDatabase(DbConnection conn, String db) {

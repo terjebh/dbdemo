@@ -38,8 +38,88 @@ public class QueryRestController {
         this.sqliteService = sqliteService;
     }
 
-    /** Forespørsel-body: valgt database + SQL. */
-    public record KjorRequest(String db, String query) {
+    /** Forespørsel-body: valgt database + SQL (+ faneId for transaksjoner). */
+    public record KjorRequest(String db, String query, Integer fane) {
+        public KjorRequest {
+            if (fane == null) fane = 1;
+        }
+    }
+
+    // ===== Transaksjonsstøtte (per fane): BEGIN/COMMIT/ROLLBACK =====
+    // Når brukeren kjører BEGIN/START TRANSACTION åpnes ÉN skrivbar tilkobling
+    // for den fanen (autocommit=false) som holdes åpen i HttpSession til
+    // COMMIT/ROLLBACK. Alle spørringer i mellomtiden går på den tilkoblingen,
+    // så INSERT/UPDATE/DELETE + ROLLBACK kan demonstreres. Utenfor en åpen
+    // transaksjon er appen read-only som før; delte databaser er beskyttet av
+    // DB-rettighetene (kurs-brukerne har kun SELECT på hr/brreg).
+
+    /** Session-attributt: faneId → åpen transaksjonstilkobling. */
+    private static final String TX_ATTRIBUTT = "transaksjonTilkoblinger";
+
+    /** Henter transaksjonskartet (faneId → Connection) fra sesjonen. */
+    @SuppressWarnings("unchecked")
+    private static Map<Integer, java.sql.Connection> txKart(jakarta.servlet.http.HttpSession session) {
+        Map<Integer, java.sql.Connection> kart = (Map<Integer, java.sql.Connection>) session.getAttribute(TX_ATTRIBUTT);
+        if (kart == null) {
+            kart = new java.util.concurrent.ConcurrentHashMap<>();
+            session.setAttribute(TX_ATTRIBUTT, kart);
+        }
+        return kart;
+    }
+
+    /**
+     * Gjenkjenner transaksjonskommandoer. Returnerer "BEGIN", "COMMIT" eller
+     * "ROLLBACK" hvis spørringen er en ren slik kommando, ellers null.
+     * Støtter MySQL/PostgreSQL (BEGIN/START TRANSACTION), MSSQL
+     * (BEGIN TRANSACTION/BEGIN TRAN) og Oracle (kun COMMIT/ROLLBACK —
+     * transaksjoner er implisitte der, styres av autocommit=false).
+     */
+    static String transaksjonsKommando(String query, String rdbms) {
+        if (query == null) return null;
+        String q = query.trim();
+        String enkelt = q.endsWith(";") ? q.substring(0, q.length() - 1).trim() : q;
+        if (enkelt.contains(";")) return null; // kun én ren kommando
+        String uq = enkelt.toUpperCase(Locale.ROOT);
+
+        if (uq.equals("COMMIT") || uq.equals("COMMIT WORK")
+                || uq.equals("COMMIT TRANSACTION") || uq.equals("COMMIT TRAN")) {
+            return "COMMIT";
+        }
+        if (uq.equals("ROLLBACK") || uq.equals("ROLLBACK WORK")
+                || uq.equals("ROLLBACK TRANSACTION") || uq.equals("ROLLBACK TRAN")) {
+            return "ROLLBACK";
+        }
+        if ("oracle".equals(rdbms)) return null; // Oracle har ingen BEGIN
+        // Kun RENE BEGIN-setninger: «BEGIN», «BEGIN TRANSACTION» (MSSQL),
+        // «BEGIN TRAN» eller «START TRANSACTION» — aldri «BEGIN SELECT …»
+        if (uq.equals("BEGIN") || uq.equals("BEGIN WORK")
+                || uq.equals("BEGIN TRANSACTION") || uq.equals("BEGIN TRAN")
+                || uq.equals("START TRANSACTION")) {
+            return "BEGIN";
+        }
+        return null;
+    }
+
+    /**
+     * Åpner en skrivbar transaksjonstilkobling (autocommit=false) for én fane.
+     * Returnerer null hvis en transaksjon allerede er åpen for fanen.
+     */
+    private java.sql.Connection apneTransaksjon(DbConnection conn, String db,
+                                                jakarta.servlet.http.HttpSession session, int faneId) throws SQLException {
+        Map<Integer, java.sql.Connection> kart = txKart(session);
+        java.sql.Connection eksisterende = kart.get(faneId);
+        if (eksisterende != null && !eksisterende.isClosed()) {
+            return null; // allerede åpen — ikke start en ny
+        }
+        // Oracle: «db» er skjema, ikke database — ikke bytt i URL-en.
+        DbConnection kobling = conn;
+        if (!"oracle".equals(conn.getRdbms())) {
+            kobling = dao.kopiMedDatabasePublikk(conn, db);
+        }
+        java.sql.Connection c = dao.connect(kobling, true); // skrivbar!
+        c.setAutoCommit(false);
+        kart.put(faneId, c);
+        return c;
     }
 
     /** Klassifiserer om en feilmelding har med tilkobling å gjøre. */
@@ -123,6 +203,78 @@ public class QueryRestController {
         try {
             String bruker = authentication == null ? "anonym" : authentication.getName();
             DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
+
+            // ===== Transaksjonsmodus: BEGIN/COMMIT/ROLLBACK =====
+            // En åpen transaksjon per fane (faneId fra klienten). Mens den er
+            // åpen kjører ALLE spørringer på transaksjonstilkoblingen (skrivbar,
+            // autocommit=false), så INSERT/UPDATE/DELETE + ROLLBACK fungerer.
+            int faneId = request.fane() == null ? 1 : request.fane();
+            String txKommando = transaksjonsKommando(query, rdbms_sti);
+            Map<Integer, java.sql.Connection> txKart = txKart(session);
+            java.sql.Connection tx = txKart.get(faneId);
+            if (tx != null && tx.isClosed()) {
+                txKart.remove(faneId);
+                tx = null;
+            }
+
+            if ("BEGIN".equals(txKommando)) {
+                if (tx != null) {
+                    return ResponseEntity.ok(Map.of("melding",
+                            "En transaksjon er allerede åpen for denne fanen — avslutt med COMMIT eller ROLLBACK"));
+                }
+                java.sql.Connection c = apneTransaksjon(conn, db, session, faneId);
+                if (c == null) {
+                    return ResponseEntity.ok(Map.of("melding",
+                            "En transaksjon er allerede åpen for denne fanen — avslutt med COMMIT eller ROLLBACK"));
+                }
+                // Transaksjonen startes av setAutoCommit(false) i apneTransaksjon
+                // — vi kjører IKKE BEGIN som SQL (MSSQL krever «BEGIN TRANSACTION»,
+                // MySQL/PG «BEGIN», Oracle har ingen BEGIN; autocommit=false
+                // starter en implisitt transaksjon i alle fire).
+                return ResponseEntity.ok(Map.of(
+                        "header", List.of(),
+                        "rows", List.of(),
+                        "tidMs", 0L,
+                        "transaksjon", true,
+                        "melding", "Transaksjon startet — endringer er ikke lagret før COMMIT. Prøv: INSERT, SELECT, deretter ROLLBACK eller COMMIT."));
+            }
+
+            if (("COMMIT".equals(txKommando) || "ROLLBACK".equals(txKommando)) && tx == null) {
+                return ResponseEntity.ok(Map.of("melding",
+                        "Ingen åpen transaksjon i denne fanen — start med BEGIN (eller START TRANSACTION)"));
+            }
+            if (("COMMIT".equals(txKommando) || "ROLLBACK".equals(txKommando)) && tx != null) {
+                txKart.remove(faneId);
+                try (java.sql.Statement st = tx.createStatement()) {
+                    st.execute(txKommando);
+                } catch (SQLException e) {
+                    tx.rollback(); // forsøk å rydde opp ved feil
+                    throw e;
+                } finally {
+                    try { tx.close(); } catch (SQLException ignored) { }
+                }
+                boolean erCommit = "COMMIT".equals(txKommando);
+                return ResponseEntity.ok(Map.of(
+                        "header", List.of(),
+                        "rows", List.of(),
+                        "tidMs", 0L,
+                        "transaksjon", false,
+                        "melding", erCommit
+                                ? "COMMIT utført — endringene er nå lagret permanent."
+                                : "ROLLBACK utført — alle endringer i transaksjonen ble angret."));
+            }
+
+            // Åpen transaksjon → kjør spørringen på transaksjonstilkoblingen
+            // (skrivbar). Session-kommandoer/SET replayes IKKE her — de kjørte
+            // allerede på denne tilkoblingen da de ble satt.
+            if (tx != null) {
+                Dao.QueryResult resultat = dao.executeQueryPåTilkobling(tx, db, query);
+                return ResponseEntity.ok(Map.of(
+                        "header", resultat.header(),
+                        "rows", resultat.rows(),
+                        "tidMs", resultat.tidMs(),
+                        "transaksjon", true));
+            }
 
             // psql-oppførsel: andre session-kommandoer (SET lc_time_names,
             // SET TIME ZONE, ALTER SESSION SET NLS_…, SET LANGUAGE …) lagres

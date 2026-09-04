@@ -81,6 +81,25 @@
                         </svg>
                         <span class="d-none d-sm-inline" th:text="#{select.terminal}">Terminal</span>
                     </button>
+                    <!-- Transaksjonsknapper: Commit/Rollback — kun synlige når en
+                         transaksjon er åpen i den aktive fanen (JS styrer synlighet) -->
+                    <span id="transaksjonInfo" class="badge text-bg-warning fane-tx-info" style="display:none; align-self:center;">
+                        ⚡ Transaksjon åpen
+                    </span>
+                    <button type="button" id="commitKnapp" class="btn btn-success btn-sm fane-kjor-knapp"
+                            style="display:none;" th:title="#{select.commitTittel}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:-1px;">
+                            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                        <span th:text="#{select.commit}">COMMIT</span>
+                    </button>
+                    <button type="button" id="rollbackKnapp" class="btn btn-danger btn-sm fane-kjor-knapp"
+                            style="display:none;" th:title="#{select.rollbackTittel}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:-1px;">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                        <span th:text="#{select.rollback}">ROLLBACK</span>
+                    </button>
                     <!-- Lagre SQL-fil (Ctrl+S) + åpne SQL-fil (Ctrl+O) -->
                     <button type="button" id="lagreSqlKnapp" class="btn btn-outline-light btn-sm fane-kjor-knapp"
                             th:title="#{select.lagreSqlTittel}" style="border-color:var(--app-kant); color:var(--app-tekst);">
@@ -106,7 +125,7 @@
                  resultat-tabellen ellers. -->
             <div id="resultatPanel">
                 <div class="resultat-verktøylinje">
-                    <div id="resultatStatus" class="text-muted small">Kjør en spørring med ctrl+enter — resultatet vises her</div>
+                    <div id="resultatStatus" class="text-muted small" th:text="#{select.kjorHint}">Kjør en spørring med ctrl+enter — resultatet vises her</div>
                     <div class="resultat-knapper d-flex align-items-center gap-1">
                         <!-- Lagre resultat-tabellen som CSV-fil -->
                         <button type="button" id="lagreCsvKnapp" class="btn btn-outline-secondary btn-sm"
