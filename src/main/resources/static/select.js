@@ -1337,11 +1337,16 @@ function handleOnDocumentLoaded() {
   const terminalLukk = document.getElementById("terminalLukk");
   const terminalContainer = document.getElementById("terminalContainer");
   const formElement = document.getElementById("sql");
+  // Venstrespalten (trestrukturen) + dra-splitteren — skjules i terminal-modus
+  // slik at terminalen får hele vinduets bredde
+  const trePanelEl = document.getElementById("trePanel");
+  const treSplitterEl = document.getElementById("treSplitter");
 
-  // Viser terminalpanelet (skjuler editor + resultat) — kalles når
-  // terminal-fanen aktiveres. VIKTIG: vi skjuler bare EDITOREN, ikke hele
-  // <form> — fane-linjen ligger inne i form-elementet og må alltid være
-  // synlig slik at man kan veksle mellom SQL-faner og terminal-fanen.
+  // Viser terminalpanelet (skjuler editor + resultat + venstrespalten) —
+  // kalles når terminal-fanen aktiveres. VIKTIG: vi skjuler bare EDITOREN,
+  // ikke hele <form> — fane-linjen ligger inne i form-elementet og må alltid
+  // være synlig slik at man kan veksle mellom SQL-faner og terminal-fanen.
+  // Trestrukturen skjules også, slik at terminalen får HELE bredden.
   function visTerminalModus() {
     if (!terminalPanel) return;
     terminalPanel.style.display = "flex";
@@ -1351,10 +1356,14 @@ function handleOnDocumentLoaded() {
     if (editorContainer) editorContainer.style.display = "none";
     if (editorSplitter) editorSplitter.style.display = "none";
     if (resultatPanel) resultatPanel.style.display = "none";
+    // Gi terminalen hele bredden: skjul venstrespalten + dra-splitteren
+    if (trePanelEl) trePanelEl.style.display = "none";
+    if (treSplitterEl) treSplitterEl.style.display = "none";
     if (xtermInstans) xtermInstans.focus();
-    // Etter at panelet er synlig igjen, oppdater PTY-størrelsen (xterm har
-    // null-dimensjoner mens panelet var skjult)
-    setTimeout(sendTerminalResize, 50);
+    // Etter at panelet er synlig og bredden er endret, oppdater PTY-størrelsen
+    // (xterm har null-dimensjoner mens panelet var skjult, og kolonneantallet
+    // avhenger av den nye, bredere containeren)
+    setTimeout(sendTerminalResize, 120);
   }
 
   // Viser editor + resultat (skjuler terminalen) — kalles når en SQL-fane
@@ -1364,6 +1373,9 @@ function handleOnDocumentLoaded() {
     if (editorContainer) editorContainer.style.display = "";
     if (editorSplitter) editorSplitter.style.display = "";
     if (resultatPanel) resultatPanel.style.display = "";
+    // Vis venstrespalten igjen (trestrukturen hører til SQL-fanene)
+    if (trePanelEl) trePanelEl.style.display = "";
+    if (treSplitterEl) treSplitterEl.style.display = "";
     if (editor) editor.focus();
   }
 
@@ -1476,16 +1488,33 @@ function handleOnDocumentLoaded() {
   }
 
   function sendTerminalResize() {
-    if (!xtermInstans || !terminalWs || terminalWs.readyState !== WebSocket.OPEN) return;
+    if (!xtermInstans || !terminalContainer) return;
     const dims = xtermInstans._core ? xtermInstans._core._renderService.dimensions : null;
-    if (dims && dims.actualCellWidth > 0 && dims.actualCellHeight > 0) {
-      const w = terminalContainer.clientWidth;
-      const h = terminalContainer.clientHeight;
-      const cols = Math.max(20, Math.floor(w / dims.actualCellWidth));
-      const rows = Math.max(5, Math.floor(h / dims.actualCellHeight));
+    if (!dims || !(dims.actualCellWidth > 0) || !(dims.actualCellHeight > 0)) return;
+    const w = terminalContainer.clientWidth;
+    const h = terminalContainer.clientHeight;
+    if (w <= 0 || h <= 0) return;
+    const cols = Math.max(20, Math.floor(w / dims.actualCellWidth));
+    const rows = Math.max(5, Math.floor(h / dims.actualCellHeight));
+    // Oppdater xterm SELV også — uten dette riter den fortsatt i 80×24 og
+    // etterlater tomrom til høyre/under. resize() trigger onResize, som
+    // sender den nye størrelsen videre til serveren (stty/PTY).
+    if (xtermInstans.cols !== cols || xtermInstans.rows !== rows) {
+      xtermInstans.resize(cols, rows);
+    }
+    // Send alltid til serveren også (i tilfelle PTY-en henger etter)
+    if (terminalWs && terminalWs.readyState === WebSocket.OPEN) {
       terminalWs.send(JSON.stringify({ type: "resize", cols, rows }));
     }
   }
+
+  // Tilpass terminalen når vinduet endres (bare når terminalen er synlig) —
+  // uten dette beholder PTY-en og xterm den gamle bredden etter en resize.
+  window.addEventListener("resize", () => {
+    if (xtermInstans && terminalPanel && terminalPanel.style.display !== "none") {
+      sendTerminalResize();
+    }
+  });
 
   // Lukker terminalen helt (kalles når terminal-fanen lukkes) — xterm +
   // WebSocket ryddes; neste åpning starter en fersk terminal
