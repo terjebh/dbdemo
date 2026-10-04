@@ -310,11 +310,12 @@ main {
 
 /* PK/FK-merke etter datatypen i en kolonne-rad (f.eks. «id (int) PK») */
 .tre-nokkel {
+    display: inline-block;
     font-weight: 700;
     font-size: 0.68rem;
     padding: 0 3px;
     border-radius: 3px;
-    margin-left: 2px;
+    margin-left: 3px;
     letter-spacing: 0.2px;
 }
 

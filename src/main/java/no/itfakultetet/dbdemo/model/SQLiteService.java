@@ -286,8 +286,13 @@ public class SQLiteService {
                     while (rs.next()) {
                         // Kolonner: id(1), seq(2), table(3), from(4), to(5), ...
                         String fra = rs.getString(4);
-                        if (fra != null && !forTabell.containsKey(fra)) {
+                        if (fra == null) continue;
+                        // En kolonne kan være både PK og FK → vis begge
+                        String eksisterende = forTabell.get(fra);
+                        if (eksisterende == null) {
                             forTabell.put(fra, "FK");
+                        } else if (eksisterende.contains("PK")) {
+                            forTabell.put(fra, "PK,FK");
                         }
                     }
                 }

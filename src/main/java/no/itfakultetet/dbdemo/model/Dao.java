@@ -561,20 +561,21 @@ public class Dao {
                     + "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu "
                     + "JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc "
                     + "ON tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
-                    + "AND tc.TABLE_CATALOG = kcu.TABLE_CATALOG "
+                    + "AND tc.TABLE_NAME = kcu.TABLE_NAME AND tc.TABLE_CATALOG = kcu.TABLE_CATALOG "
                     + "WHERE tc.CONSTRAINT_TYPE IN ('PRIMARY KEY','FOREIGN KEY') "
                     + "AND kcu.TABLE_CATALOG = ?";
             case "oracle" -> "SELECT ac.table_name, acc.column_name, "
                     + "CASE ac.constraint_type WHEN 'P' THEN 'PK' ELSE 'FK' END "
                     + "FROM all_constraints ac "
                     + "JOIN all_cons_columns acc ON acc.constraint_name = ac.constraint_name "
-                    + "AND acc.owner = ac.owner "
+                    + "AND acc.owner = ac.owner AND acc.table_name = ac.table_name "
                     + "WHERE ac.owner = ? AND ac.constraint_type IN ('P','R')";
             case "mysql" -> "SELECT kcu.table_name, kcu.column_name, "
                     + "CASE tc.constraint_type WHEN 'PRIMARY KEY' THEN 'PK' ELSE 'FK' END "
                     + "FROM information_schema.key_column_usage kcu "
                     + "JOIN information_schema.table_constraints tc "
                     + "ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema "
+                    + "AND tc.table_name = kcu.table_name "
                     + "WHERE kcu.table_schema = ? "
                     + "AND tc.constraint_type IN ('PRIMARY KEY','FOREIGN KEY')";
             default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
@@ -594,8 +595,15 @@ public class Dao {
                     String tabell = rs.getString(1);
                     String kolonne = rs.getString(2);
                     String type = rs.getString(3);
+                    // En kolonne kan være BÅDE primær- og fremmednøkkel (typisk i
+                    // koblingstabeller, f.eks. dept_emp.emp_no). Vis begge: «PK,FK».
                     nokler.computeIfAbsent(tabell, k -> new java.util.LinkedHashMap<>())
-                            .put(kolonne, type);
+                            .merge(kolonne, type, (a, b) -> {
+                                boolean pk = a.contains("PK") || b.contains("PK");
+                                boolean fk = a.contains("FK") || b.contains("FK");
+                                if (pk && fk) return "PK,FK";
+                                return pk ? "PK" : "FK";
+                            });
                 }
                 return nokler;
             }

@@ -587,14 +587,16 @@ function handleOnDocumentLoaded() {
                   flab.textContent = felt + "  (" + type + ")";
                   const nokkel = nokler[felt];
                   if (nokkel) {
-                    // PK/FK vises etter datatypen, f.eks. «id (int) PK»
-                    const fmerke = document.createElement("span");
-                    fmerke.className = "tre-nokkel " + (nokkel === "PK" ? "tre-pk" : "tre-fk");
-                    fmerke.textContent = " " + nokkel;
-                    fmerke.title = nokkel === "PK"
-                            ? "Primærnøkkel (primary key)"
-                            : "Fremmednøkkel (foreign key)";
-                    flab.appendChild(fmerke);
+                    // Kan være «PK», «FK» eller begge («PK,FK») — ett merke per rolle
+                    nokkel.split(",").forEach((rolle) => {
+                      const fmerke = document.createElement("span");
+                      fmerke.className = "tre-nokkel " + (rolle === "PK" ? "tre-pk" : "tre-fk");
+                      fmerke.textContent = rolle;
+                      fmerke.title = rolle === "PK"
+                              ? "Primærnøkkel (primary key)"
+                              : "Fremmednøkkel (foreign key)";
+                      flab.appendChild(fmerke);
+                    });
                   }
                   feltNode.appendChild(fik);
                   feltNode.appendChild(flab);
