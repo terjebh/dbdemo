@@ -1337,16 +1337,12 @@ function handleOnDocumentLoaded() {
   const terminalLukk = document.getElementById("terminalLukk");
   const terminalContainer = document.getElementById("terminalContainer");
   const formElement = document.getElementById("sql");
-  // Venstrespalten (trestrukturen) + dra-splitteren — skjules i terminal-modus
-  // slik at terminalen får hele vinduets bredde
-  const trePanelEl = document.getElementById("trePanel");
-  const treSplitterEl = document.getElementById("treSplitter");
 
-  // Viser terminalpanelet (skjuler editor + resultat + venstrespalten) —
-  // kalles når terminal-fanen aktiveres. VIKTIG: vi skjuler bare EDITOREN,
-  // ikke hele <form> — fane-linjen ligger inne i form-elementet og må alltid
-  // være synlig slik at man kan veksle mellom SQL-faner og terminal-fanen.
-  // Trestrukturen skjules også, slik at terminalen får HELE bredden.
+  // Viser terminalpanelet (skjuler editor + resultat) — kalles når
+  // terminal-fanen aktiveres. VIKTIG: vi skjuler bare EDITOREN, ikke hele
+  // <form> — fane-linjen ligger inne i form-elementet og må alltid være
+  // synlig slik at man kan veksle mellom SQL-faner og terminal-fanen.
+  // Trestrukturen (venstrespalten) beholdes synlig.
   function visTerminalModus() {
     if (!terminalPanel) return;
     terminalPanel.style.display = "flex";
@@ -1356,13 +1352,10 @@ function handleOnDocumentLoaded() {
     if (editorContainer) editorContainer.style.display = "none";
     if (editorSplitter) editorSplitter.style.display = "none";
     if (resultatPanel) resultatPanel.style.display = "none";
-    // Gi terminalen hele bredden: skjul venstrespalten + dra-splitteren
-    if (trePanelEl) trePanelEl.style.display = "none";
-    if (treSplitterEl) treSplitterEl.style.display = "none";
     if (xtermInstans) xtermInstans.focus();
-    // Etter at panelet er synlig og bredden er endret, oppdater PTY-størrelsen
-    // (xterm har null-dimensjoner mens panelet var skjult, og kolonneantallet
-    // avhenger av den nye, bredere containeren)
+    // Etter at panelet er synlig: oppdater PTY- og xterm-størrelsen slik at
+    // terminalen bruker HELE bredden sin (xterm har null-dimensjoner mens
+    // panelet var skjult)
     setTimeout(sendTerminalResize, 120);
   }
 
@@ -1373,9 +1366,6 @@ function handleOnDocumentLoaded() {
     if (editorContainer) editorContainer.style.display = "";
     if (editorSplitter) editorSplitter.style.display = "";
     if (resultatPanel) resultatPanel.style.display = "";
-    // Vis venstrespalten igjen (trestrukturen hører til SQL-fanene)
-    if (trePanelEl) trePanelEl.style.display = "";
-    if (treSplitterEl) treSplitterEl.style.display = "";
     if (editor) editor.focus();
   }
 
