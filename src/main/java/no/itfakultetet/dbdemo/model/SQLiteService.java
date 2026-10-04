@@ -255,4 +255,45 @@ public class SQLiteService {
         }
         return indekser;
     }
+
+    /** Primær-/fremmednøkler per kolonne — Map&lt;tabell, Map&lt;kolonne, "PK"|"FK"&gt;&gt;. */
+    public java.util.Map<String, java.util.Map<String, String>> getKeys(String brukernavn, String navn)
+            throws SQLException {
+        java.util.Map<String, java.util.Map<String, String>> nokler = new java.util.LinkedHashMap<>();
+        try (Connection c = koble(brukernavn, navn);
+             Statement st = c.createStatement();
+             ResultSet tabeller = st.executeQuery(
+                     "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")) {
+            List<String> tabellNavn = new ArrayList<>();
+            while (tabeller.next()) {
+                tabellNavn.add(tabeller.getString(1));
+            }
+            for (String tabell : tabellNavn) {
+                java.util.Map<String, String> forTabell = new java.util.LinkedHashMap<>();
+                // Primærnøkkel: PRAGMA table_info gir pk > 0 for PK-kolonner
+                try (PreparedStatement ps = c.prepareStatement("PRAGMA table_info(\"" + tabell + "\")");
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        // Kolonner: cid(1), name(2), type(3), notnull(4), dflt(5), pk(6)
+                        if (rs.getInt(6) > 0) {
+                            forTabell.put(rs.getString(2), "PK");
+                        }
+                    }
+                }
+                // Fremmednøkler: PRAGMA foreign_key_list
+                try (PreparedStatement ps = c.prepareStatement("PRAGMA foreign_key_list(\"" + tabell + "\")");
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        // Kolonner: id(1), seq(2), table(3), from(4), to(5), ...
+                        String fra = rs.getString(4);
+                        if (fra != null && !forTabell.containsKey(fra)) {
+                            forTabell.put(fra, "FK");
+                        }
+                    }
+                }
+                if (!forTabell.isEmpty()) nokler.put(tabell, forTabell);
+            }
+        }
+        return nokler;
+    }
 }

@@ -117,4 +117,33 @@ public class TableListRestController {
         }
     }
 
+    /** Primær-/fremmednøkler per kolonne — vises i trestrukturen (PK/FK). */
+    @GetMapping(value = "/rest/get/keys/{rdbms_sti}/{db}")
+    public ResponseEntity<?> hentNokler(@PathVariable("rdbms_sti") String rdbms_sti,
+                                        @PathVariable("db") String database,
+                                        Authentication authentication) {
+        // SQLite: nøkler i brukerens database
+        if ("sqlite".equals(rdbms_sti)) {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            try {
+                return ResponseEntity.ok(sqliteService.getKeys(bruker, database));
+            } catch (SQLException e) {
+                return ResponseEntity.internalServerError().body("Kunne ikke hente nøkler: " + e.getMessage());
+            }
+        }
+        try {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
+            if (database == null || database.isBlank() || "Velg Database".equals(database)) {
+                return ResponseEntity.ok(java.util.Map.of());
+            }
+            return ResponseEntity.ok(dao.getKeys(conn, database));
+        } catch (SQLException e) {
+            logger.error("Kunne ikke hente nøkler fra {} ({}): {}", rdbms_sti, database, e.getMessage());
+            return ResponseEntity.internalServerError().body("Kunne ikke hente nøkler: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

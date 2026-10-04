@@ -308,6 +308,28 @@ main {
     background: transparent;
 }
 
+/* PK/FK-merke etter datatypen i en kolonne-rad (f.eks. «id (int) PK») */
+.tre-nokkel {
+    font-weight: 700;
+    font-size: 0.68rem;
+    padding: 0 3px;
+    border-radius: 3px;
+    margin-left: 2px;
+    letter-spacing: 0.2px;
+}
+
+.tre-nokkel.tre-pk {
+    background: #d8f3ea;
+    color: #0b6b52;
+    border: 1px solid #0e9f7a;
+}
+
+.tre-nokkel.tre-fk {
+    background: #e3efff;
+    color: #1c4e8a;
+    border: 1px solid #7fb2e8;
+}
+
 .tre-node.tre-valgt {
     background: var(--app-aktiv);
     color: var(--app-aktiv-tekst);

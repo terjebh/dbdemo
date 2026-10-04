@@ -538,4 +538,67 @@ public class Dao {
             }
         }
     }
+
+    /**
+     * Primær- og fremmednøkler per kolonne.
+     * Returnerer Map&lt;tabell, Map&lt;kolonnenavn, "PK"|"FK"&gt;&gt; — brukes til
+     * å merke kolonnene i trestrukturen, f.eks. «id (int) PK».
+     */
+    public java.util.Map<String, java.util.Map<String, String>> getKeys(DbConnection conn, String db)
+            throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "postgres" -> "SELECT t.relname, a.attname, "
+                    + "CASE c.contype WHEN 'p' THEN 'PK' ELSE 'FK' END "
+                    + "FROM pg_constraint c "
+                    + "JOIN pg_class t ON t.oid = c.conrelid "
+                    + "JOIN pg_namespace n ON n.oid = t.relnamespace "
+                    + "JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey) "
+                    + "WHERE c.contype IN ('p','f') "
+                    + "AND n.nspname NOT IN ('pg_catalog','information_schema')";
+            case "microsoft" -> "SELECT kcu.TABLE_NAME, kcu.COLUMN_NAME, "
+                    + "CASE tc.CONSTRAINT_TYPE WHEN 'PRIMARY KEY' THEN 'PK' ELSE 'FK' END "
+                    + "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu "
+                    + "JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc "
+                    + "ON tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
+                    + "AND tc.TABLE_CATALOG = kcu.TABLE_CATALOG "
+                    + "WHERE tc.CONSTRAINT_TYPE IN ('PRIMARY KEY','FOREIGN KEY') "
+                    + "AND kcu.TABLE_CATALOG = ?";
+            case "oracle" -> "SELECT ac.table_name, acc.column_name, "
+                    + "CASE ac.constraint_type WHEN 'P' THEN 'PK' ELSE 'FK' END "
+                    + "FROM all_constraints ac "
+                    + "JOIN all_cons_columns acc ON acc.constraint_name = ac.constraint_name "
+                    + "AND acc.owner = ac.owner "
+                    + "WHERE ac.owner = ? AND ac.constraint_type IN ('P','R')";
+            case "mysql" -> "SELECT kcu.table_name, kcu.column_name, "
+                    + "CASE tc.constraint_type WHEN 'PRIMARY KEY' THEN 'PK' ELSE 'FK' END "
+                    + "FROM information_schema.key_column_usage kcu "
+                    + "JOIN information_schema.table_constraints tc "
+                    + "ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema "
+                    + "WHERE kcu.table_schema = ? "
+                    + "AND tc.constraint_type IN ('PRIMARY KEY','FOREIGN KEY')";
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
+        };
+
+        DbConnection kobling = ("postgres".equals(rdbms) || "microsoft".equals(rdbms))
+                ? kopiMedDatabase(conn, db) : conn;
+        try (Connection c = connect(kobling);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            if ("oracle".equals(rdbms) || "mysql".equals(rdbms) || "microsoft".equals(rdbms)) {
+                ps.setString(1, db);
+            }
+            begrens(ps);
+            java.util.Map<String, java.util.Map<String, String>> nokler = new java.util.LinkedHashMap<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String tabell = rs.getString(1);
+                    String kolonne = rs.getString(2);
+                    String type = rs.getString(3);
+                    nokler.computeIfAbsent(tabell, k -> new java.util.LinkedHashMap<>())
+                            .put(kolonne, type);
+                }
+                return nokler;
+            }
+        }
+    }
 }

@@ -568,13 +568,13 @@ function handleOnDocumentLoaded() {
         ik.textContent = "▾";
         if (!lastet) {
           lastet = true;
-          // Hent kolonner + indekser parallelt og vis som to grupper:
-          //   Kolonner (N) → • kolonne (type)
+          // Hent kolonner + indekser + nøkler parallelt og vis som grupper:
+          //   Kolonner (N) → • kolonne (type) PK/FK
           //   Indekser (N) → • indeksnavn (UNIK: kol1, kol2)
-          Promise.all([hentKolonner(navn), hentIndekser(navn)])
-            .then(([kolonner, indekser]) => {
+          Promise.all([hentKolonner(navn), hentIndekser(navn), hentNokler(navn)])
+            .then(([kolonner, indekser, nokler]) => {
               barn.innerHTML = "";
-              // Kolonner
+              // Kolonner — med PK/FK-merke der kolonnen er nøkkel
               if (kolonner.length > 0) {
                 barn.appendChild(lagUnderGruppe(`Kolonner (${kolonner.length})`, "🔤"));
                 kolonner.forEach(([felt, type]) => {
@@ -585,6 +585,17 @@ function handleOnDocumentLoaded() {
                   fik.textContent = "•";
                   const flab = document.createElement("span");
                   flab.textContent = felt + "  (" + type + ")";
+                  const nokkel = nokler[felt];
+                  if (nokkel) {
+                    // PK/FK vises etter datatypen, f.eks. «id (int) PK»
+                    const fmerke = document.createElement("span");
+                    fmerke.className = "tre-nokkel " + (nokkel === "PK" ? "tre-pk" : "tre-fk");
+                    fmerke.textContent = " " + nokkel;
+                    fmerke.title = nokkel === "PK"
+                            ? "Primærnøkkel (primary key)"
+                            : "Fremmednøkkel (foreign key)";
+                    flab.appendChild(fmerke);
+                  }
                   feltNode.appendChild(fik);
                   feltNode.appendChild(flab);
                   // Dobbeltklikk på feltet → sett inn i SQL-editoren på markøren
@@ -659,6 +670,18 @@ function handleOnDocumentLoaded() {
       const ix = (data || {})[tabell];
       return Array.isArray(ix) ? ix : [];
     }).catch(() => []);
+  }
+
+  // Henter {kolonne: "PK"|"FK"} for en tabell
+  function hentNokler(tabell) {
+    const url = `/rest/get/keys/${rdbms}/${encodeURIComponent(db.value || "")}`;
+    return fetch(url).then((r) => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then((data) => {
+      const n = (data || {})[tabell];
+      return (n && typeof n === "object") ? n : {};
+    }).catch(() => ({}));
   }
 
   // Liten gruppe-overskrift inne i en tabell-nodes barneliste
