@@ -462,4 +462,80 @@ public class Dao {
             }
         }
     }
+
+    /**
+     * Lister indekser per tabell i valgt database/skjema.
+     * Returnerer Map&lt;tabell, liste av [indeksnavn, unik-tekst, kolonner]&gt;.
+     * F.eks. {"employees": [["EMP_DEPT_IX", "", "department_id"],
+     *                       ["EMP_EMAIL_UK", "UNIK", "email"]]}
+     */
+    public java.util.Map<String, List<List<String>>> getIndexes(DbConnection conn, String db) throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "postgres" -> "SELECT t.relname AS tabell, i.relname AS indeks, ix.indisunique, "
+                    + "pg_get_indexdef(ix.indexrelid) AS def "
+                    + "FROM pg_index ix "
+                    + "JOIN pg_class t ON t.oid = ix.indrelid "
+                    + "JOIN pg_class i ON i.oid = ix.indexrelid "
+                    + "JOIN pg_namespace n ON n.oid = t.relnamespace "
+                    + "WHERE n.nspname NOT IN ('pg_catalog','information_schema') "
+                    + "ORDER BY 1, 2";
+            case "microsoft" -> "SELECT t.name AS tabell, i.name AS indeks, i.is_unique, "
+                    + "STUFF((SELECT ', ' + c.name FROM sys.index_columns ic "
+                    + "JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id "
+                    + "WHERE ic.object_id = i.object_id AND ic.index_id = i.index_id "
+                    + "ORDER BY ic.key_ordinal FOR XML PATH('')), 1, 2, '') AS kolonner "
+                    + "FROM sys.indexes i JOIN sys.tables t ON t.object_id = i.object_id "
+                    + "WHERE t.is_ms_shipped = 0 ORDER BY t.name, i.name";
+            case "oracle" -> "SELECT ic.table_name, ic.index_name, "
+                    + "(SELECT CASE WHEN ix.uniqueness = 'UNIQUE' THEN 1 ELSE 0 END FROM all_indexes ix "
+                    + " WHERE ix.index_name = ic.index_name AND ix.owner = ic.index_owner) AS unik, "
+                    + "LISTAGG(ic.column_name, ', ') WITHIN GROUP (ORDER BY ic.column_position) AS kolonner "
+                    + "FROM all_ind_columns ic WHERE ic.index_owner = ? "
+                    + "GROUP BY ic.table_name, ic.index_name, ic.index_owner ORDER BY ic.table_name, ic.index_name";
+            case "mysql" -> "SELECT table_name, index_name, MAX(non_unique), "
+                    + "GROUP_CONCAT(column_name ORDER BY seq_in_index SEPARATOR ', ') "
+                    + "FROM information_schema.statistics WHERE table_schema = ? "
+                    + "GROUP BY table_name, index_name ORDER BY table_name, index_name";
+            default -> throw new IllegalArgumentException("Ukjent RDBMS: " + rdbms);
+        };
+
+        DbConnection kobling = ("postgres".equals(rdbms) || "microsoft".equals(rdbms))
+                ? kopiMedDatabase(conn, db) : conn;
+        try (Connection c = connect(kobling);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            if ("oracle".equals(rdbms) || "mysql".equals(rdbms)) {
+                ps.setString(1, db);
+            }
+            begrens(ps);
+            java.util.Map<String, List<List<String>>> indekser = new java.util.LinkedHashMap<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String tabell = rs.getString(1);
+                    String navn = rs.getString(2);
+                    boolean unik;
+                    String kolonner;
+                    if ("postgres".equals(rdbms)) {
+                        unik = rs.getBoolean(3);
+                        String def = rs.getString(4);
+                        int p1 = def == null ? -1 : def.indexOf('(');
+                        int p2 = def == null ? -1 : def.lastIndexOf(')');
+                        kolonner = (p1 >= 0 && p2 > p1) ? def.substring(p1 + 1, p2) : "";
+                    } else if ("microsoft".equals(rdbms)) {
+                        unik = rs.getBoolean(3);
+                        kolonner = rs.getString(4);
+                    } else if ("oracle".equals(rdbms)) {
+                        unik = rs.getInt(3) == 1;
+                        kolonner = rs.getString(4);
+                    } else { // mysql
+                        unik = rs.getInt(3) == 0;
+                        kolonner = rs.getString(4);
+                    }
+                    indekser.computeIfAbsent(tabell, k -> new ArrayList<>())
+                            .add(List.of(navn, unik ? "UNIK" : "", kolonner == null ? "" : kolonner));
+                }
+                return indekser;
+            }
+        }
+    }
 }

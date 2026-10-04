@@ -568,28 +568,62 @@ function handleOnDocumentLoaded() {
         ik.textContent = "▾";
         if (!lastet) {
           lastet = true;
-          hentKolonner(navn).then((kolonner) => {
-            barn.innerHTML = "";
-            kolonner.forEach(([felt, type]) => {
-              const feltNode = document.createElement("div");
-              feltNode.className = "tre-node tre-kolonne";
-              const fik = document.createElement("span");
-              fik.className = "tre-ikon";
-              fik.textContent = "•";
-              const flab = document.createElement("span");
-              flab.textContent = felt + "  (" + type + ")";
-              feltNode.appendChild(fik);
-              feltNode.appendChild(flab);
-              // Dobbeltklikk på feltet → sett inn i SQL-editoren på markøren
-              feltNode.addEventListener("dblclick", (e) => {
-                e.stopPropagation();
-                settInnIEditor(felt);
-              });
-              barn.appendChild(feltNode);
+          // Hent kolonner + indekser parallelt og vis som to grupper:
+          //   Kolonner (N) → • kolonne (type)
+          //   Indekser (N) → • indeksnavn (UNIK: kol1, kol2)
+          Promise.all([hentKolonner(navn), hentIndekser(navn)])
+            .then(([kolonner, indekser]) => {
+              barn.innerHTML = "";
+              // Kolonner
+              if (kolonner.length > 0) {
+                barn.appendChild(lagUnderGruppe(`Kolonner (${kolonner.length})`, "🔤"));
+                kolonner.forEach(([felt, type]) => {
+                  const feltNode = document.createElement("div");
+                  feltNode.className = "tre-node tre-kolonne";
+                  const fik = document.createElement("span");
+                  fik.className = "tre-ikon";
+                  fik.textContent = "•";
+                  const flab = document.createElement("span");
+                  flab.textContent = felt + "  (" + type + ")";
+                  feltNode.appendChild(fik);
+                  feltNode.appendChild(flab);
+                  // Dobbeltklikk på feltet → sett inn i SQL-editoren på markøren
+                  feltNode.addEventListener("dblclick", (e) => {
+                    e.stopPropagation();
+                    settInnIEditor(felt);
+                  });
+                  barn.appendChild(feltNode);
+                });
+              }
+              // Indekser
+              if (indekser.length > 0) {
+                barn.appendChild(lagUnderGruppe(`Indekser (${indekser.length})`, "🔑"));
+                indekser.forEach(([navnIx, unik, kolonnerIx]) => {
+                  const ixNode = document.createElement("div");
+                  ixNode.className = "tre-node tre-indeks";
+                  const iik = document.createElement("span");
+                  iik.className = "tre-ikon";
+                  iik.textContent = unik ? "🔒" : "•";
+                  const ilab = document.createElement("span");
+                  ilab.textContent = navnIx + (kolonnerIx ? "  (" + kolonnerIx + ")" : "")
+                          + (unik ? "  UNIK" : "");
+                  ixNode.title = (unik ? "Unik indeks" : "Indeks") + " på " + navnIx;
+                  ixNode.appendChild(iik);
+                  ixNode.appendChild(ilab);
+                  ixNode.addEventListener("dblclick", (e) => {
+                    e.stopPropagation();
+                    settInnIEditor(navnIx);
+                  });
+                  barn.appendChild(ixNode);
+                });
+              }
+              if (kolonner.length === 0 && indekser.length === 0) {
+                barn.textContent = "Ingen kolonner eller indekser";
+              }
+            })
+            .catch(() => {
+              barn.textContent = "Kunne ikke hente kolonner/indekser";
             });
-          }).catch(() => {
-            barn.textContent = "Kunne ikke hente kolonner";
-          });
         }
       } else {
         barn.style.display = "none";
@@ -613,6 +647,33 @@ function handleOnDocumentLoaded() {
       const k = (data || {})[tabell];
       return Array.isArray(k) ? k : [];
     });
+  }
+
+  // Henter [indeksnavn, unik, kolonner]-rader for en tabell
+  function hentIndekser(tabell) {
+    const url = `/rest/get/indexes/${rdbms}/${encodeURIComponent(db.value || "")}`;
+    return fetch(url).then((r) => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then((data) => {
+      const ix = (data || {})[tabell];
+      return Array.isArray(ix) ? ix : [];
+    }).catch(() => []);
+  }
+
+  // Liten gruppe-overskrift inne i en tabell-nodes barneliste
+  // (f.eks. «Kolonner (5)» / «Indekser (2)»)
+  function lagUnderGruppe(tekst, ikon) {
+    const rad = document.createElement("div");
+    rad.className = "tre-node tre-undergruppe";
+    const ik = document.createElement("span");
+    ik.className = "tre-ikon";
+    ik.textContent = ikon;
+    const lab = document.createElement("span");
+    lab.textContent = tekst;
+    rad.appendChild(ik);
+    rad.appendChild(lab);
+    return rad;
   }
 
   // Piltast-navigasjon i resultat-tabellen: pil opp/ned flytter en markør
@@ -1253,14 +1314,16 @@ function handleOnDocumentLoaded() {
   const formElement = document.getElementById("sql");
 
   // Viser terminalpanelet (skjuler editor + resultat) — kalles når
-  // terminal-fanen aktiveres
+  // terminal-fanen aktiveres. VIKTIG: vi skjuler bare EDITOREN, ikke hele
+  // <form> — fane-linjen ligger inne i form-elementet og må alltid være
+  // synlig slik at man kan veksle mellom SQL-faner og terminal-fanen.
   function visTerminalModus() {
     if (!terminalPanel) return;
     terminalPanel.style.display = "flex";
     terminalPanel.style.flexDirection = "column";
     terminalPanel.style.flex = "1";
     terminalPanel.style.minHeight = "0";
-    if (formElement) formElement.style.display = "none";
+    if (editorContainer) editorContainer.style.display = "none";
     if (editorSplitter) editorSplitter.style.display = "none";
     if (resultatPanel) resultatPanel.style.display = "none";
     if (xtermInstans) xtermInstans.focus();
@@ -1273,7 +1336,7 @@ function handleOnDocumentLoaded() {
   // aktiveres. Terminalen (xterm + WS) lever videre i bakgrunnen.
   function visEditorModus() {
     if (terminalPanel) terminalPanel.style.display = "none";
-    if (formElement) formElement.style.display = "";
+    if (editorContainer) editorContainer.style.display = "";
     if (editorSplitter) editorSplitter.style.display = "";
     if (resultatPanel) resultatPanel.style.display = "";
     if (editor) editor.focus();
@@ -1306,25 +1369,6 @@ function handleOnDocumentLoaded() {
       return true;
     });
 
-    // WebSocket til serveren (samme origin — krever innlogging)
-    const proto = location.protocol === "https:" ? "wss" : "ws";
-    terminalWs = new WebSocket(`${proto}://${location.host}/ws/terminal`);
-    terminalWs.onopen = () => {
-      xtermInstans.writeln("\x1b[32mTerminal klar — lokal shell i containeren.\x1b[0m");
-      xtermInstans.writeln("\x1b[33mKoble til f.eks.: ssh bruker@vert  |  psql -h vert -U bruker\x1b[0m");
-      xtermInstans.writeln("");
-      // Send terminalens faktiske størrelse → PTY-en blir like stor som
-      // vinduet (ellers er den bare skrivbar i 80×24)
-      sendTerminalResize();
-    };
-    terminalWs.onmessage = (ev) => xtermInstans.write(ev.data);
-    terminalWs.onclose = () => {
-      if (xtermInstans) xtermInstans.writeln("\r\n\x1b[31mTerminal-tilkoblingen ble lukket.\x1b[0m");
-    };
-    terminalWs.onerror = () => {
-      if (xtermInstans) xtermInstans.writeln("\r\n\x1b[31mKunne ikke koble til terminal-serveren.\x1b[0m");
-    };
-
     // Tastatur-input → WebSocket (inkl. escape-sekvenser for piler/tab)
     xtermInstans.onData((data) => {
       if (terminalWs && terminalWs.readyState === WebSocket.OPEN) {
@@ -1337,6 +1381,73 @@ function handleOnDocumentLoaded() {
         terminalWs.send(JSON.stringify({ type: "resize", cols, rows }));
       }
     });
+
+    kobleTilTerminal();
+  }
+
+  // Sender keepalive-ping til serveren så lenge terminalen er åpen. Holder
+  // WebSocket-en (og ssh-økten) våken gjennom reverse-proxyer med idle-timeout.
+  let terminalHeartbeat = null;
+  function startTerminalHeartbeat() {
+    stoppTerminalHeartbeat();
+    terminalHeartbeat = setInterval(() => {
+      if (terminalWs && terminalWs.readyState === WebSocket.OPEN) {
+        terminalWs.send(JSON.stringify({ type: "ping" }));
+      }
+    }, 30000);
+  }
+  function stoppTerminalHeartbeat() {
+    if (terminalHeartbeat) {
+      clearInterval(terminalHeartbeat);
+      terminalHeartbeat = null;
+    }
+  }
+
+  // Kobler WebSocket-en til /ws/terminal. Kalles både ved første åpning og
+  // ved automatisk gjenoppkobling hvis tilkoblingen skulle falle.
+  let terminalReconnectForsok = 0;
+  let terminalLukkes = false; // true når brukeren selv lukker terminal-fanen
+  function kobleTilTerminal() {
+    if (!xtermInstans) return;
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    terminalWs = new WebSocket(`${proto}://${location.host}/ws/terminal`);
+    terminalWs.onopen = () => {
+      const forsteOppkobling = terminalReconnectForsok === 0;
+      terminalReconnectForsok = 0;
+      if (forsteOppkobling && !terminalLukkes) {
+        xtermInstans.writeln("\x1b[32mTerminal klar — lokal shell i containeren.\x1b[0m");
+        xtermInstans.writeln("\x1b[33mKoble til f.eks.: ssh bruker@vert  |  psql -h vert -U bruker\x1b[0m");
+        xtermInstans.writeln("");
+      }
+      // Send terminalens faktiske størrelse → PTY-en blir like stor som
+      // vinduet (ellers er den bare skrivbar i 80×24)
+      sendTerminalResize();
+      startTerminalHeartbeat();
+    };
+    terminalWs.onmessage = (ev) => {
+      // Ignorer keepalive-svar (pong) — skal ikke vises i terminalen
+      if (ev.data === '{"type":"pong"}') return;
+      if (xtermInstans) xtermInstans.write(ev.data);
+    };
+    terminalWs.onclose = () => {
+      stoppTerminalHeartbeat();
+      if (terminalLukkes || !xtermInstans) return;
+      xtermInstans.writeln("\r\n\x1b[31mTerminal-tilkoblingen ble lukket.\x1b[0m");
+      // Automatisk gjenoppkobling — en ssh-økt i den gamle shell-en er tapt,
+      // men brukeren slipper å lukke/åpne terminal-fanen manuelt.
+      if (terminalReconnectForsok < 3) {
+        terminalReconnectForsok++;
+        xtermInstans.writeln(`\x1b[33mKobler til på nytt (forsøk ${terminalReconnectForsok}/3) …\x1b[0m`);
+        setTimeout(() => {
+          if (!terminalLukkes && xtermInstans) kobleTilTerminal();
+        }, 2000);
+      } else {
+        xtermInstans.writeln("\x1b[31mGa opp gjenoppkobling — lukk og åpne terminal-fanen på nytt.\x1b[0m");
+      }
+    };
+    terminalWs.onerror = () => {
+      if (xtermInstans) xtermInstans.writeln("\r\n\x1b[31mKunne ikke koble til terminal-serveren.\x1b[0m");
+    };
   }
 
   function sendTerminalResize() {
@@ -1354,6 +1465,8 @@ function handleOnDocumentLoaded() {
   // Lukker terminalen helt (kalles når terminal-fanen lukkes) — xterm +
   // WebSocket ryddes; neste åpning starter en fersk terminal
   function lukkTerminal() {
+    terminalLukkes = true; // hindre automatisk gjenoppkobling
+    stoppTerminalHeartbeat();
     if (terminalWs) {
       terminalWs.close();
       terminalWs = null;
@@ -1364,6 +1477,7 @@ function handleOnDocumentLoaded() {
     }
     if (terminalContainer) terminalContainer.innerHTML = "";
     terminalFaneId = null;
+    terminalReconnectForsok = 0;
     visEditorModus();
   }
 
@@ -1386,6 +1500,8 @@ function handleOnDocumentLoaded() {
     faneTyper[id] = "terminal";
     terminalFaneId = id;
     aktivFaneId = id;
+    terminalLukkes = false; // ny terminal-fane: tillat gjenoppkobling
+    terminalReconnectForsok = 0;
     opprettTerminal();
     renderFaner();
     visTerminalModus();

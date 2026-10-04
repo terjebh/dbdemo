@@ -215,4 +215,44 @@ public class SQLiteService {
         }
         return kolonner;
     }
+
+    /** Lister indekser per tabell — Map&lt;tabell, liste av [navn, unik, kolonner]&gt;. */
+    public java.util.Map<String, List<List<String>>> getIndexes(String brukernavn, String navn) throws SQLException {
+        java.util.Map<String, List<List<String>>> indekser = new java.util.LinkedHashMap<>();
+        try (Connection c = koble(brukernavn, navn);
+             Statement st = c.createStatement();
+             ResultSet tabeller = st.executeQuery(
+                     "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")) {
+            List<String> tabellNavn = new ArrayList<>();
+            while (tabeller.next()) {
+                tabellNavn.add(tabeller.getString(1));
+            }
+            for (String tabell : tabellNavn) {
+                List<List<String>> forTabell = new ArrayList<>();
+                try (PreparedStatement ps = c.prepareStatement("PRAGMA index_list(\"" + tabell + "\")");
+                     ResultSet rs = ps.executeQuery()) {
+                    List<String[]> liste = new ArrayList<>(); // [navn, unik]
+                    while (rs.next()) {
+                        // Kolonner: seq(1), name(2), unique(3), origin(4), partial(5)
+                        String indeksNavn = rs.getString(2);
+                        boolean unik = rs.getInt(3) == 1;
+                        liste.add(new String[]{indeksNavn, unik ? "UNIK" : ""});
+                    }
+                    for (String[] ix : liste) {
+                        StringBuilder kolonner = new StringBuilder();
+                        try (PreparedStatement ps2 = c.prepareStatement("PRAGMA index_info(\"" + ix[0] + "\")");
+                             ResultSet rs2 = ps2.executeQuery()) {
+                            while (rs2.next()) {
+                                if (kolonner.length() > 0) kolonner.append(", ");
+                                kolonner.append(rs2.getString(3)); // name
+                            }
+                        }
+                        forTabell.add(List.of(ix[0], ix[1], kolonner.toString()));
+                    }
+                }
+                if (!forTabell.isEmpty()) indekser.put(tabell, forTabell);
+            }
+        }
+        return indekser;
+    }
 }

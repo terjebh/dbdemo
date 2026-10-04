@@ -39,6 +39,20 @@ public class TerminalWebSocketHandler implements WebSocketHandler {
         String bruker = auth == null ? "anonym" : auth.getName();
         logger.info("Terminal koblet til: {} (sesjon {})", bruker, session.getId());
 
+        // Ingen idle-timeout: terminalen skal kunne stå åpen i timer (f.eks.
+        // en ssh-økt) uten at Tomcat lukker WebSocket-en. Klienten holder den
+        // i tillegg våken med en ping hvert 30. sekund (select.js) slik at
+        // også reverse-proxyen ser trafikk. Castet er guards mot ikke-nativa
+        // sesjoner (f.eks. i tester).
+        try {
+            if (session instanceof org.springframework.web.socket.adapter.standard.StandardWebSocketSession sws
+                    && sws.getNativeSession() != null) {
+                sws.getNativeSession().setMaxIdleTimeout(0); // 0 = ingen timeout
+            }
+        } catch (Exception e) {
+            logger.debug("Kunne ikke sette idle-timeout: {}", e.getMessage());
+        }
+
         // script -qefc gir en pseudo-TTY (nødvendig for ssh/psql-prompt)
         ProcessBuilder pb = new ProcessBuilder("script", "-qefc", "bash", "/dev/null");
         pb.redirectErrorStream(true);
@@ -91,6 +105,18 @@ public class TerminalWebSocketHandler implements WebSocketHandler {
             return;
         }
         String tekst = message.getPayload().toString();
+        // Keepalive-ping fra klienten: hold WebSocket-en (og dermed ssh-økten)
+        // våken uten å sende noe til skallet. Svarer med pong.
+        if (tekst.startsWith("{\"type\":\"ping\"")) {
+            try {
+                if (session.isOpen()) {
+                    session.sendMessage(new TextMessage("{\"type\":\"pong\"}"));
+                }
+            } catch (IOException e) {
+                logger.debug("Kunne ikke svare på ping: {}", e.getMessage());
+            }
+            return;
+        }
         // Resize-meldinger fra xterm.js: {type:"resize",cols,rows} — endrer
         // PTY-størrelsen via stty, slik at terminalen er skrivbar i HELE
         // vinduet (uten dette blir PTY-en stående på 80×24).

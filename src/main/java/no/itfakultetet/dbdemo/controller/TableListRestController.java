@@ -88,4 +88,33 @@ public class TableListRestController {
         }
     }
 
+    /** Indekser per tabell — vises i trestrukturen. */
+    @GetMapping(value = "/rest/get/indexes/{rdbms_sti}/{db}")
+    public ResponseEntity<?> hentIndekser(@PathVariable("rdbms_sti") String rdbms_sti,
+                                          @PathVariable("db") String database,
+                                          Authentication authentication) {
+        // SQLite: indekser i brukerens database
+        if ("sqlite".equals(rdbms_sti)) {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            try {
+                return ResponseEntity.ok(sqliteService.getIndexes(bruker, database));
+            } catch (SQLException e) {
+                return ResponseEntity.internalServerError().body("Kunne ikke hente indekser: " + e.getMessage());
+            }
+        }
+        try {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
+            if (database == null || database.isBlank() || "Velg Database".equals(database)) {
+                return ResponseEntity.ok(java.util.Map.of());
+            }
+            return ResponseEntity.ok(dao.getIndexes(conn, database));
+        } catch (SQLException e) {
+            logger.error("Kunne ikke hente indekser fra {} ({}): {}", rdbms_sti, database, e.getMessage());
+            return ResponseEntity.internalServerError().body("Kunne ikke hente indekser: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
