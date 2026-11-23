@@ -23,6 +23,13 @@ public class TableListRestController {
     private final ConnectionHelper connectionHelper;
     private final SQLiteService sqliteService;
 
+    /**
+     * Cache over reserverte ord per RDBMS. Lista endrer seg bare ved
+     * databaseoppgradering, så den hentes én gang per system og gjenbrukes.
+     */
+    private final java.util.Map<String, java.util.Set<String>> reserverteOrdCache =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
     public TableListRestController(Dao dao, ConnectionHelper connectionHelper, SQLiteService sqliteService) {
         this.dao = dao;
         this.connectionHelper = connectionHelper;
@@ -114,6 +121,39 @@ public class TableListRestController {
             return ResponseEntity.internalServerError().body("Kunne ikke hente indekser: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * Reserverte ord/funksjonsnavn for RDBMS-et. Frontend bruker lista til å
+     * sette anførselstegn rundt kolonnenavn som ellers gir syntaksfeil
+     * (f.eks. «to_date» i MariaDB 12). Cachet per system.
+     */
+    @GetMapping(value = "/rest/get/reserved/{rdbms_sti}")
+    public ResponseEntity<?> hentReserverteOrd(@PathVariable("rdbms_sti") String rdbms_sti,
+                                               Authentication authentication) {
+        java.util.Set<String> cachet = reserverteOrdCache.get(rdbms_sti);
+        if (cachet != null) {
+            return ResponseEntity.ok(cachet);
+        }
+        // SQLite og systemer uten katalogoppslag: statisk reserve-liste
+        if ("sqlite".equals(rdbms_sti)) {
+            java.util.Set<String> ord = dao.getReservedWordsFor("sqlite");
+            reserverteOrdCache.put(rdbms_sti, ord);
+            return ResponseEntity.ok(ord);
+        }
+        try {
+            String bruker = authentication == null ? "anonym" : authentication.getName();
+            DbConnection conn = connectionHelper.hentEllerFeil(rdbms_sti, bruker);
+            java.util.Set<String> ord = dao.getReservedWords(conn);
+            reserverteOrdCache.put(rdbms_sti, ord);
+            return ResponseEntity.ok(ord);
+        } catch (SQLException | RuntimeException e) {
+            logger.warn("Kunne ikke hente reserverte ord for {}: {}", rdbms_sti, e.getMessage());
+            // Fall tilbake til den statiske lista — escaping virker fortsatt
+            java.util.Set<String> ord = dao.getReservedWordsFor(rdbms_sti);
+            reserverteOrdCache.put(rdbms_sti, ord);
+            return ResponseEntity.ok(ord);
         }
     }
 

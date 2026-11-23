@@ -372,6 +372,9 @@ function handleOnDocumentLoaded() {
 
   function byggTre() {
     tre.innerHTML = "";
+    // Sørg for at lista over reserverte ord er lastet (brukes når kolonnenavn
+    // settes inn i editoren — se settInnIEditor)
+    forberedReserverteOrd();
     // Rot: databasesystemet
     const rotNode = lagNode({
       tekst: SYSTEMNAVN[rdbms] || rdbms,
@@ -729,11 +732,44 @@ function handleOnDocumentLoaded() {
     tabell.tabIndex = 0;
   }
 
+  // Reserverte ord/funksjonsnavn per RDBMS — hentes én gang fra serveren og
+  // caches. Brukes for å avgjøre om et kolonnenavn må omsluttes av
+  // anførselstegn (f.eks. «to_date», som ble en funksjon i MariaDB 12).
+  const reserverteOrdPerRdbms = {};
+  function forberedReserverteOrd() {
+    if (reserverteOrdPerRdbms[rdbms]) return;
+    fetch(`/rest/get/reserved/${rdbms}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((liste) => {
+        const sett = new Set(
+          (Array.isArray(liste) ? liste : []).map((o) => String(o).toLowerCase())
+        );
+        reserverteOrdPerRdbms[rdbms] = sett;
+      })
+      .catch(() => {
+        reserverteOrdPerRdbms[rdbms] = new Set();
+      });
+  }
+
   // Setter inn navnet (tabell/felt) i editoren på markørens posisjon.
-  // Hvis navnet består av flere ord eller inneholder punktum, omsluttes
-  // det med doble anførselstegn ("…") slik at SQL-en blir gyldig.
+  // Navn som er reserverte ord/funksjoner (f.eks. to_date i MariaDB 12), eller
+  // som inneholder spesialtegn/mellomrom, omsluttes med riktig anførselstegn
+  // for systemet: `…` (MySQL/MariaDB), "…" (PostgreSQL/Oracle/SQLite), […] (MSSQL).
   function settInnIEditor(navn) {
-    const inn = /[\s.]/.test(navn) ? '"' + navn + '"' : navn;
+    const reserverte = reserverteOrdPerRdbms[rdbms];
+    const enkelIdentifikator = /^[A-Za-z_][A-Za-z0-9_]*$/.test(navn);
+    const maaEscapes = !enkelIdentifikator
+      || (reserverte && reserverte.has(navn.toLowerCase()));
+    let inn = navn;
+    if (maaEscapes) {
+      if (rdbms === "mysql") {
+        inn = "`" + navn + "`";
+      } else if (rdbms === "microsoft") {
+        inn = "[" + navn + "]";
+      } else {
+        inn = '"' + navn + '"';
+      }
+    }
     const cursor = editor.state.selection.main.head;
     editor.dispatch({
       changes: { from: cursor, insert: inn },

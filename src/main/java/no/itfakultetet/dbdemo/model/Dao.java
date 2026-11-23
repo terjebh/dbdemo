@@ -609,4 +609,61 @@ public class Dao {
             }
         }
     }
+
+    /**
+     * Reserverte ord og funksjonsnavn for RDBMS-et, med små bokstaver.
+     * Brukes til å escape kolonnenavn som kolliderer med nøkkelord/funksjoner
+     * — f.eks. «to_date», som ble et funksjonsnavn i MariaDB 12 og derfor
+     * gir syntaksfeil hvis det skrives uten anførselstegn.
+     */
+    public java.util.Set<String> getReservedWords(DbConnection conn) throws SQLException {
+        String rdbms = conn.getRdbms();
+        String sql = switch (rdbms) {
+            case "mysql" -> "SELECT WORD FROM information_schema.KEYWORDS";
+            case "postgres" -> "SELECT word FROM pg_get_keywords()";
+            default -> null; // statisk liste under
+        };
+        if (sql == null) {
+            return statiskeReserverteOrd();
+        }
+        java.util.Set<String> ord = new java.util.HashSet<>();
+        try (Connection c = connect(conn);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            begrens(ps);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String w = rs.getString(1);
+                    if (w != null && !w.isBlank()) {
+                        ord.add(w.toLowerCase(java.util.Locale.ROOT));
+                    }
+                }
+            }
+        }
+        // Funksjonsnavn som MariaDB godtar uten parenteser er også «farlige»
+        ord.addAll(statiskeReserverteOrd());
+        return ord;
+    }
+
+    /** Reserve-liste for RDBMS-er uten katalog over nøkkelord (MSSQL/Oracle/SQLite). */
+    public java.util.Set<String> getReservedWordsFor(String rdbms) {
+        return statiskeReserverteOrd();
+    }
+
+    private java.util.Set<String> statiskeReserverteOrd() {
+        return new java.util.HashSet<>(java.util.List.of(
+                "add", "all", "alter", "and", "any", "as", "asc", "between", "by", "case",
+                "check", "column", "constraint", "create", "cross", "current_date",
+                "current_time", "current_timestamp", "database", "date", "day", "default",
+                "delete", "desc", "distinct", "drop", "else", "end", "exists", "false",
+                "fetch", "for", "foreign", "from", "full", "group", "having", "hour", "in",
+                "index", "inner", "insert", "interval", "into", "is", "join", "key",
+                "language", "left", "level", "like", "limit", "match", "minute", "mode",
+                "month", "natural", "not", "null", "offset", "on", "or", "order", "outer",
+                "primary", "rank", "references", "right", "role", "rollback", "row",
+                "row_number", "second", "select", "session", "set", "size", "status",
+                "system", "table", "then", "time", "timestamp", "to", "to_char", "to_date",
+                "to_number", "top", "transaction", "true", "type", "union", "unique",
+                "update", "user", "using", "value", "values", "when", "where", "with",
+                "year", "commit", "begin"));
+    }
 }
